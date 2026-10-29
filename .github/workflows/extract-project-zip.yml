@@ -1,40 +1,37 @@
-name: Extract uploaded project ZIP
+name: Build LahmPOS Android APK
 
 on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  extract:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
+      - name: Check out LahmPOS source branch
         uses: actions/checkout@v4
         with:
-          persist-credentials: true
+          ref: lahmpos-source
 
-      - name: Extract project into repository root
-        shell: bash
-        run: |
-          set -euo pipefail
-          ZIP="PuntroSales-Demo-master.zip"
-          test -f "$ZIP" || { echo "ZIP file not found: $ZIP"; exit 1; }
-          mkdir -p /tmp/project-zip
-          unzip -q "$ZIP" -d /tmp/project-zip
-          SOURCE_DIR="$(find /tmp/project-zip -mindepth 1 -maxdepth 1 -type d | head -n 1)"
-          test -n "$SOURCE_DIR" || { echo "No project folder found inside ZIP"; exit 1; }
-          cp -a "$SOURCE_DIR"/. .
-          # Remove workflows bundled inside the source ZIP; this token cannot push new workflow files.
-          find .github/workflows -type f ! -name "extract-project-zip.yml" -delete
-          rm "$ZIP"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          if git diff --cached --quiet; then
-            echo "No extracted changes to commit."
-          else
-            git commit -m "Extract Android POS project from ZIP"
-            git push
-          fi
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build debug APK
+        run: gradle -p LahmPOS assembleDebug --stacktrace
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: LahmPOS-debug-APK
+          path: LahmPOS/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
