@@ -1,0 +1,38 @@
+name: Extract uploaded project ZIP
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Extract project into repository root
+        shell: bash
+        run: |
+          set -euo pipefail
+          ZIP="PuntroSales-Demo-master.zip"
+          test -f "$ZIP" || { echo "ZIP file not found: $ZIP"; exit 1; }
+          mkdir -p /tmp/project-zip
+          unzip -q "$ZIP" -d /tmp/project-zip
+          SOURCE_DIR="$(find /tmp/project-zip -mindepth 1 -maxdepth 1 -type d | head -n 1)"
+          test -n "$SOURCE_DIR" || { echo "No project folder found inside ZIP"; exit 1; }
+          cp -a "$SOURCE_DIR"/. .
+          rm "$ZIP"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No extracted changes to commit."
+          else
+            git commit -m "Extract Android POS project from ZIP"
+            git push
+          fi
