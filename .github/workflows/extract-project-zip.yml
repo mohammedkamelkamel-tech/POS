@@ -26,6 +26,8 @@ jobs:
           SOURCE_DIR="$(find /tmp/project-zip -mindepth 1 -maxdepth 1 -type d | head -n 1)"
           test -n "$SOURCE_DIR" || { echo "No project folder found inside ZIP"; exit 1; }
           cp -a "$SOURCE_DIR"/. .
+          # Avoid pushing bundled workflow files; the automation token lacks workflow-write permission.
+          rm -f .github/workflows/android.yml
           rm "$ZIP"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
