@@ -20,7 +20,7 @@ import {
   buildProductSheet,
   buildTemplateSheet,
   parseProductRows,
-  type ImportResult,
+  type استيرادtResult,
   type ParseResult,
 } from '@/services/products/productIo'
 
@@ -36,7 +36,7 @@ const busyExport = ref(false)
 const error = ref('')
 const fileName = ref('')
 const parsed = ref<ParseResult | null>(null)
-const result = ref<ImportResult | null>(null)
+const result = ref<استيرادtResult | null>(null)
 const progress = ref(0)
 
 watch(
@@ -68,14 +68,14 @@ async function runExport(format: 'xlsx' | 'csv') {
   try {
     const sheet = buildProductSheet(products.items, categories.items)
     if (!sheet.rows.length) {
-      error.value = 'Belum ada produk untuk diekspor.'
+      error.value = 'لا يوجد بعد produk untuk diekspor.'
       return
     }
     const name = `produk-${dayKey(Date.now())}.${format}`
     if (format === 'csv') await exportCsv(name, sheet)
     else await exportXlsx(name, [sheet])
   } catch (e) {
-    error.value = e instanceof Error ? e.message : 'Gagal mengekspor.'
+    error.value = e instanceof Error ? e.message : 'فشل mengekspor.'
   } finally {
     busyExport.value = false
   }
@@ -88,7 +88,7 @@ async function downloadTemplate() {
   try {
     await exportXlsx('template-produk.xlsx', [buildTemplateSheet()])
   } catch (e) {
-    error.value = e instanceof Error ? e.message : 'Gagal membuat template.'
+    error.value = e instanceof Error ? e.message : 'فشل membuat template.'
   } finally {
     busyExport.value = false
   }
@@ -100,7 +100,7 @@ const ACCEPTED_EXTS = ['.csv', '.xlsx']
 async function chooseFile() {
   error.value = ''
   const file = await pickDataFile(ACCEPTED_EXTS)
-  // null = user menekan Batal → diam saja, bukan error.
+  // null = user menekan إلغاء → diam saja, bukan error.
   if (!file) return
   const name = file.name.toLowerCase()
   if (!ACCEPTED_EXTS.some((ext) => name.endsWith(ext))) {
@@ -122,7 +122,7 @@ async function chooseFile() {
     }
     stage.value = 'preview'
   } catch (e) {
-    error.value = e instanceof Error ? e.message : 'Gagal membaca file.'
+    error.value = e instanceof Error ? e.message : 'فشل membaca file.'
     stage.value = 'idle'
   }
 }
@@ -134,14 +134,14 @@ async function runاستيرادt() {
   progress.value = 0
   error.value = ''
   try {
-    result.value = await products.bulkImport(p.rows, (done, total) => {
+    result.value = await products.bulkاستيرادt(p.rows, (done, total) => {
       progress.value = total ? Math.round((done / total) * 100) : 100
     })
     // استيراد bisa bikin kategori baru → daftar kategori di halaman ikut segar.
     await categories.load()
     stage.value = 'done'
   } catch (e) {
-    error.value = e instanceof Error ? e.message : 'Gagal mengimpor.'
+    error.value = e instanceof Error ? e.message : 'فشل mengimpor.'
     stage.value = 'preview'
   }
 }
@@ -212,7 +212,7 @@ async function runاستيرادt() {
             </ul>
           </div>
           <div class="flex gap-2">
-            <Button variant="outline" class="flex-1" @click="reset">Batal</Button>
+            <Button variant="outline" class="flex-1" @click="reset">إلغاء</Button>
             <Button class="flex-1" :disabled="!parsed.rows.length" @click="runاستيرادt">
               استيراد {{ parsed.rows.length }} Baris
             </Button>
