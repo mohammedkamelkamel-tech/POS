@@ -30,7 +30,7 @@ const menu = [
   { to: '/pos', label: 'الكاشير', desc: 'بدء عملية بيع', icon: ShoppingCart },
   { to: '/products', label: 'المنتجات', desc: 'إدارة المنتجات', icon: Package },
   { to: '/transactions', label: 'المبيعات', desc: 'سجل المبيعات', icon: Receipt },
-  { to: '/الحركة المالية', label: 'الحركة المالية', desc: 'الإيرادات والمصروفات', icon: Wallet },
+  { to: '/cashflow', label: 'الحركة المالية', desc: 'الإيرادات والمصروفات', icon: Wallet },
   { to: '/reports', label: 'التقارير', desc: 'ملخص المبيعات والرسوم البيانية', icon: BarChart3 },
   { to: '/cashier', label: 'جلسة الكاشير', desc: 'فتح وإغلاق جلسة الكاشير', icon: CalendarClock },
   { to: '/printer', label: 'الطابعة', desc: 'طباعة الفاتورة', icon: Printer },
