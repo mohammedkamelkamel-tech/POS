@@ -21,6 +21,8 @@ import { useSettingsStore } from '@/stores/settings'
 const settings = useSettingsStore()
 const auth = useAuthStore()
 const visibleMenu = computed(() => auth.isOwner ? menu : menu.filter(item => item.to === '/pos'))
+const ownerAccessRoute = computed(() => settings.hasPin ? '/owner-unlock' : '/owner-setup')
+const ownerAccessLabel = computed(() => settings.hasPin ? 'دخول المالك' : 'إعداد حساب المالك')
 const { storeName, storeOwner } = storeToRefs(settings)
 
 const menu = [
@@ -58,6 +60,15 @@ const menu = [
           </p>
         </div>
       </div>
+
+      <RouterLink
+        v-if="!auth.isOwner"
+        :to="ownerAccessRoute"
+        class="mt-5 flex items-center justify-center gap-2 rounded-xl border border-white/30 bg-white/15 px-4 py-3 text-sm font-semibold text-white backdrop-blur"
+      >
+        <UserCog class="size-5" />
+        {{ ownerAccessLabel }}
+      </RouterLink>
 
       <!-- لافتة الربط مع الكامل برو -->
       <RouterLink
