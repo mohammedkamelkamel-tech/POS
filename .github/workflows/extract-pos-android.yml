@@ -1,0 +1,42 @@
+name: Extract POS Android project
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "pos-android-master.zip"
+      - ".github/workflows/extract-pos-android.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Extract project ZIP
+        run: |
+          test -f pos-android-master.zip
+          mkdir -p pos-android
+          unzip -oq pos-android-master.zip -d /tmp/pos-source
+          SOURCE_DIR="$(find /tmp/pos-source -mindepth 1 -maxdepth 1 -type d | head -n 1)"
+          test -n "$SOURCE_DIR"
+          cp -a "$SOURCE_DIR"/. pos-android/
+          test -n "$(find pos-android -mindepth 1 -maxdepth 1 -print -quit)"
+
+      - name: Commit extracted project
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pos-android
+          if git diff --cached --quiet; then
+            echo "No extracted source changes to commit."
+          else
+            git commit -m "Extract POS Android project source"
+            git push origin HEAD:main
+          fi
