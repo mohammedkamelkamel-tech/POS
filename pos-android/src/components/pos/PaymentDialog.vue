@@ -125,7 +125,7 @@ function confirm() {
       <!-- Input tunai -->
       <template v-if="method === 'cash'">
         <div class="space-y-2">
-          <p class="text-xs font-medium text-muted-foreground">Uang diterima</p>
+          <p class="text-xs font-medium text-muted-foreground">المبلغ المستلم</p>
           <MoneyInput v-model="paid" class="h-12 text-lg font-semibold" />
           <div class="grid grid-cols-3 gap-2">
             <button
@@ -136,7 +136,7 @@ function confirm() {
               :class="paid === amt ? 'border-primary bg-primary/5 text-primary' : 'text-foreground'"
               @click="paid = amt"
             >
-              {{ amt === total ? 'المبلغ exact' : formatRupiah(amt) }}
+              {{ amt === total ? 'المبلغ بالكامل' : formatRupiah(amt) }}
             </button>
           </div>
         </div>
@@ -181,7 +181,7 @@ function confirm() {
       </div>
       <Button v-else class="h-12 w-full gap-2 text-base" :disabled="!canConfirm" @click="confirm">
         <Loader2 v-if="busy" class="size-4 animate-spin" />
-        {{ busy ? 'جارٍ المعالجة…' : 'Selesaikan الدفع' }}
+        {{ busy ? 'جارٍ المعالجة…' : 'إتمام الدفع' }}
       </Button>
     </div>
   </BottomSheet>
