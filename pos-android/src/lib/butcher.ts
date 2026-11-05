@@ -9,7 +9,8 @@ export const MEAL_PORTIONS: ReadonlyArray<{ units: MealPortion; label: string }>
 
 /** Calculate a portion price from the full-person price using integer arithmetic. */
 export function mealPortionPrice(fullPersonPrice: number, portion: MealPortion): number {
-  if (!Number.isSafeInteger(portion) || portion < 1 || portion > 40) throw new RangeError('عدد الأنفار غير صحيح')\n  if (!Number.isSafeInteger(fullPersonPrice) || fullPersonPrice < 0) throw new RangeError('سعر النفر يجب أن يكون مبلغاً صحيحاً غير سالب');
+  if (!Number.isSafeInteger(portion) || portion < 1 || portion > 40) throw new RangeError('عدد الأنفار غير صحيح')
+  if (!Number.isSafeInteger(fullPersonPrice) || fullPersonPrice < 0) throw new RangeError('سعر النفر يجب أن يكون مبلغاً صحيحاً غير سالب');
   const result = Math.round((fullPersonPrice * portion) / 4)
   if (!Number.isSafeInteger(result)) throw new RangeError('قيمة الوجبة أكبر من المسموح')
   return result;
