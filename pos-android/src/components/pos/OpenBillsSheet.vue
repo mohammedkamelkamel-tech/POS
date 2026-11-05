@@ -53,7 +53,7 @@ function discard(bill: Sale) {
         v-if="cartHasLines"
         class="rounded-xl border border-warning/30 bg-warning/10 p-3 text-xs leading-relaxed text-warning-foreground"
       >
-        Kosongkan atau tahan keranjang aktif terlebih dahulu sebelum melanjutkan فاتورة معلقة lain.
+        أفرغ السلة الحالية أو علّق الطلب قبل استكمال فاتورة معلقة أخرى.
       </p>
 
       <div
@@ -114,7 +114,7 @@ function discard(bill: Sale) {
         </div>
         <p class="text-sm font-semibold">لا توجد فواتير معلّقة بعد</p>
         <p class="max-w-64 text-xs leading-relaxed text-muted-foreground">
-          Tahan pesanan dari keranjang untuk melanjutkannya nanti.
+          علّق الطلب من السلة لتتمكن من استكماله لاحقاً.
         </p>
       </div>
     </div>
