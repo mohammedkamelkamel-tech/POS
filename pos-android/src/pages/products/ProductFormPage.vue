@@ -60,6 +60,14 @@ const trackStock = computed({
   get: () => form.track_stock === 1,
   set: (v: boolean) => (form.track_stock = v ? 1 : 0),
 })
+const selectedCategoryName = computed(() =>
+  categories.items.find((category) => category.id === form.category_id)?.name ?? '',
+)
+const priceLabel = computed(() =>
+  ['اللحوم', 'الكبد'].includes(selectedCategoryName.value) ? 'سعر الكيلو' :
+  selectedCategoryName.value === 'الوجبات' ? 'سعر النفر الكامل' : 'سعر البيع',
+)
+
 const isActive = computed({
   get: () => form.active === 1,
   set: (v: boolean) => (form.active = v ? 1 : 0),
@@ -254,7 +262,7 @@ async function remove() {
 
       <div class="space-y-1.5">
         <Label for="name">Nama Produk <span class="text-destructive">*</span></Label>
-        <Input id="name" v-model="form.name" placeholder="mis. Bolu Coklat" />
+        <Input id="name" v-model="form.name" placeholder="مثال: لحم بلدي" />
       </div>
 
       <div class="space-y-1.5">
@@ -273,11 +281,11 @@ async function remove() {
 
       <div class="grid grid-cols-2 gap-3">
         <div class="space-y-1.5">
-          <Label>Harga Jual</Label>
+          <Label>{{ priceLabel }}</Label>
           <MoneyInput v-model="form.price" />
         </div>
         <div class="space-y-1.5">
-          <Label>Harga Modal</Label>
+          <Label>سعر التكلفة</Label>
           <MoneyInput v-model="form.cost" />
         </div>
       </div>
