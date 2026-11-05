@@ -18,7 +18,7 @@ const media = useMediaStore()
   <div class="divide-y divide-border">
     <div
       v-for="l in cart.lines"
-      :key="l.productId"
+      :key="l.cartKey"
       class="flex items-center gap-3"
       :class="rowClass"
     >
@@ -38,7 +38,7 @@ const media = useMediaStore()
       <div class="flex items-center gap-2">
         <button
           class="flex size-8 items-center justify-center rounded-full border border-border text-foreground active:scale-95"
-          @click="cart.dec(l.productId)"
+          @click="cart.dec(l.cartKey)"
         >
           <component :is="l.qty <= 1 ? Trash2 : Minus" class="size-4" :class="l.qty <= 1 ? 'text-destructive' : ''" />
         </button>
@@ -46,7 +46,7 @@ const media = useMediaStore()
         <button
           class="flex size-8 items-center justify-center rounded-full border border-border text-foreground disabled:opacity-40 active:scale-95"
           :disabled="l.qty >= cart.maxQty(l)"
-          @click="cart.inc(l.productId)"
+          @click="cart.inc(l.cartKey)"
         >
           <Plus class="size-4" />
         </button>
