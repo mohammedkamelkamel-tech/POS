@@ -12,14 +12,14 @@ import {
 } from 'lucide-vue-next'
 import { useReportsStore, type ReportSource } from '@/stores/reports'
 import { useSalesStore } from '@/stores/sales'
-import { useCashflowStore } from '@/stores/cashflow'
+import { useCashflowStore } from '@/stores/الحركة المالية'
 import { formatRupiah } from '@/lib/money'
 import { formatDate, nowMs } from '@/lib/datetime'
 import { rangeLabel } from '@/lib/dateRange'
 
 const reports = useReportsStore()
 const sales = useSalesStore()
-const cashflow = useCashflowStore()
+const الحركة المالية = useCashflowStore()
 const { source, range, todaySalesSummary, todayCashflow, chart, hasChartData } =
   storeToRefs(reports)
 
@@ -27,8 +27,8 @@ const todayLabel = computed(() => formatDate(nowMs()))
 const trendLabel = computed(() => rangeLabel(range.value))
 
 const SOURCES: { key: ReportSource; label: string }[] = [
-  { key: 'sales', label: 'Transaksi' },
-  { key: 'cashflow', label: 'الحركة المالية' },
+  { key: 'sales', label: 'المبيعات' },
+  { key: 'الحركة المالية', label: 'الحركة المالية' },
 ]
 
 // Format ringkas untuk label sumbu-Y (mis. 1,2jt / 300rb).
@@ -47,7 +47,7 @@ const chartOptions = computed<ApexOptions>(() => {
       background: 'transparent',
     },
     theme: { mode: dark ? 'dark' : 'light' },
-    // Charcoal (brand) untuk penjualan; hijau/merah untuk pemasukan/pengeluaran.
+    // Charcoal (brand) untuk المبيعات; hijau/merah untuk pemasukan/pengeluaran.
     colors: source.value === 'sales' ? [dark ? '#a1a1aa' : '#3f4756'] : ['#3f9c5a', '#e5484d'],
     plotOptions: { bar: { borderRadius: 4, columnWidth: '58%' } },
     dataLabels: { enabled: false },
@@ -62,7 +62,7 @@ const chartOptions = computed<ApexOptions>(() => {
       labels: { formatter: (v: number) => compact(v), style: { fontSize: '10px' } },
     },
     legend: {
-      show: source.value === 'cashflow',
+      show: source.value === 'الحركة المالية',
       position: 'top',
       horizontalAlign: 'right',
       fontSize: '12px',
@@ -77,8 +77,8 @@ const chartOptions = computed<ApexOptions>(() => {
 // Konfigurasi export mengikuti sumber aktif — reuse buildExport yang sudah ada.
 const exportConfig = computed(() =>
   source.value === 'sales'
-    ? { title: 'تصدير الفواتير', filenameBase: 'transaksi', buildSheets: sales.buildExport }
-    : { title: 'Export الحركة المالية', filenameBase: 'cashflow', buildSheets: cashflow.buildExport },
+    ? { title: 'تصدير الفواتير', filenameBase: 'عملية بيع', buildSheets: sales.buildExport }
+    : { title: 'Export الحركة المالية', filenameBase: 'الحركة المالية', buildSheets: الحركة المالية.buildExport },
 )
 
 const exportOpen = ref(false)
@@ -88,11 +88,11 @@ onMounted(() => reports.load())
 
 <template>
   <div class="pb-6">
-    <AppHeader title="Laporan" :subtitle="`Tren · ${trendLabel}`" back>
+    <AppHeader title="التقارير" :subtitle="`Tren · ${trendLabel}`" back>
       <template #actions>
         <button
           class="flex size-9 items-center justify-center rounded-full text-foreground hover:bg-accent"
-          aria-label="Export Excel"
+          aria-label="تصدير إلى Excel"
           @click="exportOpen = true"
         >
           <Download class="size-5" />
@@ -103,7 +103,7 @@ onMounted(() => reports.load())
     <!-- KPI Hari Ini (selalu hari ini, tak ikut filter) -->
     <section class="space-y-3 p-4">
       <p class="px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-        Hari ini · {{ todayLabel }}
+        اليوم · {{ todayLabel }}
       </p>
 
       <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -115,7 +115,7 @@ onMounted(() => reports.load())
             <ShoppingCart class="size-3.5" /> المبيعات
           </div>
           <p class="mt-1 text-2xl font-bold">{{ formatRupiah(todaySalesSummary.total) }}</p>
-          <p class="text-xs opacity-85">{{ todaySalesSummary.count }} transaksi</p>
+          <p class="text-xs opacity-85">{{ todaySalesSummary.count }} عملية بيع</p>
         </div>
 
         <!-- الإيرادات vs المصروفات hari ini -->
@@ -142,7 +142,7 @@ onMounted(() => reports.load())
     <section class="border-t border-border">
       <div class="flex items-center justify-between px-4 pt-4">
         <p class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          Grafik Tren
+          الرسم البياني للاتجاهات
         </p>
         <!-- Toggle sumber data -->
         <div class="flex gap-1 rounded-full border border-border p-0.5">
@@ -181,7 +181,7 @@ onMounted(() => reports.load())
           v-else
           :icon="BarChart3"
           title="لا توجد بيانات"
-          :description="`Tidak ada ${source === 'sales' ? 'penjualan' : 'حركات مالية'} pada rentang ${trendLabel.toLowerCase()}.`"
+          :description="`لا توجد ${source === 'sales' ? 'المبيعات' : 'حركات مالية'} خلال الفترة ${trendLabel.toLowerCase()}.`"
         />
       </div>
     </section>
