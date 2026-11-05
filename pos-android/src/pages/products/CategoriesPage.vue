@@ -34,20 +34,20 @@ async function saveEdit() {
 }
 
 async function remove(id: string) {
-  if (!confirm('Hapus kategori ini? Produk terkait jadi tanpa kategori.')) return
+  if (!confirm('حذف kategori ini? Produk terkait jadi tanpa kategori.')) return
   await categories.remove(id)
 }
 </script>
 
 <template>
   <div>
-    <AppHeader title="Kategori" back />
+    <AppHeader title="التصنيفات" back />
 
     <div class="border-b border-border p-4">
       <div class="flex gap-2">
-        <Input v-model="newName" placeholder="Nama kategori baru" @keyup.enter="add" />
+        <Input v-model="newName" placeholder="اسم التصنيف الجديد" @keyup.enter="add" />
         <Button class="shrink-0 gap-1" :disabled="!newName.trim()" @click="add">
-          <Plus class="size-4" /> Tambah
+          <Plus class="size-4" /> إضافة
         </Button>
       </div>
     </div>
