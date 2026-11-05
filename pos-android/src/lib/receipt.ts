@@ -94,6 +94,7 @@ export function buildReceipt(
   }
   lines.push({ text: div })
   lines.push({ text: 'شكراً لتعاملكم معنا 🙏', align: 'center' })
+  lines.push({ text: 'الكامل-كاشير', align: 'center' })
 
   return { title: `إيصال ${sale.number}`, lines }
 }
