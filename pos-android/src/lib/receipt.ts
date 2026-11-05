@@ -74,9 +74,12 @@ export function buildReceipt(
 
   for (const it of items) {
     lines.push({ text: it.name_snapshot })
-    lines.push({
-      text: row(`  ${it.qty} x ${formatRupiah(it.price_snapshot)}`, formatRupiah(it.line_total), w),
-    })
+    const quantityText = it.quantity_kind === 'weight' && it.weight_grams !== null
+      ? `${(it.weight_grams / 1000).toFixed(3)} كجم × ${formatRupiah(it.price_snapshot)} / كجم`
+      : it.quantity_kind === 'meal' && it.unit_label
+        ? `${it.unit_label} × ${formatRupiah(it.price_snapshot)}`
+        : `${it.qty} × ${formatRupiah(it.price_snapshot)}`
+    lines.push({ text: row(`  ${quantityText}`, formatRupiah(it.line_total), w) })
   }
 
   lines.push({ text: div })
