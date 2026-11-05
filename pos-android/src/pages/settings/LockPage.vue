@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import PinPad from '@/components/common/PinPad.vue'
@@ -27,7 +27,12 @@ onMounted(async () => {
     await media.ensure([storeLogo.value])
     logoUrl.value = media.url(storeLogo.value)
   }
-  if (settings.biometricEnabled) await unlockWithBiometric()
+  if (settings.biometricEnabled) {
+    // Let the lock screen finish rendering before Android opens its biometric sheet.
+    await nextTick()
+    await new Promise(resolve => window.setTimeout(resolve, 300))
+    if (settings.biometricEnabled) await unlockWithBiometric()
+  }
 })
 
 async function unlockWithBiometric() {
@@ -63,8 +68,8 @@ async function onComplete(value: string) {
 <template>
   <div class="flex min-h-full flex-col items-center justify-center gap-10 px-6 py-12">
     <div class="flex flex-col items-center gap-3 text-center">
-      <div class="flex size-20 items-center justify-center overflow-hidden rounded-3xl bg-primary/10">
-        <img v-if="logoUrl" :src="logoUrl" alt="الشعار" class="size-full object-cover" />
+      <div class="flex size-28 items-center justify-center overflow-hidden rounded-3xl bg-primary/10 p-2">
+        <img v-if="logoUrl" :src="logoUrl" alt="الشعار" class="size-full object-contain p-1" />
         <ShieldCheck v-else class="size-9 text-primary" />
       </div>
       <div>
