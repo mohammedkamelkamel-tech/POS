@@ -69,7 +69,7 @@ function backspace() {
       <button
         type="button"
         class="flex size-16 items-center justify-center rounded-full text-muted-foreground transition active:scale-95 active:bg-accent"
-        aria-label="Hapus"
+        aria-label="حذف"
         @click="backspace"
       >
         <Delete class="size-6" />
