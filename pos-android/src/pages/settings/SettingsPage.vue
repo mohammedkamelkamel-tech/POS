@@ -207,13 +207,13 @@ function lockNow() {
         </p>
         <Card>
           <CardContent class="space-y-4 p-4">
-            <!-- Logo toko -->
+            <!-- شعار المتجر -->
             <div class="flex items-center gap-4">
               <div class="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-primary/10 text-primary">
                 <img
                   v-if="media.url(storeLogo)"
                   :src="media.url(storeLogo)!"
-                  alt="Logo toko"
+                  alt="شعار المتجر"
                   class="size-full object-contain p-1"
                 />
                 <Store v-else class="size-6" />
@@ -317,9 +317,9 @@ function lockNow() {
                 <Lock class="size-5" />
               </div>
               <div class="flex-1">
-                <p class="text-sm font-medium">Aktifkan Login</p>
+                <p class="text-sm font-medium">تفعيل تسجيل الدخول</p>
                 <p class="text-xs text-muted-foreground">
-                  Default nonaktif. Kunci app dengan PIN 6 digit.
+                  Default nonaktif. Kunci app dengan PIN من 6 أرقام.
                 </p>
               </div>
               <Switch :model-value="loginEnabled" @update:model-value="onToggleLogin" />
@@ -334,8 +334,8 @@ function lockNow() {
                 <KeyRound class="size-5" />
               </div>
               <div class="flex-1">
-                <p class="text-sm font-medium">Ubah PIN</p>
-                <p class="text-xs text-muted-foreground">تغيير PIN 6 digit</p>
+                <p class="text-sm font-medium">تغيير الرقم السري</p>
+                <p class="text-xs text-muted-foreground">تغيير PIN من 6 أرقام</p>
               </div>
             </button>
             <button
@@ -348,7 +348,7 @@ function lockNow() {
                 <LockKeyhole class="size-5" />
               </div>
               <div class="flex-1">
-                <p class="text-sm font-medium">Kunci Sekarang</p>
+                <p class="text-sm font-medium">قفل التطبيق الآن</p>
                 <p class="text-xs text-muted-foreground">العودة إلى شاشة الرقم السري</p>
               </div>
             </button>
@@ -357,7 +357,7 @@ function lockNow() {
                 <Moon class="size-5" />
               </div>
               <div class="flex-1">
-                <p class="text-sm font-medium">Mode داكن</p>
+                <p class="text-sm font-medium">الوضع الداكن</p>
                 <p class="text-xs text-muted-foreground">مظهر داكن</p>
               </div>
               <Switch :model-value="theme === 'dark'" @update:model-value="settings.toggleTheme()" />
@@ -378,14 +378,14 @@ function lockNow() {
                 <Sparkles class="size-5" />
               </div>
               <div class="flex-1">
-                <p class="text-sm font-medium">Tampilkan Splash</p>
+                <p class="text-sm font-medium">إظهار شاشة البداية</p>
                 <p class="text-xs text-muted-foreground">عرض شعار المتجر عند فتح التطبيق.</p>
               </div>
               <Switch :model-value="splashEnabled" @update:model-value="settings.setSplash({ enabled: $event })" />
             </div>
 
             <div v-if="splashEnabled" class="space-y-2">
-              <p class="text-xs font-medium text-muted-foreground">Latar</p>
+              <p class="text-xs font-medium text-muted-foreground">الخلفية</p>
               <div class="grid grid-cols-3 gap-2">
                 <button
                   v-for="bg in SPLASH_BGS"
@@ -416,7 +416,7 @@ function lockNow() {
     <!-- Sheet buat/ubah PIN -->
     <BottomSheet
       :open="pinSheetOpen"
-      :title="pinMode === 'change' ? 'Ubah PIN' : 'Buat PIN'"
+      :title="pinMode === 'change' ? 'تغيير الرقم السري' : 'إنشاء رقم سري'"
       @update:open="pinSheetOpen = $event"
     >
       <div class="flex flex-col items-center gap-8 px-5 pb-8 pt-4">
