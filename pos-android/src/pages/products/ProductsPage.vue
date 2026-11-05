@@ -44,19 +44,19 @@ function setFilter(id: string | null) {
 
 <template>
   <div>
-    <AppHeader title="Produk" :subtitle="`${count} item`" back>
+    <AppHeader title="المنتجات" :subtitle="`${count} item`" back>
       <template #actions>
         <Button
           variant="outline"
           size="icon"
           class="size-9"
-          title="Impor / ekspor produk"
+          title="استيراد وتصدير المنتجات"
           @click="ioOpen = true"
         >
           <FileSpreadsheet class="size-4" />
         </Button>
         <RouterLink to="/categories">
-          <Button variant="outline" size="sm" class="gap-1.5" title="Kelola kategori">
+          <Button variant="outline" size="sm" class="gap-1.5" title="إدارة التصنيفات">
             <Tag class="size-4" />
             <span>Kategori</span>
           </Button>
@@ -68,7 +68,7 @@ function setFilter(id: string | null) {
     <div class="sticky top-[57px] z-20 space-y-3 border-b border-border bg-background/95 px-4 py-3 backdrop-blur">
       <div class="relative">
         <Search class="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input v-model="query" placeholder="Cari produk / SKU / barcode" class="pl-9" />
+        <Input v-model="query" placeholder="ابحث عن منتج أو رمز أو باركود" class="pl-9" />
       </div>
       <!-- Filter kategori -->
       <div v-if="categories.items.length" class="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1">
@@ -120,14 +120,14 @@ function setFilter(id: string | null) {
           </div>
           <div class="text-right">
             <p class="text-sm font-bold text-info">{{ formatRupiah(p.price) }}</p>
-            <Badge v-if="!p.active" variant="secondary" class="mt-0.5">Nonaktif</Badge>
+            <Badge v-if="!p.active" variant="secondary" class="mt-0.5">غير نشط</Badge>
           </div>
         </RouterLink>
         <button
           v-if="p.barcode"
           type="button"
           class="mr-2 flex size-10 shrink-0 items-center justify-center rounded-xl text-muted-foreground transition active:scale-95 active:bg-accent"
-          title="Lihat barcode"
+          title="عرض الباركود"
           @click="showBarcode(p)"
         >
           <Barcode class="size-5" />
@@ -139,11 +139,11 @@ function setFilter(id: string | null) {
     <EmptyState
       v-else
       :icon="Package"
-      :title="query || categoryFilter ? 'Produk tidak ditemukan' : 'Belum ada produk'"
-      description="Tambahkan produk pertama untuk mulai berjualan."
+      :title="query || categoryFilter ? 'المنتجات tidak ditemukan' : 'لا توجد منتجات بعد'"
+      description="أضف أول منتج لبدء البيع."
     >
       <Button class="gap-2" @click="router.push('/products/new')">
-        <Plus class="size-4" /> Tambah Produk
+        <Plus class="size-4" /> Tambah المنتجات
       </Button>
     </EmptyState>
 
