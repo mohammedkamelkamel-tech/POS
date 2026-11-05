@@ -112,6 +112,7 @@ const routes: RouteRecordRaw[] = [
     name: 'printer',
     component: () => import('@/pages/printer/PrinterPage.vue'),
   },
+  { path: '/backups', name: 'backups', component: () => import('@/pages/settings/BackupsPage.vue'), meta: { hideNav: true } },
   {
     path: '/settings',
     name: 'settings',

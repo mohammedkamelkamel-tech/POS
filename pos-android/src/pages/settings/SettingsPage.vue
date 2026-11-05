@@ -194,29 +194,26 @@ function lockNow() {
   <div>
     <AppHeader title="الحساب والإعدادات" />
     <div class="space-y-5 p-4">
-      <!-- الكامل برو / الخدمات السحابية (paling atas) -->
+      <!-- النسخ الاحتياطية المحلية -->
       <section class="space-y-3">
         <p class="px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          الخدمات السحابية
+          النسخ الاحتياطية
         </p>
         <Card class="border-primary/30 bg-primary/5">
           <CardContent class="space-y-3 p-4">
             <div class="flex items-center gap-3">
               <div class="flex size-11 items-center justify-center rounded-xl bg-primary/15 text-primary">
-                <Cloud class="size-5" />
+                <Save class="size-5" />
               </div>
-              <div class="flex-1">
-                <p class="text-sm font-semibold">الكامل برو</p>
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-semibold">نسخ بيانات الكامل-كاشير</p>
                 <p class="text-xs text-muted-foreground">
-                  تسجيل الدخول والنسخ الاحتياطي ومزامنة البيانات سحابياً
+                  نسخة يومية تلقائية على الهاتف مع إمكانية إنشاء نسخة أو استعادة نسخة سابقة.
                 </p>
               </div>
-              <Badge :variant="account.isAuthenticated ? 'success' : 'secondary'">
-                {{ account.isAuthenticated ? 'متصل' : 'غير متصل' }}
-              </Badge>
             </div>
-            <Button variant="outline" class="w-full" @click="router.push('/connect')">
-              {{ account.isAuthenticated ? 'إدارة الاتصال' : 'ربط الحساب' }}
+            <Button variant="outline" class="w-full" @click="router.push('/backups')">
+              إدارة النسخ الاحتياطية
             </Button>
           </CardContent>
         </Card>

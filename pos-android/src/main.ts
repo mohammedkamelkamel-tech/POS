@@ -9,6 +9,8 @@ import { useSettingsStore } from '@/stores/settings'
 import { useAccountStore } from '@/stores/account'
 import { useSyncStore } from '@/stores/sync'
 import { usePrinterStore } from '@/stores/printer'
+import { App as CapacitorApp } from '@capacitor/app'
+import { runDailyBackupIfDue } from '@/services/backup/localBackup'
 
 async function bootstrap() {
   // Urutan penting: DB dulu -> capabilities -> pinia -> load settings -> router
@@ -26,6 +28,11 @@ async function bootstrap() {
 
   // Muat setelan (device_id, tema, dll) sebelum UI tampil.
   await useSettingsStore().load()
+  // النسخ اليومية: تنفذ مرة واحدة في اليوم عند فتح التطبيق أو عودته للمقدمة.
+  void runDailyBackupIfDue().catch((error) => console.warn('[Backup] daily backup failed:', error))
+  void CapacitorApp.addListener('appStateChange', ({ isActive }) => {
+    if (isActive) void runDailyBackupIfDue().catch((error) => console.warn('[Backup] daily backup failed:', error))
+  })
   // Muat printer tersimpan (device + lebar kertas) → cetak ulang pakai setelan benar.
   await usePrinterStore().load()
 
