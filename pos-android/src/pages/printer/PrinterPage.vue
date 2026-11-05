@@ -28,8 +28,8 @@ const printing = ref(false)
 const message = ref('')
 
 const CONN_META: Record<PrinterConnection, { label: string; icon: unknown }> = {
-  bluetooth: { label: 'Bluetooth', icon: Bluetooth },
-  usb: { label: 'USB', icon: Usb },
+  bluetooth: { label: 'بلوتوث', icon: Bluetooth },
+  usb: { label: 'يو إس بي', icon: Usb },
 }
 
 const activeConn = ref<PrinterConnection>('bluetooth')
@@ -74,7 +74,7 @@ async function testPrint() {
         { text: '' },
         { text: formatDateTime(nowMs()), align: 'center' },
         { text: '-'.repeat(w), align: 'center' },
-        { text: 'Printer تعمل بشكل صحيح', align: 'center' },
+        { text: 'الطابعة تعمل بشكل صحيح', align: 'center' },
       ],
     })
     message.value = 'تم إرسال أمر الطباعة.'
@@ -88,7 +88,7 @@ async function testPrint() {
 
 <template>
   <div>
-    <AppHeader title="Printer" back />
+    <AppHeader title="الطابعة" back />
     <div class="space-y-4 p-4">
       <!-- Status -->
       <Card>
@@ -98,7 +98,7 @@ async function testPrint() {
           </div>
           <div class="flex-1">
             <p class="text-sm font-semibold">
-              {{ isNative ? 'Printer Thermal (ESC/POS)' : 'معاينة الطباعة عبر الويب' }}
+              {{ isNative ? 'طابعة حرارية (ESC/POS)' : 'معاينة الطباعة عبر الويب' }}
             </p>
             <p class="text-xs text-muted-foreground">
               {{ isNative ? (selected ? deviceName : 'لم يتم اختيار طابعة') : 'الطباعة عبر نافذة المتصفح' }}
