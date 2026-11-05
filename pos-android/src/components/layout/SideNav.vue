@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
-import { Store } from 'lucide-vue-next'
 import { storeToRefs } from 'pinia'
 import { cn } from '@/lib/utils'
 import { useSettingsStore } from '@/stores/settings'
