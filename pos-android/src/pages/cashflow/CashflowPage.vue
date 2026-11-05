@@ -5,28 +5,28 @@ import { storeToRefs } from 'pinia'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import DateRangeFilter from '@/components/common/DateRangeFilter.vue'
-import ExportDialog from '@/components/common/ExportDialog.vue'
+import تصديرDialog from '@/components/common/تصديرDialog.vue'
 import { Button } from '@/components/ui/button'
 import {
   Wallet, Plus, Tag, ArrowDownLeft, ArrowUpRight, Lock, Download,
 } from 'lucide-vue-next'
-import { useCashflowStore } from '@/stores/cashflow'
+import { useالحركة الماليةStore } from '@/stores/cashflow'
 import { formatRupiah } from '@/lib/money'
 import { formatTime, formatDate, dayKey } from '@/lib/datetime'
 import { rangeLabel } from '@/lib/dateRange'
-import type { CashflowEntry } from '@/db/types'
+import type { الحركة الماليةEntry } from '@/db/types'
 
 const router = useRouter()
-const cashflow = useCashflowStore()
+const cashflow = useالحركة الماليةStore()
 const { entries, summary, byCategory, range } = storeToRefs(cashflow)
 
 const label = computed(() => rangeLabel(range.value))
 
 const exportOpen = ref(false)
 
-// Kelompokkan entri per hari.
+// تجميع الحركات حسب اليوم.
 const groups = computed(() => {
-  const map = new Map<string, CashflowEntry[]>()
+  const map = new Map<string, الحركة الماليةEntry[]>()
   for (const e of entries.value) {
     const k = dayKey(e.occurred_at)
     if (!map.has(k)) map.set(k, [])
@@ -42,8 +42,8 @@ const groups = computed(() => {
 
 onMounted(() => cashflow.load())
 
-function openEntry(e: CashflowEntry) {
-  if (e.source !== 'manual') return // entri dari penjualan terkunci
+function openEntry(e: الحركة الماليةEntry) {
+  if (e.source !== 'manual') return // حركات المبيعات مقفلة ولا يمكن تعديلها
   router.push(`/cashflow/${e.id}/edit`)
 }
 </script>
@@ -68,13 +68,13 @@ function openEntry(e: CashflowEntry) {
       </template>
     </AppHeader>
 
-    <!-- Filter tanggal -->
+    <!-- تصفية حسب التاريخ -->
     <DateRangeFilter
       :model-value="range"
       @update:model-value="cashflow.setRange($event)"
     />
 
-    <!-- Ringkasan rentang aktif -->
+    <!-- ملخص الفترة المحددة -->
     <div class="border-b border-border bg-gradient-to-br from-hero to-hero/90 px-5 py-5 text-hero-foreground">
       <p class="text-xs opacity-80">صافي الرصيد · {{ label }}</p>
       <p class="mt-1 text-2xl font-bold">{{ formatRupiah(summary.net) }}</p>
@@ -94,7 +94,7 @@ function openEntry(e: CashflowEntry) {
       </div>
     </div>
 
-    <!-- Breakdown per kategori -->
+    <!-- تفصيل حسب التصنيف -->
     <section v-if="byCategory.length" class="border-b border-border p-4">
       <p class="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         حسب التصنيف · {{ label }}
@@ -120,7 +120,7 @@ function openEntry(e: CashflowEntry) {
       </div>
     </section>
 
-    <!-- Ledger -->
+    <!-- سجل الحركات -->
     <template v-if="entries.length">
       <section v-for="g in groups" :key="g.key">
         <div class="flex items-center justify-between bg-muted/40 px-4 py-1.5 text-xs font-medium text-muted-foreground">
@@ -170,7 +170,7 @@ function openEntry(e: CashflowEntry) {
       description="تُسجّل المبيعات تلقائياً هنا. أضف الإيرادات أو المصروفات يدوياً من زر +."
     />
 
-    <!-- FAB tambah -->
+    <!-- زر إضافة حركة -->
     <button
       class="fixed bottom-20 right-5 z-30 md:bottom-6 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition active:scale-95"
       @click="router.push('/cashflow/new')"
@@ -178,12 +178,12 @@ function openEntry(e: CashflowEntry) {
       <Plus class="size-6" />
     </button>
 
-    <ExportDialog
+    <تصديرDialog
       v-model:open="exportOpen"
       title="تصدير الحركة المالية"
       filename-base="cashflow"
       :initial-range="range"
-      :build-sheets="cashflow.buildExport"
+      :build-sheets="cashflow.buildتصدير"
     />
   </div>
 </template>
