@@ -54,7 +54,7 @@ async function remove(c: CashflowCategory) {
   <div>
     <AppHeader title="تصنيفات الحركة المالية" back />
 
-    <!-- Form tambah -->
+    <!-- نموذج إضافة تصنيف -->
     <div class="space-y-3 border-b border-border p-4">
       <div class="grid grid-cols-2 gap-2">
         <button
@@ -82,7 +82,7 @@ async function remove(c: CashflowCategory) {
       </div>
     </div>
 
-    <!-- Daftar per tipe -->
+    <!-- قائمة التصنيفات حسب النوع -->
     <template v-for="section in [
       { key: 'income', label: 'الإيرادات', rows: income, icon: ArrowDownLeft, tint: 'bg-success/10 text-success' },
       { key: 'expense', label: 'المصروفات', rows: expense, icon: ArrowUpRight, tint: 'bg-destructive/10 text-destructive' },
