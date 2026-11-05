@@ -31,7 +31,7 @@ const cart = useCartStore()
       </Button>
       <div class="grid grid-cols-2 gap-2">
         <Button variant="outline" :disabled="cart.isEmpty" @click="cart.clear()">
-          Kosongkan
+          إفراغ السلة
         </Button>
         <Button variant="secondary" :disabled="cart.isEmpty" @click="emit('hold')">
           {{ cart.activeOpenBillId ? 'حفظ التعديلات' : 'تعليق الطلب' }}
