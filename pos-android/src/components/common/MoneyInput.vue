@@ -21,10 +21,10 @@ function onInput(e: Event) {
     <span
       class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground"
     >
-      Rp
+      ر.ي
     </span>
     <input
-      inputmode="numeric"
+      inputmode="decimal"
       :value="display"
       :placeholder="placeholder ?? '0'"
       @input="onInput"
