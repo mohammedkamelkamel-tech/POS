@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - butcher-pos-dev
+      - owner-worker-security
     paths:
       - "pos-android/**"
       - ".github/workflows/build-butcher-pos-android.yml"
