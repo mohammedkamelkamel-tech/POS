@@ -6,28 +6,28 @@ import type { ApexOptions } from 'apexcharts'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import DateRangeFilter from '@/components/common/DateRangeFilter.vue'
-import تصديرDialog from '@/components/common/تصديرDialog.vue'
+import ExportDialog from '@/components/common/ExportDialog.vue'
 import {
   BarChart3, Download, ShoppingCart, ArrowDownLeft, ArrowUpRight,
 } from 'lucide-vue-next'
 import { useReportsStore, type ReportSource } from '@/stores/reports'
 import { useSalesStore } from '@/stores/sales'
-import { useالحركة الماليةStore } from '@/stores/cashflow'
+import { useCashflowStore } from '@/stores/cashflow'
 import { formatRupiah } from '@/lib/money'
 import { formatDate, nowMs } from '@/lib/datetime'
 import { rangeLabel } from '@/lib/dateRange'
 
 const reports = useReportsStore()
 const sales = useSalesStore()
-const cashflow = useالحركة الماليةStore()
-const { source, range, todaySalesSummary, todayالحركة المالية, chart, hasChartData } =
+const cashflow = useCashflowStore()
+const { source, range, todaySalesSummary, todayCashflow, chart, hasChartData } =
   storeToRefs(reports)
 
 const todayLabel = computed(() => formatDate(nowMs()))
 const trendLabel = computed(() => rangeLabel(range.value))
 
 const SOURCES: { key: ReportSource; label: string }[] = [
-  { key: 'sales', label: 'المبيعات' },
+  { key: 'sales', label: 'Transaksi' },
   { key: 'cashflow', label: 'الحركة المالية' },
 ]
 
@@ -47,7 +47,7 @@ const chartOptions = computed<ApexOptions>(() => {
       background: 'transparent',
     },
     theme: { mode: dark ? 'dark' : 'light' },
-    // اللون الداكن للمبيعات، والأخضر للإيرادات، والأحمر للمصروفات.
+    // Charcoal (brand) untuk penjualan; hijau/merah untuk pemasukan/pengeluaran.
     colors: source.value === 'sales' ? [dark ? '#a1a1aa' : '#3f4756'] : ['#3f9c5a', '#e5484d'],
     plotOptions: { bar: { borderRadius: 4, columnWidth: '58%' } },
     dataLabels: { enabled: false },
@@ -74,11 +74,11 @@ const chartOptions = computed<ApexOptions>(() => {
   }
 })
 
-// Konfigurasi export mengikuti sumber aktif — reuse buildتصدير yang sudah ada.
+// Konfigurasi export mengikuti sumber aktif — reuse buildExport yang sudah ada.
 const exportConfig = computed(() =>
   source.value === 'sales'
-    ? { title: 'تصدير الفواتير', filenameBase: 'عملية بيع', buildSheets: sales.buildتصدير }
-    : { title: 'تصدير الحركة المالية', filenameBase: 'الحركة-المالية', buildSheets: cashflow.buildتصدير },
+    ? { title: 'تصدير الفواتير', filenameBase: 'transaksi', buildSheets: sales.buildExport }
+    : { title: 'Export الحركة المالية', filenameBase: 'cashflow', buildSheets: cashflow.buildExport },
 )
 
 const exportOpen = ref(false)
@@ -88,11 +88,11 @@ onMounted(() => reports.load())
 
 <template>
   <div class="pb-6">
-    <AppHeader title="التقارير" :subtitle="`الاتجاهات · ${trendLabel}`" back>
+    <AppHeader title="Laporan" :subtitle="`Tren · ${trendLabel}`" back>
       <template #actions>
         <button
           class="flex size-9 items-center justify-center rounded-full text-foreground hover:bg-accent"
-          aria-label="تصدير إلى Excel"
+          aria-label="Export Excel"
           @click="exportOpen = true"
         >
           <Download class="size-5" />
@@ -100,14 +100,14 @@ onMounted(() => reports.load())
       </template>
     </AppHeader>
 
-    <!-- KPI اليوم (selalu اليوم, tak ikut filter) -->
+    <!-- KPI Hari Ini (selalu hari ini, tak ikut filter) -->
     <section class="space-y-3 p-4">
       <p class="px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-        اليوم · {{ todayLabel }}
+        Hari ini · {{ todayLabel }}
       </p>
 
       <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <!-- المبيعات اليوم -->
+        <!-- المبيعات hari ini -->
         <div
           class="col-span-2 rounded-2xl bg-gradient-to-br from-hero to-hero/90 p-4 text-hero-foreground sm:col-span-1"
         >
@@ -115,16 +115,16 @@ onMounted(() => reports.load())
             <ShoppingCart class="size-3.5" /> المبيعات
           </div>
           <p class="mt-1 text-2xl font-bold">{{ formatRupiah(todaySalesSummary.total) }}</p>
-          <p class="text-xs opacity-85">{{ todaySalesSummary.count }} عملية بيع</p>
+          <p class="text-xs opacity-85">{{ todaySalesSummary.count }} transaksi</p>
         </div>
 
-        <!-- الإيرادات vs المصروفات اليوم -->
+        <!-- الإيرادات vs المصروفات hari ini -->
         <div class="rounded-2xl border border-border bg-card p-4">
           <div class="flex items-center gap-1.5 text-xs text-muted-foreground">
             <ArrowDownLeft class="size-3.5 text-success" /> الإيرادات
           </div>
           <p class="mt-1 text-lg font-bold text-success">
-            {{ formatRupiah(todayالحركة المالية.income) }}
+            {{ formatRupiah(todayCashflow.income) }}
           </p>
         </div>
         <div class="rounded-2xl border border-border bg-card p-4">
@@ -132,7 +132,7 @@ onMounted(() => reports.load())
             <ArrowUpRight class="size-3.5 text-destructive" /> المصروفات
           </div>
           <p class="mt-1 text-lg font-bold text-destructive">
-            {{ formatRupiah(todayالحركة المالية.expense) }}
+            {{ formatRupiah(todayCashflow.expense) }}
           </p>
         </div>
       </div>
@@ -142,7 +142,7 @@ onMounted(() => reports.load())
     <section class="border-t border-border">
       <div class="flex items-center justify-between px-4 pt-4">
         <p class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          الرسم البياني للاتجاهات
+          Grafik Tren
         </p>
         <!-- Toggle sumber data -->
         <div class="flex gap-1 rounded-full border border-border p-0.5">
@@ -181,12 +181,12 @@ onMounted(() => reports.load())
           v-else
           :icon="BarChart3"
           title="لا توجد بيانات"
-          :description="`لا توجد ${source === 'sales' ? 'المبيعات' : 'حركات مالية'} خلال الفترة ${trendLabel.toLowerCase()}.`"
+          :description="`Tidak ada ${source === 'sales' ? 'penjualan' : 'حركات مالية'} pada rentang ${trendLabel.toLowerCase()}.`"
         />
       </div>
     </section>
 
-    <تصديرDialog
+    <ExportDialog
       v-model:open="exportOpen"
       :title="exportConfig.title"
       :filename-base="exportConfig.filenameBase"
