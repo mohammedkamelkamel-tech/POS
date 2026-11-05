@@ -1,4 +1,4 @@
-import { Capacitor } from '@capacitor/core'
+import { Capacitor, registerPlugin } from '@capacitor/core'
 import { Directory, Encoding, Filesystem } from '@capacitor/filesystem'
 import { CapacitorSQLite } from '@capacitor-community/sqlite'
 import { getDb, closeDb, initDb } from '@/db/sqlite'
@@ -8,6 +8,28 @@ const DATABASE = 'poskacaw'
 const BACKUP_FOLDER = 'AlKamel-Cashier-Backups'
 const LAST_AUTO_BACKUP_KEY = 'backup_last_auto_date'
 const BACKUP_PREFIX = 'alkamel-cashier-backup-'
+
+interface BackupDirectoryApi {
+  choose(): Promise<{ uri: string; name: string }>
+  getSelected(): Promise<{ uri?: string | null }>
+  writeText(options: { name: string; data: string }): Promise<void>
+  listFiles(): Promise<{ files: Array<{ name: string; size?: number }> }>
+  readText(options: { name: string }): Promise<{ data: string }>
+  deleteFile(options: { name: string }): Promise<void>
+}
+const BackupDirectory = registerPlugin<BackupDirectoryApi>('BackupDirectory')
+
+export async function chooseBackupDirectory(): Promise<string> {
+  assertSupportedPlatform()
+  const chosen = await BackupDirectory.choose()
+  return chosen.name || 'المجلد المختار'
+}
+
+export async function getBackupDirectoryLabel(): Promise<string> {
+  if (Capacitor.getPlatform() !== 'android') return 'غير متاح'
+  const selected = await BackupDirectory.getSelected()
+  return selected.uri ? decodeURIComponent(selected.uri.split('/').pop() || 'المجلد المختار') : `Documents/${BACKUP_FOLDER}`
+}
 let backupInProgress: Promise<string> | null = null
 
 export interface LocalBackupFile {
