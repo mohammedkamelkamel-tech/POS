@@ -41,11 +41,11 @@ const emit = defineEmits<{
 
       <div v-if="mode === 'register'" class="space-y-2">
         <Label for="name">الاسم</Label>
-        <Input id="name" :model-value="name" placeholder="الاسم kamu / toko" @update:model-value="emit('update:name', String($event))" />
+        <Input id="name" :model-value="name" placeholder="اسم المتجر أو المالك" @update:model-value="emit('update:name', String($event))" />
       </div>
       <div class="space-y-2">
         <Label for="email">البريد الإلكتروني</Label>
-        <Input id="email" :model-value="email" type="email" placeholder="email@toko.com" @update:model-value="emit('update:email', String($event))" />
+        <Input id="email" :model-value="email" type="email" placeholder="example@email.com" @update:model-value="emit('update:email', String($event))" />
       </div>
       <div class="space-y-2">
         <Label for="password">كلمة المرور</Label>
@@ -59,9 +59,9 @@ const emit = defineEmits<{
       <p v-if="localError || accountError" class="flex items-center gap-1.5 text-xs text-destructive"><AlertCircle class="size-3.5" /> {{ localError || accountError }}</p>
       <Button class="w-full" :disabled="loading" @click="emit('submit')">
         <Loader2 v-if="status === 'loading'" class="size-4 animate-spin" />
-        {{ mode === 'register' ? 'إنشاء حساب & تسجيل الدخول' : 'تسجيل الدخول dengan البريد الإلكتروني' }}
+        {{ mode === 'register' ? 'إنشاء حساب & تسجيل الدخول' : 'تسجيل الدخول بالبريد الإلكتروني' }}
       </Button>
-      <div class="relative py-1 text-center"><span class="bg-background px-2 text-xs text-muted-foreground">atau</span></div>
+      <div class="relative py-1 text-center"><span class="bg-background px-2 text-xs text-muted-foreground">أو</span></div>
       <button type="button" class="flex h-11 w-full items-center justify-center gap-3 rounded-full border border-[#dadce0] bg-white font-medium text-[#3c4043] shadow-sm transition hover:bg-[#f8faff] disabled:cursor-not-allowed disabled:opacity-60" :disabled="loading || !hasGoogle" @click="emit('google-login')">
         <Loader2 v-if="status === 'loading'" class="size-4 animate-spin" />
         <svg v-else class="size-5 shrink-0" viewBox="0 0 48 48" aria-hidden="true">
@@ -72,7 +72,7 @@ const emit = defineEmits<{
         </svg>
         تسجيل الدخول باستخدام Google
       </button>
-      <p v-if="!hasGoogle" class="text-center text-xs text-muted-foreground">تسجيل الدخول باستخدام Google hanya tersedia di <span class="whitespace-nowrap">aplikasi Android.</span></p>
+      <p v-if="!hasGoogle" class="text-center text-xs text-muted-foreground">تسجيل الدخول باستخدام Google hanya tersedia di <span class="whitespace-nowrap">تطبيق أندرويد.</span></p>
     </CardContent>
   </Card>
 </template>
