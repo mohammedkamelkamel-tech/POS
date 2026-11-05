@@ -16,7 +16,6 @@ import { useMediaStore } from '@/stores/media'
 import { pickImage, downscale, toDataUrl, type ProcessedImage } from '@/lib/image'
 import {
   BARCODE_TYPES,
-  DEFAULT_BARCODE_TYPE,
   barcodeTypeHint,
   barcodeTypeLabel,
   effectiveBarcodeValue,
