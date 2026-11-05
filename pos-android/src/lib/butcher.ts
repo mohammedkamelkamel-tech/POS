@@ -10,7 +10,9 @@ export const MEAL_PORTIONS: ReadonlyArray<{ units: MealPortion; label: string }>
 /** Calculate a portion price from the full-person price using integer arithmetic. */
 export function mealPortionPrice(fullPersonPrice: number, portion: MealPortion): number {
   if (!Number.isSafeInteger(fullPersonPrice) || fullPersonPrice < 0) throw new RangeError('سعر النفر يجب أن يكون مبلغاً صحيحاً غير سالب');
-  return Math.round((fullPersonPrice * portion) / 4);
+  const result = Math.round((fullPersonPrice * portion) / 4)
+  if (!Number.isSafeInteger(result)) throw new RangeError('قيمة الوجبة أكبر من المسموح')
+  return result;
 }
 
 /** Convert kilograms and grams to an integer gram quantity. */
@@ -24,5 +26,7 @@ export function weightInGrams(kilograms: number, grams = 0): number {
 /** Calculate a weighed item's total from price/kg and integer grams. */
 export function weighedItemPrice(pricePerKg: number, grams: number): number {
   if (!Number.isSafeInteger(pricePerKg) || pricePerKg < 0 || !Number.isSafeInteger(grams) || grams < 0) throw new RangeError('السعر أو الوزن غير صحيح');
-  return Math.round((pricePerKg * grams) / 1000);
+  const result = Math.round((pricePerKg * grams) / 1000)
+  if (!Number.isSafeInteger(result)) throw new RangeError('إجمالي الوزن أكبر من المسموح')
+  return result;
 }
