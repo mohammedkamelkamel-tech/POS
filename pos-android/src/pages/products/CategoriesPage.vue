@@ -34,7 +34,7 @@ async function saveEdit() {
 }
 
 async function remove(id: string) {
-  if (!confirm('حذف kategori ini? Produk terkait jadi tanpa kategori.')) return
+  if (!confirm('حذف kategori ini? المنتجات terkait jadi tanpa kategori.')) return
   await categories.remove(id)
 }
 </script>
