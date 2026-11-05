@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
-  الطابعة, CheckCircle2, XCircle, Bluetooth, Usb, Loader2, RefreshCw, Trash2, Check,
+  Printer, CheckCircle2, XCircle, Bluetooth, Usb, Loader2, RefreshCw, Trash2, Check,
 } from 'lucide-vue-next'
 import { capabilities } from '@/services/capabilities/registry'
 import type { PrinterCapability } from '@/services/capabilities/registry'
