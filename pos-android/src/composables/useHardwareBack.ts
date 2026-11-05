@@ -4,8 +4,7 @@ import { Capacitor, type PluginListenerHandle } from '@capacitor/core'
 import { App } from '@capacitor/app'
 
 /**
- * Mundur sesuai riwayat; kalau riwayat kosong (mis. masuk lewat deep-link / setelah
- * redirect) balik ke Home supaya tak pernah mentok / keluar app dari halaman dalam.
+ * Mundur sesuai riwayat; kalau riwayat kosong balik ke Home.
  * Dipakai bareng oleh tombol back hardware & tombol back di AppHeader.
  */
 export function goBackOrHome(router: Router): void {
@@ -13,29 +12,24 @@ export function goBackOrHome(router: Router): void {
   else void router.replace('/')
 }
 
-/**
- * Tangani tombol **back hardware Android** (`@capacitor/app` `backButton`):
- * - `/lock` → di-swallow (tetap terkunci).
- * - Home (`/`) → tekan 2× untuk keluar (hint muncul dulu, back kedua <2s → exit).
- * - Halaman lain → {@link goBackOrHome}.
- *
- * Hanya aktif di platform native; di web listener tak dipasang.
- */
 export function useHardwareBack() {
   const router = useRouter()
   const showExitHint = ref(false)
-
   let handle: PluginListenerHandle | null = null
   let lastBackAt = 0
   let hintTimer: ReturnType<typeof setTimeout> | null = null
 
   function handleBack() {
-    const route = router.currentRoute.value
+    // إغلاق النافذة أو القائمة المفتوحة أولاً قبل مغادرة الصفحة.
+    const dialog = document.querySelector<HTMLElement>('[role="dialog"][aria-modal="true"]')
+    if (dialog) {
+      dialog.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+      return
+    }
 
-    // Layar kunci: jangan biarkan back keluar dari kunci.
+    const route = router.currentRoute.value
     if (route.name === 'lock') return
 
-    // Home: tekan back 2× untuk keluar.
     if (route.path === '/') {
       const now = Date.now()
       if (now - lastBackAt < 2000) {
@@ -45,13 +39,9 @@ export function useHardwareBack() {
       lastBackAt = now
       showExitHint.value = true
       if (hintTimer) clearTimeout(hintTimer)
-      hintTimer = setTimeout(() => {
-        showExitHint.value = false
-      }, 2000)
+      hintTimer = setTimeout(() => { showExitHint.value = false }, 2000)
       return
     }
-
-    // Halaman lain: mundur sesuai riwayat (fallback Home).
     goBackOrHome(router)
   }
 
