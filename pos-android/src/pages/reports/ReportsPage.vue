@@ -12,19 +12,19 @@ import {
 } from 'lucide-vue-next'
 import { useReportsStore, type ReportSource } from '@/stores/reports'
 import { useSalesStore } from '@/stores/sales'
-import { useCashflowStore } from '@/stores/الحركة المالية'
+import { useCashflowStore } from '@/stores/cashflow'
 import { formatRupiah } from '@/lib/money'
 import { formatDate, nowMs } from '@/lib/datetime'
-import { rangeالتسمية } from '@/lib/dateRange'
+import { rangeLabel } from '@/lib/dateRange'
 
 const reports = useReportsStore()
 const sales = useSalesStore()
-const الحركة المالية = useCashflowStore()
+const cashflow = useCashflowStore()
 const { source, range, todaySalesSummary, todayCashflow, chart, hasChartData } =
   storeToRefs(reports)
 
-const todayالتسمية = computed(() => formatDate(nowMs()))
-const trendالتسمية = computed(() => rangeالتسمية(range.value))
+const todayLabel = computed(() => formatDate(nowMs()))
+const trendLabel = computed(() => rangeLabel(range.value))
 
 const SOURCES: { key: ReportSource; label: string }[] = [
   { key: 'sales', label: 'المبيعات' },
@@ -50,11 +50,11 @@ const chartOptions = computed<ApexOptions>(() => {
     // Charcoal (brand) untuk المبيعات; hijau/merah untuk pemasukan/pengeluaran.
     colors: source.value === 'sales' ? [dark ? '#a1a1aa' : '#3f4756'] : ['#3f9c5a', '#e5484d'],
     plotOptions: { bar: { borderRadius: 4, columnWidth: '58%' } },
-    dataالتسميةs: { enabled: false },
+    dataLabels: { enabled: false },
     grid: { borderColor: dark ? '#27272a' : '#e5e7eb', strokeDashArray: 4 },
     xaxis: {
       categories: chart.value.categories,
-      labels: { style: { fontSize: '10px' }, rotate: 0, hideOverlappingالتسميةs: true },
+      labels: { style: { fontSize: '10px' }, rotate: 0, hideOverlappingLabels: true },
       axisBorder: { show: false },
       axisTicks: { show: false },
     },
@@ -78,7 +78,7 @@ const chartOptions = computed<ApexOptions>(() => {
 const exportConfig = computed(() =>
   source.value === 'sales'
     ? { title: 'تصدير الفواتير', filenameBase: 'عملية بيع', buildSheets: sales.buildExport }
-    : { title: 'Export الحركة المالية', filenameBase: 'الحركة المالية', buildSheets: الحركة المالية.buildExport },
+    : { title: 'Export الحركة المالية', filenameBase: 'الحركة المالية', buildSheets: cashflow.buildExport },
 )
 
 const exportOpen = ref(false)
@@ -88,7 +88,7 @@ onMounted(() => reports.load())
 
 <template>
   <div class="pb-6">
-    <AppHeader title="التقارير" :subtitle="`Tren · ${trendالتسمية}`" back>
+    <AppHeader title="التقارير" :subtitle="`Tren · ${trendLabel}`" back>
       <template #actions>
         <button
           class="flex size-9 items-center justify-center rounded-full text-foreground hover:bg-accent"
@@ -103,7 +103,7 @@ onMounted(() => reports.load())
     <!-- KPI Hari Ini (selalu hari ini, tak ikut filter) -->
     <section class="space-y-3 p-4">
       <p class="px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-        اليوم · {{ todayالتسمية }}
+        اليوم · {{ todayLabel }}
       </p>
 
       <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -181,7 +181,7 @@ onMounted(() => reports.load())
           v-else
           :icon="BarChart3"
           title="لا توجد بيانات"
-          :description="`لا توجد ${source === 'sales' ? 'المبيعات' : 'حركات مالية'} خلال الفترة ${trendالتسمية.toLowerCase()}.`"
+          :description="`لا توجد ${source === 'sales' ? 'المبيعات' : 'حركات مالية'} خلال الفترة ${trendLabel.toLowerCase()}.`"
         />
       </div>
     </section>
