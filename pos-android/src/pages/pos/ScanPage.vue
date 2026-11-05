@@ -45,20 +45,20 @@ function handleCode(code: string) {
   }
   if (!p.active) {
     scanFeedback(false)
-    say(`${p.name} nonaktif — aktifkan dulu di menu المنتجات`, 'warn')
+    say(`${p.name} غير نشط — فعّله أولاً من قائمة المنتجات`, 'warn')
     return
   }
   // cart.add() nolak produk habis tanpa bilang apa-apa, jadi dicek di sini
   // supaya kasir gak mengira barangnya sudah masuk keranjang.
   if (p.track_stock && p.stock <= 0) {
     scanFeedback(false)
-    say(`${p.name} stoknya habis`, 'warn')
+    say(`${p.name} نفد مخزونه`, 'warn')
     return
   }
   const line = cart.find(p.id)
   if (line && line.qty >= cart.maxQty(line)) {
     scanFeedback(false)
-    say(`${p.name} sudah sebanyak stok (${p.stock})`, 'warn')
+    say(`${p.name} وصلت الكمية إلى حد المخزون (${p.stock})`, 'warn')
     return
   }
 
