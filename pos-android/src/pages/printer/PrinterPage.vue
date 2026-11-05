@@ -9,33 +9,33 @@ import {
   الطابعة, CheckCircle2, XCircle, Bluetooth, Usb, Loader2, RefreshCw, Trash2, Check,
 } from 'lucide-vue-next'
 import { capabilities } from '@/services/capabilities/registry'
-import type { الطابعةCapability } from '@/services/capabilities/registry'
-import { useالطابعةStore } from '@/stores/printer'
-import type { الطابعةConnection, Discoveredالطابعة } from '@/services/capabilities/printers/transport'
+import type { PrinterCapability } from '@/services/capabilities/registry'
+import { usePrinterStore } from '@/stores/printer'
+import type { PrinterConnection, DiscoveredPrinter } from '@/services/capabilities/printers/transport'
 import { formatDateTime, nowMs } from '@/lib/datetime'
 import { storeToRefs } from 'pinia'
 
 const isNative = Capacitor.isNativePlatform()
-const printer = useالطابعةStore()
+const printer = usePrinterStore()
 const {
   connection, deviceName, paperWidth, devices, scanning, error,
   transportAvailable, supportedConnections, selected,
 } = storeToRefs(printer)
 
-const cap = ref<الطابعةCapability | null>(null)
+const cap = ref<PrinterCapability | null>(null)
 const canPrint = ref(false)
 const printing = ref(false)
 const message = ref('')
 
-const CONN_META: Record<الطابعةConnection, { label: string; icon: unknown }> = {
+const CONN_META: Record<PrinterConnection, { label: string; icon: unknown }> = {
   bluetooth: { label: 'Bluetooth', icon: Bluetooth },
   usb: { label: 'USB', icon: Usb },
 }
 
-const activeConn = ref<الطابعةConnection>('bluetooth')
+const activeConn = ref<PrinterConnection>('bluetooth')
 
 onMounted(async () => {
-  cap.value = capabilities.get<الطابعةCapability>('printer')
+  cap.value = capabilities.get<PrinterCapability>('printer')
   await printer.load()
   if (supportedConnections.value.length) activeConn.value = supportedConnections.value[0]
   await refreshCanPrint()
@@ -45,12 +45,12 @@ async function refreshCanPrint() {
   canPrint.value = await capabilities.has('printer')
 }
 
-async function scan(conn: الطابعةConnection) {
+async function scan(conn: PrinterConnection) {
   activeConn.value = conn
   await printer.scan(conn)
 }
 
-async function pick(d: Discoveredالطابعة) {
+async function pick(d: DiscoveredPrinter) {
   await printer.select(d)
   await refreshCanPrint()
 }
