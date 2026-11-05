@@ -79,7 +79,7 @@ async function save() {
 
 async function remove() {
   if (!id.value) return
-  if (!confirm('Hapus catatan kas ini?')) return
+  if (!confirm('هل تريد حذف هذه الحركة المالية؟')) return
   await cashflow.deleteEntry(id.value)
   router.back()
 }
@@ -87,7 +87,7 @@ async function remove() {
 
 <template>
   <div>
-    <AppHeader :title="isEdit ? 'Edit Kas' : 'Tambah Kas'" back />
+    <AppHeader :title="isEdit ? 'تعديل حركة مالية' : 'إضافة حركة مالية'" back />
 
     <div class="space-y-5 p-4">
       <!-- Jenis -->
@@ -98,7 +98,7 @@ async function remove() {
           :class="cn(type === 'income' ? 'border-success bg-success/5 text-success' : 'border-border text-muted-foreground')"
           @click="setType('income')"
         >
-          <ArrowDownLeft class="size-4" /> Pemasukan
+          <ArrowDownLeft class="size-4" /> إيراد
         </button>
         <button
           type="button"
@@ -106,7 +106,7 @@ async function remove() {
           :class="cn(type === 'expense' ? 'border-destructive bg-destructive/5 text-destructive' : 'border-border text-muted-foreground')"
           @click="setType('expense')"
         >
-          <ArrowUpRight class="size-4" /> Pengeluaran
+          <ArrowUpRight class="size-4" /> مصروف
         </button>
       </div>
 
@@ -126,8 +126,8 @@ async function remove() {
           </button>
         </div>
         <p v-else class="text-xs text-muted-foreground">
-          Belum ada kategori {{ type === 'income' ? 'pemasukan' : 'pengeluaran' }}.
-          <RouterLink to="/cashflow/categories" class="text-primary underline">Tambah dulu</RouterLink>.
+          لا توجد تصنيفات لـ {{ type === 'income' ? 'pemasukan' : 'pengeluaran' }}.
+          <RouterLink to="/cashflow/categories" class="text-primary underline">أضف تصنيفاً أولاً</RouterLink>.
         </p>
       </div>
 
@@ -140,11 +140,11 @@ async function remove() {
       <!-- Catatan -->
       <div class="space-y-1.5">
         <Label for="note">Catatan (opsional)</Label>
-        <Input id="note" v-model="note" placeholder="mis. beli gas, bayar listrik" />
+        <Input id="note" v-model="note" placeholder="مثال: شراء غاز أو دفع الكهرباء" />
       </div>
 
       <Button class="h-12 w-full text-base" :disabled="!canSave" @click="save">
-        {{ saving ? 'Menyimpan…' : 'Simpan' }}
+        {{ saving ? 'جارٍ الحفظ…' : 'حفظ' }}
       </Button>
 
       <Button
@@ -153,7 +153,7 @@ async function remove() {
         class="w-full gap-2 text-destructive"
         @click="remove"
       >
-        <Trash2 class="size-4" /> Hapus Catatan
+        <Trash2 class="size-4" /> حذف الحركة
       </Button>
     </div>
   </div>
