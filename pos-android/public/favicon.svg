@@ -1,10 +1,11 @@
-<!-- Lambang POS Kacaw/POS Pro — satu merek, satu tanda: struk dengan sobekan
-     di bawah. Barisnya lubang (fill-rule evenodd) supaya warna kotak di
-     belakangnya yang tembus. Sumber yang sama dipakai untuk ikon Android
-     (android/app/src/main/res/mipmap-*) dan favicon web POS Pro. -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-  <rect width="64" height="64" rx="14" fill="#222933"/>
-  <g transform="translate(12.8 12.8) scale(1.6)">
-    <path fill="#ffffff" fill-rule="evenodd" clip-rule="evenodd" d="M6 2.5H18A1.5 1.5 0 0 1 19.5 4V21.5L17.625 19.9L15.75 21.5L13.875 19.9L12 21.5L10.125 19.9L8.25 21.5L6.375 19.9L4.5 21.5V4A1.5 1.5 0 0 1 6 2.5ZM8 6.4H16A0.9 0.9 0 0 1 16 8.2H8A0.9 0.9 0 0 1 8 6.4ZM8 10.2H16A0.9 0.9 0 0 1 16 12H8A0.9 0.9 0 0 1 8 10.2ZM8 14H12A0.9 0.9 0 0 1 12 15.8H8A0.9 0.9 0 0 1 8 14Z"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <rect width="128" height="128" rx="26" fill="#24499F"/>
+  <rect x="8" y="8" width="112" height="112" rx="23" fill="#24499F" stroke="#4C78CE" stroke-width="3"/>
+  <path d="M30 51 39 35h33l9 16-11 22H39z" fill="#fff"/>
+  <path d="M42 44h26M42 52h19" stroke="#24499F" stroke-width="4" stroke-linecap="round"/>
+  <path d="M34 77h60l-6-16H40z" fill="#fff"/>
+  <path d="M44 70h5m7 0h5m7 0h5m7 0h5" stroke="#24499F" stroke-width="3" stroke-linecap="round"/>
+  <path d="M77 58 100 28m-16 2 16-2-2 16" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="64" y="96" text-anchor="middle" fill="#fff" font-size="17" font-weight="700">الكامل</text>
+  <text x="64" y="111" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">كاشير</text>
 </svg>
