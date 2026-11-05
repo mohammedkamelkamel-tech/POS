@@ -28,7 +28,7 @@ const trendLabel = computed(() => rangeLabel(range.value))
 
 const SOURCES: { key: ReportSource; label: string }[] = [
   { key: 'sales', label: 'المبيعات' },
-  { key: 'cashflow', label: 'cashflow' },
+  { key: 'cashflow', label: 'الحركة المالية' },
 ]
 
 // Format ringkas untuk label sumbu-Y (mis. 1,2jt / 300rb).
@@ -78,7 +78,7 @@ const chartOptions = computed<ApexOptions>(() => {
 const exportConfig = computed(() =>
   source.value === 'sales'
     ? { title: 'تصدير الفواتير', filenameBase: 'عملية بيع', buildSheets: sales.buildExport }
-    : { title: 'Export الحركة المالية', filenameBase: 'cashflow', buildSheets: cashflow.buildExport },
+    : { title: 'تصدير الحركة المالية', filenameBase: 'الحركة-المالية', buildSheets: cashflow.buildExport },
 )
 
 const exportOpen = ref(false)
@@ -88,7 +88,7 @@ onMounted(() => reports.load())
 
 <template>
   <div class="pb-6">
-    <AppHeader title="التقارير" :subtitle="`Tren · ${trendLabel}`" back>
+    <AppHeader title="التقارير" :subtitle="`الاتجاهات · ${trendLabel}`" back>
       <template #actions>
         <button
           class="flex size-9 items-center justify-center rounded-full text-foreground hover:bg-accent"
