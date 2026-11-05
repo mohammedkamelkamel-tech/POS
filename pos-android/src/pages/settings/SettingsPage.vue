@@ -13,7 +13,7 @@ import BottomSheet from '@/components/common/BottomSheet.vue'
 import PinPad from '@/components/common/PinPad.vue'
 import {
   Store, Lock, Moon, Cloud, Smartphone, Save, ImagePlus, Sparkles, Check,
-  QrCode, Loader2, KeyRound, LockKeyhole,
+  QrCode, Loader2, KeyRound, LockKeyhole, MessageCircle,
 } from 'lucide-vue-next'
 import { useSettingsStore, type SplashBg } from '@/stores/settings'
 import { useMediaStore } from '@/stores/media'
@@ -445,6 +445,21 @@ function lockNow() {
         <Smartphone class="size-3.5" />
         الجهاز: {{ devicePrefix }} · الكامل-كاشير v0.1
       </div>
+
+      <!-- حقوق الملكية والتواصل -->
+      <footer class="border-t border-border px-2 pb-2 pt-4 text-center">
+        <p class="text-xs text-muted-foreground">جميع الحقوق محفوظة © محمد كامل العجاج</p>
+        <a
+          href="https://wa.me/967772072056?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%D8%8C%20%D8%A3%D8%AA%D9%88%D8%A7%D8%B5%D9%84%20%D9%85%D8%B9%D9%83%20%D8%A8%D8%AE%D8%B5%D9%88%D8%B5%20%D8%AA%D8%B7%D8%A8%D9%8A%D9%82%20%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84-%D9%83%D8%A7%D8%B4%D9%8A%D8%B1"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="mt-2 inline-flex items-center justify-center gap-1.5 text-xs font-medium text-primary"
+        >
+          <MessageCircle class="size-4" />
+          التواصل عبر واتساب: 772072056
+        </a>
+      </footer>
+
     </div>
 
     <!-- نافذة إنشاء الرقم السري أو تغييره -->
