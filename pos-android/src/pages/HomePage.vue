@@ -40,7 +40,7 @@ const menu = [
 
 <template>
   <div class="min-h-full bg-background pb-6">
-    <!-- Header profil toko — hero gelap, konsisten di light & dark -->
+    <!-- رأس الصفحة وبيانات المتجر -->
     <header
       class="bg-gradient-to-br from-hero to-hero/90 px-5 pb-14 pt-[max(1.5rem,env(safe-area-inset-top))] text-hero-foreground md:px-6"
     >
@@ -64,7 +64,7 @@ const menu = [
         </div>
       </div>
 
-      <!-- Banner konek POS Pro -->
+      <!-- لافتة الربط مع الكامل برو -->
       <RouterLink
         to="/settings"
         class="group mt-5 flex items-center gap-3 rounded-2xl bg-white/12 p-3.5 backdrop-blur transition hover:bg-white/[.18]"
@@ -86,7 +86,7 @@ const menu = [
       </RouterLink>
     </header>
 
-    <!-- Panel menu yang menimpa hero -->
+    <!-- القائمة الرئيسية -->
     <div class="-mt-6 rounded-t-3xl bg-background px-4 pt-5 md:px-6">
       <p
         class="mb-3 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground"
