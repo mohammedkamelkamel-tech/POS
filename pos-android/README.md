@@ -1,6 +1,6 @@
-# POS Kacaw — aplikasi kasir Android offline (POS gratis & open source)
+# الكامل-كاشير — تطبيق كاشير أندرويد يعمل دون إنترنت
 
-Aplikasi **kasir / Point of Sale offline-first** untuk warung & UMKM. Kasir
+تطبيق **كاشير ونقطة بيع يعمل دون اتصال بالإنترنت** للمتاجر والمنشآت الصغيرة. Kasir
 jalan **100% tanpa internet** — kelola produk, transaksi, barcode, buka/tutup
 kasir, cashflow, cetak struk thermal — lalu **sinkron sendiri ke cloud
 "POS Pro"** begitu ada sinyal (login online/Google, sync dua arah). Gratis,
@@ -65,7 +65,7 @@ APK di-build **otomatis** oleh GitHub Actions (`.github/workflows/release-apk.ym
 tiap **Release** di-publish. Cara rilis:
 
 1. Buat **Release** baru di GitHub dengan tag **`vX.Y.Z`** (semver, mis. `v1.3.0`).
-2. Workflow jalan → build APK **debug-signed** → APK `pos-kacaw-X.Y.Z.apk`
+2. Workflow jalan → build APK **debug-signed** → APK `الكامل-كاشير-X.Y.Z.apk`
    **otomatis nempel** di halaman Release itu. Tinggal unduh & side-load.
 
 Versi app diturunkan dari tag: `versionName = X.Y.Z`,
