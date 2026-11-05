@@ -5,6 +5,10 @@ export interface CheckoutLine {
   readonly name: string
   readonly price: number
   readonly qty: number
+  readonly quantityKind?: 'unit' | 'weight' | 'meal'
+  readonly weightGrams?: number | null
+  readonly portionQuarters?: number | null
+  readonly unitLabel?: string | null
 }
 
 export interface PaymentInput {
