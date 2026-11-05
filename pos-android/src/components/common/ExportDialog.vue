@@ -67,7 +67,7 @@ async function run() {
   <BottomSheet :open="open" :title="title" @update:open="close">
     <div class="space-y-4 px-1 pb-5">
       <p class="px-4 pt-1 text-sm text-muted-foreground">
-        اختر النطاق الزمني، ثم صدّر التقرير بصيغة PDF.
+        حدد الفترة الزمنية ثم صدّر التقرير بصيغة PDF.
       </p>
 
       <!-- تحديد الفترة الزمنية -->
