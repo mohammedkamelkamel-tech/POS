@@ -89,7 +89,7 @@ async function chooseLogo() {
   if (!dataUrl) return
   logoBusy.value = true
   try {
-    // PNG biar transparansi logo kejaga; ukuran kecil (256px).
+    // نحافظ على شفافية الشعار مع تصغيره إلى 256 بكسل.
     const img = await downscale(dataUrl, { maxDim: 256, mime: 'image/png' })
     const ref_ = await media.save(img)
     await settings.setLogo(ref_) // langsung ke-update di Home & splash
@@ -288,8 +288,7 @@ function lockNow() {
               <div class="flex-1">
                 <p class="text-sm font-medium">رمز QR المتغير</p>
                 <p class="text-xs text-muted-foreground">
-                  Saat pembeli bayar pakai رمز QR, nominal tagihan otomatis dimasukkan ke
-                  kode QR — pembeli scan langsung dengan jumlah pas, tanpa ketik manual.
+                  عند الدفع باستخدام رمز QR، يُدرج مبلغ الفاتورة تلقائياً في الرمز ليتمكن العميل من مسحه والدفع بالمبلغ الصحيح دون إدخاله يدوياً.
                 </p>
               </div>
               <Switch
@@ -299,7 +298,7 @@ function lockNow() {
               />
             </div>
             <p v-if="!qrisPayload" class="text-xs text-muted-foreground">
-              رفع رمز QR statis dulu untuk mengaktifkan mode dinamis.
+              ارفع رمز QR ثابتاً أولاً لتفعيل الوضع المتغير.
             </p>
           </CardContent>
         </Card>
@@ -319,7 +318,7 @@ function lockNow() {
               <div class="flex-1">
                 <p class="text-sm font-medium">تفعيل تسجيل الدخول</p>
                 <p class="text-xs text-muted-foreground">
-                  Default nonaktif. Kunci app dengan PIN من 6 أرقام.
+                  معطّل افتراضياً. يمكنك حماية التطبيق برقم سري من 6 أرقام.
                 </p>
               </div>
               <Switch :model-value="loginEnabled" @update:model-value="onToggleLogin" />
@@ -335,7 +334,7 @@ function lockNow() {
               </div>
               <div class="flex-1">
                 <p class="text-sm font-medium">تغيير الرقم السري</p>
-                <p class="text-xs text-muted-foreground">تغيير PIN من 6 أرقام</p>
+                <p class="text-xs text-muted-foreground">تغيير الرقم السري المكوّن من 6 أرقام</p>
               </div>
             </button>
             <button
@@ -366,7 +365,7 @@ function lockNow() {
         </Card>
       </section>
 
-      <!-- Tampilan / Splash -->
+      <!-- المظهر وشاشة البداية -->
       <section class="space-y-3">
         <p class="px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           شاشة البداية
@@ -406,14 +405,14 @@ function lockNow() {
         </Card>
       </section>
 
-      <!-- Info perangkat -->
+      <!-- معلومات الجهاز -->
       <div class="flex items-center justify-center gap-2 pb-2 text-xs text-muted-foreground">
         <Smartphone class="size-3.5" />
         الجهاز: {{ devicePrefix }} · الكامل-كاشير v0.1
       </div>
     </div>
 
-    <!-- Sheet buat/ubah PIN -->
+    <!-- نافذة إنشاء الرقم السري أو تغييره -->
     <BottomSheet
       :open="pinSheetOpen"
       :title="pinMode === 'change' ? 'تغيير الرقم السري' : 'إنشاء رقم سري'"
