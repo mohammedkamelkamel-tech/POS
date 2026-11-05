@@ -10,13 +10,13 @@ import {
 } from 'lucide-vue-next'
 import { capabilities } from '@/services/capabilities/registry'
 import type { PrinterCapability } from '@/services/capabilities/registry'
-import { useالطابعةStore } from '@/stores/printer'
-import type { PrinterConnection, Discoveredالطابعة } from '@/services/capabilities/printers/transport'
+import { usePrinterStore } from '@/stores/printer'
+import type { PrinterConnection, DiscoveredPrinter } from '@/services/capabilities/printers/transport'
 import { formatDateTime, nowMs } from '@/lib/datetime'
 import { storeToRefs } from 'pinia'
 
 const isNative = Capacitor.isNativePlatform()
-const printer = useالطابعةStore()
+const printer = usePrinterStore()
 const {
   connection, deviceName, paperWidth, devices, scanning, error,
   transportAvailable, supportedConnections, selected,
@@ -50,7 +50,7 @@ async function scan(conn: PrinterConnection) {
   await printer.scan(conn)
 }
 
-async function pick(d: Discoveredالطابعة) {
+async function pick(d: DiscoveredPrinter) {
   await printer.select(d)
   await refreshCanPrint()
 }
@@ -74,7 +74,7 @@ async function testPrint() {
         { text: '' },
         { text: formatDateTime(nowMs()), align: 'center' },
         { text: '-'.repeat(w), align: 'center' },
-        { text: 'الطابعة تعمل بشكل صحيح', align: 'center' },
+        { text: 'Printer تعمل بشكل صحيح', align: 'center' },
       ],
     })
     message.value = 'تم إرسال أمر الطباعة.'
@@ -88,7 +88,7 @@ async function testPrint() {
 
 <template>
   <div>
-    <AppHeader title="الطابعة" back />
+    <AppHeader title="Printer" back />
     <div class="space-y-4 p-4">
       <!-- Status -->
       <Card>
@@ -98,7 +98,7 @@ async function testPrint() {
           </div>
           <div class="flex-1">
             <p class="text-sm font-semibold">
-              {{ isNative ? 'الطابعة Thermal (ESC/POS)' : 'معاينة الطباعة عبر الويب' }}
+              {{ isNative ? 'Printer Thermal (ESC/POS)' : 'معاينة الطباعة عبر الويب' }}
             </p>
             <p class="text-xs text-muted-foreground">
               {{ isNative ? (selected ? deviceName : 'لم يتم اختيار طابعة') : 'الطباعة عبر نافذة المتصفح' }}
@@ -167,7 +167,7 @@ async function testPrint() {
             </button>
           </div>
 
-          <!-- الطابعة terpilih -->
+          <!-- Printer terpilih -->
           <Card v-if="selected">
             <CardContent class="flex items-center gap-3 p-4">
               <component :is="CONN_META[connection ?? 'bluetooth'].icon" class="size-5 text-primary" />
