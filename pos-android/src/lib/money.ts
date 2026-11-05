@@ -16,6 +16,6 @@ export function formatNumber(amount: number): string {
 /** Accept localized or plain numeric input and return integer rials. */
 export function parseRupiah(input: string): number {
   if (!input) return 0;
-  const digits = input.replace(/[^\\d]/g, '');
+  const normalized = input.replace(/[٠-٩]/g, (d) => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d))).replace(/[۰-۹]/g, (d) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));\n  const digits = normalized.replace(/[^0-9]/g, '');
   return digits ? parseInt(digits, 10) : 0;
 }
