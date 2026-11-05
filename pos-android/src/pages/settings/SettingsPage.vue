@@ -6,13 +6,13 @@ import AppHeader from '@/components/layout/AppHeader.vue'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { التسمية } from '@/components/ui/label'
+import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
 import BottomSheet from '@/components/common/BottomSheet.vue'
 import PinPad from '@/components/common/PinPad.vue'
 import {
-  Store, Lock, Moon, الخدمات السحابية, Smartphone, Save, ImagePlus, Sparkles, Check,
+  Store, Lock, Moon, Cloud, Smartphone, Save, ImagePlus, Sparkles, Check,
   QrCode, Loader2, KeyRound, LockKeyhole,
 } from 'lucide-vue-next'
 import { useSettingsStore, type SplashBg } from '@/stores/settings'
