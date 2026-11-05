@@ -40,9 +40,9 @@ const qrisError = ref('')
 const qrisPreview = ref<string | null>(null)
 
 const SPLASH_BGS: Array<{ id: SplashBg; label: string; swatch: string }> = [
-  { id: 'brand', label: 'Brand', swatch: 'bg-gradient-to-b from-hero to-hero/80' },
-  { id: 'light', label: 'Terang', swatch: 'bg-background border border-border' },
-  { id: 'dark', label: 'Gelap', swatch: 'bg-slate-900' },
+  { id: 'brand', label: 'الهوية', swatch: 'bg-gradient-to-b from-hero to-hero/80' },
+  { id: 'light', label: 'فاتح', swatch: 'bg-background border border-border' },
+  { id: 'dark', label: 'داكن', swatch: 'bg-slate-900' },
 ]
 
 onMounted(async () => {
@@ -64,11 +64,11 @@ async function chooseQris() {
   try {
     const payload = await decodeQrFromDataUrl(dataUrl)
     if (!payload) {
-      qrisError.value = 'QR tidak terbaca. Coba gambar QRIS yang lebih jelas/besar.'
+      qrisError.value = 'تعذر قراءة رمز QR. جرّب صورة أوضح وأكبر.'
       return
     }
     if (!isValidQris(payload)) {
-      qrisError.value = 'Gambar ini sepertinya bukan QRIS statis yang valid.'
+      qrisError.value = 'يبدو أن الصورة ليست رمز QR ثابتاً صالحاً.'
       return
     }
     await settings.setQris(payload)
@@ -104,7 +104,7 @@ async function removeLogo() {
 
 async function saveProfile() {
   savingProfile.value = true
-  await settings.setProfile(name.value.trim() || 'POS Kacaw', owner.value.trim())
+  await settings.setProfile(name.value.trim() || 'الكامل-كاشير', owner.value.trim())
   savingProfile.value = false
   savedFlash.value = true
   setTimeout(() => (savedFlash.value = false), 1500)
@@ -170,7 +170,7 @@ function lockNow() {
 
 <template>
   <div>
-    <AppHeader title="Akun & Setelan" />
+    <AppHeader title="الحساب والإعدادات" />
     <div class="space-y-5 p-4">
       <!-- POS Pro / Cloud (paling atas) -->
       <section class="space-y-3">
@@ -190,11 +190,11 @@ function lockNow() {
                 </p>
               </div>
               <Badge :variant="account.isAuthenticated ? 'success' : 'secondary'">
-                {{ account.isAuthenticated ? 'Terhubung' : 'Belum' }}
+                {{ account.isAuthenticated ? 'Terhubung' : 'غير متصل' }}
               </Badge>
             </div>
             <Button variant="outline" class="w-full" @click="router.push('/connect')">
-              {{ account.isAuthenticated ? 'Kelola Koneksi' : 'Sambungkan Akun' }}
+              {{ account.isAuthenticated ? 'إدارة الاتصال' : 'ربط الحساب' }}
             </Button>
           </CardContent>
         </Card>
@@ -219,12 +219,12 @@ function lockNow() {
                 <Store v-else class="size-6" />
               </div>
               <div class="space-y-1.5">
-                <p class="text-sm font-medium">Logo Toko</p>
-                <p class="text-xs text-muted-foreground">Tampil di home & splash screen.</p>
+                <p class="text-sm font-medium">شعار المتجر</p>
+                <p class="text-xs text-muted-foreground">يظهر في الصفحة الرئيسية وشاشة البداية.</p>
                 <div class="flex items-center gap-2 pt-0.5">
                   <Button type="button" variant="outline" size="sm" class="gap-1.5" :disabled="logoBusy" @click="chooseLogo">
                     <ImagePlus class="size-3.5" />
-                    {{ media.url(storeLogo) ? 'Ganti' : 'Tambah' }}
+                    {{ media.url(storeLogo) ? 'تغيير' : 'إضافة' }}
                   </Button>
                   <Button v-if="media.url(storeLogo)" type="button" variant="ghost" size="sm" class="text-destructive" @click="removeLogo">
                     Hapus
@@ -233,16 +233,16 @@ function lockNow() {
               </div>
             </div>
             <div class="space-y-1.5">
-              <Label for="store-name">Nama Toko</Label>
-              <Input id="store-name" v-model="name" placeholder="POS Kacaw" />
+              <Label for="store-name">اسم المتجر</Label>
+              <Input id="store-name" v-model="name" placeholder="الكامل-كاشير" />
             </div>
             <div class="space-y-1.5">
-              <Label for="store-owner">Pemilik</Label>
-              <Input id="store-owner" v-model="owner" placeholder="Nama pemilik" />
+              <Label for="store-owner">المالك</Label>
+              <Input id="store-owner" v-model="owner" placeholder="اسم المالك" />
             </div>
             <Button class="w-full gap-2" :disabled="savingProfile" @click="saveProfile">
               <Save class="size-4" />
-              {{ savedFlash ? 'Tersimpan!' : 'Simpan Profil' }}
+              {{ savedFlash ? 'تم الحفظ!' : 'حفظ بيانات المتجر' }}
             </Button>
           </CardContent>
         </Card>
@@ -255,14 +255,14 @@ function lockNow() {
         </p>
         <Card>
           <CardContent class="space-y-4 p-4">
-            <!-- Upload QRIS statis -->
+            <!-- رفع رمز QR statis -->
             <div class="flex items-center gap-4">
               <div class="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-border bg-white text-muted-foreground">
                 <img v-if="qrisPreview" :src="qrisPreview" alt="QRIS" class="size-full object-contain p-0.5" />
                 <QrCode v-else class="size-6" />
               </div>
               <div class="min-w-0 flex-1 space-y-1.5">
-                <p class="text-sm font-medium">QRIS Statis Toko</p>
+                <p class="text-sm font-medium">رمز QR الثابت للمتجر</p>
                 <p class="text-xs text-muted-foreground">
                   Upload gambar QRIS toko sekali. Dipakai untuk menerima pembayaran.
                 </p>
@@ -270,7 +270,7 @@ function lockNow() {
                   <Button type="button" variant="outline" size="sm" class="gap-1.5" :disabled="qrisBusy" @click="chooseQris">
                     <Loader2 v-if="qrisBusy" class="size-3.5 animate-spin" />
                     <ImagePlus v-else class="size-3.5" />
-                    {{ qrisPayload ? 'Ganti' : 'Upload QRIS' }}
+                    {{ qrisPayload ? 'تغيير' : 'رفع رمز QR' }}
                   </Button>
                   <Button v-if="qrisPayload" type="button" variant="ghost" size="sm" class="text-destructive" @click="removeQris">
                     Hapus
@@ -286,7 +286,7 @@ function lockNow() {
                 <QrCode class="size-5" />
               </div>
               <div class="flex-1">
-                <p class="text-sm font-medium">QRIS Dinamis</p>
+                <p class="text-sm font-medium">رمز QR المتغير</p>
                 <p class="text-xs text-muted-foreground">
                   Saat pembeli bayar pakai QRIS, nominal tagihan otomatis dimasukkan ke
                   kode QR — pembeli scan langsung dengan jumlah pas, tanpa ketik manual.
@@ -299,7 +299,7 @@ function lockNow() {
               />
             </div>
             <p v-if="!qrisPayload" class="text-xs text-muted-foreground">
-              Upload QRIS statis dulu untuk mengaktifkan mode dinamis.
+              رفع رمز QR statis dulu untuk mengaktifkan mode dinamis.
             </p>
           </CardContent>
         </Card>
@@ -335,7 +335,7 @@ function lockNow() {
               </div>
               <div class="flex-1">
                 <p class="text-sm font-medium">Ubah PIN</p>
-                <p class="text-xs text-muted-foreground">Ganti PIN 6 digit</p>
+                <p class="text-xs text-muted-foreground">تغيير PIN 6 digit</p>
               </div>
             </button>
             <button
@@ -349,7 +349,7 @@ function lockNow() {
               </div>
               <div class="flex-1">
                 <p class="text-sm font-medium">Kunci Sekarang</p>
-                <p class="text-xs text-muted-foreground">Kembali ke layar PIN</p>
+                <p class="text-xs text-muted-foreground">العودة إلى شاشة الرقم السري</p>
               </div>
             </button>
             <div class="flex items-center gap-3 p-4">
@@ -357,8 +357,8 @@ function lockNow() {
                 <Moon class="size-5" />
               </div>
               <div class="flex-1">
-                <p class="text-sm font-medium">Mode Gelap</p>
-                <p class="text-xs text-muted-foreground">Tampilan gelap</p>
+                <p class="text-sm font-medium">Mode داكن</p>
+                <p class="text-xs text-muted-foreground">مظهر داكن</p>
               </div>
               <Switch :model-value="theme === 'dark'" @update:model-value="settings.toggleTheme()" />
             </div>
@@ -379,7 +379,7 @@ function lockNow() {
               </div>
               <div class="flex-1">
                 <p class="text-sm font-medium">Tampilkan Splash</p>
-                <p class="text-xs text-muted-foreground">Layar pembuka logo saat app dibuka.</p>
+                <p class="text-xs text-muted-foreground">عرض شعار المتجر عند فتح التطبيق.</p>
               </div>
               <Switch :model-value="splashEnabled" @update:model-value="settings.setSplash({ enabled: $event })" />
             </div>
@@ -409,7 +409,7 @@ function lockNow() {
       <!-- Info perangkat -->
       <div class="flex items-center justify-center gap-2 pb-2 text-xs text-muted-foreground">
         <Smartphone class="size-3.5" />
-        Device: {{ devicePrefix }} · POS Kacaw v0.1
+        Device: {{ devicePrefix }} · الكامل-كاشير v0.1
       </div>
     </div>
 
@@ -421,7 +421,7 @@ function lockNow() {
     >
       <div class="flex flex-col items-center gap-8 px-5 pb-8 pt-4">
         <p class="text-sm text-muted-foreground">
-          {{ pinError ? 'PIN tidak cocok, ulangi' : pinStep === 'enter' ? 'Masukkan PIN 6 digit baru' : 'Ulangi PIN untuk konfirmasi' }}
+          {{ pinError ? 'الرقم السري غير متطابق، حاول مجدداً' : pinStep === 'enter' ? 'أدخل رقماً سرياً جديداً من 6 أرقام' : 'أعد إدخال الرقم السري للتأكيد' }}
         </p>
         <PinPad
           v-model="pinValue"
