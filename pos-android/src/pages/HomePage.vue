@@ -46,13 +46,13 @@ const menu = [
     >
       <div class="flex items-center gap-3">
         <div
-          class="flex size-12 items-center justify-center overflow-hidden rounded-2xl bg-white/15 backdrop-blur"
+          class="flex size-14 items-center justify-center overflow-hidden rounded-2xl bg-white/15 p-1 backdrop-blur"
         >
           <img
             v-if="media.url(storeLogo)"
             :src="media.url(storeLogo)!"
             alt="شعار المتجر"
-            class="size-full object-contain p-1"
+            class="size-full object-contain p-1.5"
           />
           <Store v-else class="size-6" />
         </div>
