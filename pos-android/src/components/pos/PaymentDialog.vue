@@ -18,7 +18,7 @@ const emit = defineEmits<{
 
 type Method = 'cash' | 'qris' | 'transfer'
 const METHODS: Array<{ id: Method; label: string; icon: typeof Banknote }> = [
-  { id: 'cash', label: 'Tunai', icon: Banknote },
+  { id: 'cash', label: 'نقداً', icon: Banknote },
   { id: 'qris', label: 'QRIS', icon: QrCode },
   { id: 'transfer', label: 'Transfer', icon: ArrowLeftRight },
 ]
@@ -99,11 +99,11 @@ function confirm() {
 </script>
 
 <template>
-  <BottomSheet :open="open" title="Pembayaran" @update:open="emit('update:open', $event)">
+  <BottomSheet :open="open" title="الدفع" @update:open="emit('update:open', $event)">
     <div class="space-y-5 p-5">
       <!-- Total tagihan -->
       <div class="rounded-2xl bg-primary/10 p-4 text-center">
-        <p class="text-xs font-medium text-muted-foreground">Total Tagihan</p>
+        <p class="text-xs font-medium text-muted-foreground">إجمالي الفاتورة</p>
         <p class="mt-1 text-3xl font-bold text-primary">{{ formatRupiah(total) }}</p>
       </div>
 
@@ -136,7 +136,7 @@ function confirm() {
               :class="paid === amt ? 'border-primary bg-primary/5 text-primary' : 'text-foreground'"
               @click="paid = amt"
             >
-              {{ amt === total ? 'Uang pas' : formatRupiah(amt) }}
+              {{ amt === total ? 'المبلغ exact' : formatRupiah(amt) }}
             </button>
           </div>
         </div>
@@ -146,7 +146,7 @@ function confirm() {
         <div class="mx-auto flex size-56 items-center justify-center rounded-2xl border border-border bg-white p-2">
           <Loader2 v-if="qrLoading" class="size-6 animate-spin text-muted-foreground" />
           <img v-else-if="qrDataUrl" :src="qrDataUrl" alt="QRIS" class="size-full object-contain" />
-          <span v-else class="px-4 text-xs text-destructive">Gagal membuat QR. Cek QRIS di setelan.</span>
+          <span v-else class="px-4 text-xs text-destructive">تعذر إنشاء رمز QR. تحقق من إعدادات رمز QR.</span>
         </div>
         <p v-if="qrisDynamicReady" class="text-xs text-muted-foreground">
           Pembeli scan QR ini — nominal sudah terkunci
@@ -154,34 +154,34 @@ function confirm() {
         </p>
         <p v-else class="text-xs text-muted-foreground">
           Pembeli scan QR ini lalu masukkan nominal
-          <span class="font-semibold text-foreground">{{ formatRupiah(total) }}</span> manual.
+          <span class="font-semibold text-foreground">{{ formatRupiah(total) }}</span> يدوياً.
         </p>
       </div>
       <p v-else class="text-center text-xs text-muted-foreground">
-        Pembayaran non-tunai dianggap lunas sejumlah total.
+        الدفع non-tunai dianggap lunas sejumlah total.
       </p>
 
-      <!-- Kembalian -->
+      <!-- الباقي -->
       <div v-if="method === 'cash'" class="flex items-center justify-between px-1">
-        <span class="text-sm text-muted-foreground">Kembalian</span>
+        <span class="text-sm text-muted-foreground">الباقي</span>
         <span class="text-lg font-bold" :class="change > 0 ? 'text-success' : ''">
           {{ formatRupiah(change) }}
         </span>
       </div>
 
-      <!-- QRIS: pembeli scan dulu, kasir konfirmasi "Sudah Bayar" / batal -->
+      <!-- QRIS: pembeli scan dulu, kasir konfirmasi "تم الدفع" / batal -->
       <div v-if="showQris" class="grid grid-cols-2 gap-2">
         <Button variant="outline" class="h-12 text-base" :disabled="busy" @click="cancel">
           Batal
         </Button>
         <Button class="h-12 gap-2 text-base" :disabled="!canConfirm" @click="confirm">
           <Loader2 v-if="busy" class="size-4 animate-spin" />
-          {{ busy ? 'Memproses…' : 'Sudah Bayar' }}
+          {{ busy ? 'جارٍ المعالجة…' : 'تم الدفع' }}
         </Button>
       </div>
       <Button v-else class="h-12 w-full gap-2 text-base" :disabled="!canConfirm" @click="confirm">
         <Loader2 v-if="busy" class="size-4 animate-spin" />
-        {{ busy ? 'Memproses…' : 'Selesaikan Pembayaran' }}
+        {{ busy ? 'جارٍ المعالجة…' : 'Selesaikan الدفع' }}
       </Button>
     </div>
   </BottomSheet>
