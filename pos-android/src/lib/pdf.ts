@@ -17,7 +17,7 @@ function buildDocument(filename: string, title: string, sheets: ExportSheet[]): 
   const sections = sheets.map((sheet) => {
     const headers = Array.from(new Set(sheet.rows.flatMap((row) => Object.keys(row))))
     if (!headers.length) return ''
-    const head = headers.map((header) => `<th>${escapeHtml(header)}</th>`).join('')
+    const head = headers.map((header) => `<th scope="col">${escapeHtml(header)}</th>`).join('')
     const body = sheet.rows.map((row) =>
       `<tr>${headers.map((header) => `<td>${escapeHtml(row[header])}</td>`).join('')}</tr>`,
     ).join('')
@@ -29,44 +29,60 @@ function buildDocument(filename: string, title: string, sheets: ExportSheet[]): 
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${escapeHtml(filename.replace(/\\.pdf$/i, ''))}</title>
+<title>${escapeHtml(filename.replace(/\.pdf$/i, ''))}</title>
 <style>
-  @page { size: A4; margin: 14mm; }
+  @page { size: A4 portrait; margin: 12mm 10mm; }
   * { box-sizing: border-box; }
-  body { direction: rtl; font-family: Arial, Tahoma, sans-serif; color: #172033; font-size: 12px; }
-  h1 { text-align: center; font-size: 21px; margin: 0 0 8px; }
-  h2 { font-size: 15px; margin: 22px 0 8px; color: #26364f; }
-  .date { text-align: center; color: #667085; margin-bottom: 20px; }
-  table { width: 100%; border-collapse: collapse; table-layout: auto; }
-  th, td { border: 1px solid #d9dee8; padding: 7px 8px; text-align: right; overflow-wrap: anywhere; }
-  th { background: #edf1f7; font-weight: 700; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html, body { direction: rtl; unicode-bidi: plaintext; }
+  body { font-family: "Noto Naskh Arabic", "Noto Sans Arabic", Tahoma, Arial, sans-serif; color: #172033; font-size: 10px; line-height: 1.65; }
+  .report-head { border-bottom: 2px solid #24364f; padding: 0 0 10px; margin-bottom: 16px; }
+  h1 { text-align: center; font-size: 20px; line-height: 1.4; margin: 0 0 5px; color: #172033; }
+  .date { text-align: center; color: #667085; margin: 0; font-size: 10px; }
+  h2 { font-size: 14px; margin: 18px 0 7px; color: #26364f; page-break-after: avoid; break-after: avoid; }
+  table { width: 100%; border-collapse: collapse; table-layout: auto; margin: 0 0 12px; }
+  thead { display: table-header-group; }
+  th, td { border: 1px solid #d5dce7; padding: 5px 6px; text-align: right; vertical-align: top; overflow-wrap: anywhere; word-break: normal; }
+  th { background: #e9eef5; color: #1d2d45; font-weight: 700; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  td { background: #fff; }
   tr { break-inside: avoid; page-break-inside: avoid; }
-  section { break-inside: auto; margin-bottom: 18px; }
-  @media screen { body { max-width: 900px; margin: 24px auto; padding: 20px; } }
+  tbody tr:nth-child(even) td { background: #f7f9fc; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  section { break-inside: auto; page-break-inside: auto; }
+  @media print { body { font-size: 9px; } th, td { padding: 4px 5px; } }
+  @media screen { body { max-width: 900px; margin: 24px auto; padding: 20px; background: #fff; } }
 </style>
 </head>
 <body>
-<h1>${escapeHtml(title)}</h1>
-<p class="date">تاريخ التصدير: ${escapeHtml(new Intl.DateTimeFormat('ar-YE', { dateStyle: 'full', timeStyle: 'short' }).format(new Date()))}</p>
+<header class="report-head">
+  <h1>${escapeHtml(title)}</h1>
+  <p class="date">تاريخ التصدير: ${escapeHtml(new Intl.DateTimeFormat('ar-YE', { dateStyle: 'full', timeStyle: 'short' }).format(new Date()))}</p>
+</header>
 ${sections}
 </body>
 </html>`
 }
 
-/** تصدير PDF فعلي: نافذة حفظ PDF الأصلية في أندرويد، والطباعة في الويب. */
+/** تصدير PDF: نافذة الحفظ والطباعة الأصلية في أندرويد، والطباعة في المتصفح. */
 export async function exportPdf(filename: string, title: string, sheets: ExportSheet[]): Promise<void> {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     throw new Error('تصدير PDF غير متاح في هذه البيئة.')
   }
+  if (!sheets.length || sheets.every((sheet) => sheet.rows.length === 0)) {
+    throw new Error('لا توجد بيانات لإنشاء ملف PDF.')
+  }
+
   const html = buildDocument(filename, title, sheets)
   if (Capacitor.isNativePlatform()) {
-    await NativePdfExport.printHtml({ html, filename: filename.replace(/\\.pdf$/i, '') })
+    await NativePdfExport.printHtml({ html, filename: filename.replace(/\.pdf$/i, '') })
     return
   }
 
   const printWindow = window.open('', '_blank')
-  if (!printWindow) throw new Error('تعذر فتح نافذة الطباعة. اسمح بالنوافذ المنبثقة ثم أعد المحاولة.')
+  if (!printWindow) throw new Error('تعذر فتح نافذة التصدير. اسمح بالنوافذ المنبثقة ثم أعد المحاولة.')
+  printWindow.onload = () => {
+    printWindow.focus()
+    printWindow.print()
+  }
   printWindow.document.open()
-  printWindow.document.write(html + '<script>window.addEventListener("load", () => setTimeout(() => window.print(), 250));<\\/script>')
+  printWindow.document.write(html)
   printWindow.document.close()
 }
