@@ -76,11 +76,11 @@ function applyCustom() {
     <div v-if="showCustom" class="mt-2 space-y-2">
       <div class="grid grid-cols-2 gap-2">
         <div class="space-y-1">
-          <label class="text-[11px] text-muted-foreground">Dari</label>
+          <label class="text-[11px] text-muted-foreground">من</label>
           <Input v-model="fromDay" type="date" class="h-9 w-full" />
         </div>
         <div class="space-y-1">
-          <label class="text-[11px] text-muted-foreground">Sampai</label>
+          <label class="text-[11px] text-muted-foreground">إلى</label>
           <Input v-model="toDay" type="date" class="h-9 w-full" />
         </div>
       </div>
