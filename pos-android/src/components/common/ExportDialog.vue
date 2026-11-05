@@ -67,10 +67,10 @@ async function run() {
   <BottomSheet :open="open" :title="title" @update:open="close">
     <div class="space-y-4 px-1 pb-5">
       <p class="px-4 pt-1 text-sm text-muted-foreground">
-        Pilih rentang tanggal, lalu ekspor ke file PDF.
+        اختر النطاق الزمني، ثم صدّر التقرير بصيغة PDF.
       </p>
 
-      <!-- Filter tanggal (sama seperti di halaman) -->
+      <!-- تحديد الفترة الزمنية -->
       <DateRangeFilter :model-value="range" @update:model-value="range = $event" />
 
       <div class="px-4 text-sm">
