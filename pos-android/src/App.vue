@@ -48,7 +48,7 @@ onMounted(() => {
       class="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex justify-center px-4"
     >
       <div class="rounded-full bg-foreground/90 px-4 py-2 text-xs font-medium text-background shadow-lg">
-        Tekan sekali lagi untuk keluar
+        اضغط مرة أخرى للخروج
       </div>
     </div>
   </Transition>
