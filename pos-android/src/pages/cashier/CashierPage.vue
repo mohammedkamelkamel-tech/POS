@@ -68,8 +68,8 @@ async function closeSession() {
 
 function diffLabel(d: number | null): string {
   if (d == null) return '—'
-  if (d === 0) return 'Pas'
-  return d > 0 ? `Lebih ${formatRupiah(d)}` : `Kurang ${formatRupiah(-d)}`
+  if (d === 0) return 'مطابق'
+  return d > 0 ? `زيادة ${formatRupiah(d)}` : `عجز ${formatRupiah(-d)}`
 }
 </script>
 
@@ -139,18 +139,18 @@ function diffLabel(d: number | null): string {
               <div class="flex-1">
                 <p class="text-sm font-semibold">فتح الجلسة</p>
                 <p class="text-xs text-muted-foreground">
-                  Mulai sesi dengan mencatat modal awal di laci.
+                  ابدأ الجلسة بتسجيل المبلغ الافتتاحي في درج النقدية.
                 </p>
               </div>
             </div>
 
             <div class="space-y-1.5">
-              <Label for="opening-cash">الرصيد الافتتاحي (uang di laci)</Label>
+              <Label for="opening-cash">الرصيد الافتتاحي (النقدية في الدرج)</Label>
               <MoneyInput id="opening-cash" v-model="openingCash" class="h-11 text-base font-semibold" />
             </div>
             <div class="space-y-1.5">
-              <Label for="open-note">Catatan (opsional)</Label>
-              <Input id="open-note" v-model="openNote" placeholder="mis. shift pagi" />
+              <Label for="open-note">Catatan (اختياري)</Label>
+              <Input id="open-note" v-model="openNote" placeholder="مثال: الوردية الصباحية" />
             </div>
 
             <Button class="w-full gap-2" :disabled="opening" @click="openSession">
@@ -164,7 +164,7 @@ function diffLabel(d: number | null): string {
       <!-- Riwayat sesi -->
       <section class="space-y-2">
         <p class="flex items-center gap-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          <History class="size-3.5" /> Riwayat Sesi
+          <History class="size-3.5" /> سجل الجلسات
         </p>
 
         <div v-if="recent.length" class="overflow-hidden rounded-2xl border border-border bg-card divide-y divide-border">
@@ -184,8 +184,8 @@ function diffLabel(d: number | null): string {
                 {{ formatDateTime(s.opened_at) }}
               </p>
               <p class="mt-0.5 text-xs text-muted-foreground">
-                <template v-if="s.closed_at">Tutup {{ formatTime(s.closed_at) }} · </template>
-                Modal {{ formatRupiah(s.opening_cash) }}
+                <template v-if="s.closed_at">أُغلقت الساعة {{ formatTime(s.closed_at) }} · </template>
+                الرصيد الافتتاحي {{ formatRupiah(s.opening_cash) }}
               </p>
             </div>
             <div class="text-right">
@@ -240,29 +240,29 @@ function diffLabel(d: number | null): string {
         </div>
 
         <div class="space-y-1.5">
-          <Label for="counted-cash">Uang aktual dihitung</Label>
+          <Label for="counted-cash">النقدية الفعلية بعد العد</Label>
           <MoneyInput id="counted-cash" v-model="countedCash" class="h-12 text-lg font-semibold" />
         </div>
 
-        <!-- Selisih -->
+        <!-- الفرق -->
         <div class="flex items-center justify-between px-1">
-          <span class="text-sm text-muted-foreground">Selisih</span>
+          <span class="text-sm text-muted-foreground">الفرق</span>
           <span
             class="text-lg font-bold"
             :class="difference === 0 ? 'text-success' : 'text-destructive'"
           >
-            {{ difference === 0 ? 'Pas' : (difference > 0 ? '+' : '') + formatRupiah(difference) }}
+            {{ difference === 0 ? 'مطابق' : (difference > 0 ? '+' : '') + formatRupiah(difference) }}
           </span>
         </div>
 
         <div class="space-y-1.5">
-          <Label for="close-note">Catatan (opsional)</Label>
+          <Label for="close-note">Catatan (اختياري)</Label>
           <Input id="close-note" v-model="closeNote" placeholder="مثال: فرق بسبب الباقي" />
         </div>
 
         <Button class="h-12 w-full gap-2 text-base" variant="destructive" :disabled="closing" @click="closeSession">
           <DoorClosed class="size-4" />
-          {{ closing ? 'Menutup…' : 'Tutup Sesi' }}
+          {{ closing ? 'جارٍ الإغلاق…' : 'أُغلقت الساعة Sesi' }}
         </Button>
       </div>
     </BottomSheet>
