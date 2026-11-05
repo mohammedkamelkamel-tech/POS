@@ -13,16 +13,16 @@ const router = useRouter()
 const auth = useAuthStore()
 const settings = useSettingsStore()
 const media = useMediaStore()
-const { storeName, storeLogo } = storeToRefs(settings)
+const { storeName, storeالشعار } = storeToRefs(settings)
 
 const pin = ref('')
 const error = ref(false)
 const logoUrl = ref<string | null>(null)
 
 onMounted(async () => {
-  if (storeLogo.value) {
-    await media.ensure([storeLogo.value])
-    logoUrl.value = media.url(storeLogo.value)
+  if (storeالشعار.value) {
+    await media.ensure([storeالشعار.value])
+    logoUrl.value = media.url(storeالشعار.value)
   }
 })
 
@@ -44,13 +44,13 @@ async function onComplete(value: string) {
   <div class="flex min-h-full flex-col items-center justify-center gap-10 px-6 py-12">
     <div class="flex flex-col items-center gap-3 text-center">
       <div class="flex size-20 items-center justify-center overflow-hidden rounded-3xl bg-primary/10">
-        <img v-if="logoUrl" :src="logoUrl" alt="Logo" class="size-full object-cover" />
+        <img v-if="logoUrl" :src="logoUrl" alt="الشعار" class="size-full object-cover" />
         <ShieldCheck v-else class="size-9 text-primary" />
       </div>
       <div>
         <p class="text-lg font-bold">{{ storeName }}</p>
         <p class="text-sm text-muted-foreground">
-          {{ error ? 'PIN salah, coba lagi' : 'Masukkan PIN untuk membuka' }}
+          {{ error ? 'الرقم السري غير صحيح، حاول مجدداً' : 'أدخل الرقم السري لفتح التطبيق' }}
         </p>
       </div>
     </div>
