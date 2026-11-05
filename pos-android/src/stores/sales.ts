@@ -102,29 +102,29 @@ export const useSalesStore = defineStore('sales', () => {
     const sales = await saleRepo().listBetween(r.from, r.to, 100000)
     const items = await itemRepo().listBetween(r.from, r.to)
     const txRows = sales.map((s) => ({
-      Tanggal: formatDateTime(s.sold_at),
-      'No Struk': s.number,
-      Metode: s.payment_method,
-      Status: s.status === 'completed' ? 'Selesai' : 'Void',
-      Subtotal: s.subtotal,
-      Diskon: s.discount,
-      Pajak: s.tax,
-      Total: s.total,
-      Bayar: s.paid,
-      Kembali: s.change_due,
+      التاريخ: formatDateTime(s.sold_at),
+      'رقم الفاتورة': s.number,
+      طريقة الدفع: s.payment_method,
+      الحالة: s.status === 'completed' ? 'Selesai' : 'Void',
+      المجموع الفرعي: s.subtotal,
+      الخصم: s.discount,
+      الضريبة: s.tax,
+      الإجمالي: s.total,
+      المدفوع: s.paid,
+      الباقي: s.change_due,
     }))
     const itemRows = items.map((it) => ({
       Tanggal: formatDateTime(it.sold_at),
       'No Struk': it.number,
-      Produk: it.name_snapshot,
-      Harga: it.price_snapshot,
-      Qty: it.qty,
+      الصنف: it.name_snapshot,
+      السعر: it.price_snapshot,
+      الكمية: it.qty,
       Diskon: it.discount,
       Subtotal: it.line_total,
     }))
     return [
-      { name: 'Transaksi', rows: txRows },
-      { name: 'Item', rows: itemRows },
+      { name: 'الفواتير', rows: txRows },
+      { name: 'تفاصيل الأصناف', rows: itemRows },
     ]
   }
 
