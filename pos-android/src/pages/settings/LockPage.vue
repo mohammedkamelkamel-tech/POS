@@ -13,16 +13,16 @@ const router = useRouter()
 const auth = useAuthStore()
 const settings = useSettingsStore()
 const media = useMediaStore()
-const { storeName, storeالشعار } = storeToRefs(settings)
+const { storeName, storeLogo } = storeToRefs(settings)
 
 const pin = ref('')
 const error = ref(false)
 const logoUrl = ref<string | null>(null)
 
 onMounted(async () => {
-  if (storeالشعار.value) {
-    await media.ensure([storeالشعار.value])
-    logoUrl.value = media.url(storeالشعار.value)
+  if (storeLogo.value) {
+    await media.ensure([storeLogo.value])
+    logoUrl.value = media.url(storeLogo.value)
   }
 })
 
