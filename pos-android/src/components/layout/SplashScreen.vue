@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
-import { Store } from 'lucide-vue-next'
 import { useSettingsStore } from '@/stores/settings'
 import { useMediaStore } from '@/stores/media'
 
@@ -26,21 +25,16 @@ onMounted(() => {
     class="fixed inset-0 z-50 flex flex-col items-center justify-center gap-5"
     :class="BG[splashBg] || BG.brand"
   >
-    <div
-      class="flex size-28 items-center justify-center overflow-hidden rounded-3xl p-1 shadow-lg"
-      :class="splashBg === 'brand' ? 'bg-white/15' : 'bg-primary/10'"
-    >
+    <div class="flex size-32 items-center justify-center overflow-hidden rounded-[2rem] bg-white p-1 shadow-2xl">
       <img
-        v-if="media.url(storeLogo)"
-        :src="media.url(storeLogo)!"
-        alt="شعار المتجر"
-        class="size-full object-contain p-1.5"
+        src="/alkamel-cashier-logo.jpg"
+        alt="شعار الكامل-كاشير"
+        class="size-full object-contain"
       />
-      <Store v-else class="size-14" :class="splashBg === 'brand' ? '' : 'text-primary'" />
     </div>
     <div class="text-center">
-      <p class="text-xl font-bold">{{ storeName }}</p>
-      <p class="mt-1 text-xs opacity-70">الكامل-كاشير</p>
+      <p class="text-xl font-bold">الكامل-كاشير</p>
+      <p class="mt-1 text-xs opacity-75">{{ storeName }}</p>
     </div>
     <div class="absolute bottom-16">
       <div
