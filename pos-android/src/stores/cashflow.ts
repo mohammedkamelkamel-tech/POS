@@ -35,7 +35,20 @@ export const useCashflowStore = defineStore('cashflow', () => {
     return categories.value.find((c) => c.id === id)
   }
   function categoryName(id: string | null): string {
-    return category(id)?.name ?? 'Tanpa kategori'
+    const name = category(id)?.name
+    if (!name) return 'بدون تصنيف'
+    const translations: Record<string, string> = {
+      'Penjualan': 'المبيعات',
+      'Modal / Setoran': 'رأس المال / الإيداعات',
+      'Pendapatan Lain': 'إيرادات أخرى',
+      'Belanja Stok': 'مشتريات المخزون',
+      'Gaji Karyawan': 'رواتب الموظفين',
+      'Sewa Tempat': 'إيجار المحل',
+      'Listrik & Air': 'الكهرباء والماء',
+      'Operasional': 'مصروفات تشغيلية',
+      'Lain-lain': 'مصروفات أخرى',
+    }
+    return translations[name] ?? name
   }
   function categoriesOfType(type: 'income' | 'expense') {
     return categories.value.filter((c) => c.type === type)
@@ -142,12 +155,12 @@ export const useCashflowStore = defineStore('cashflow', () => {
     if (categories.value.length === 0) categories.value = await catRepo().listAll()
     const rows = await entryRepo().listBetween(r.from, r.to, 100000)
     const detail = rows.map((e) => ({
-      Tanggal: formatDateTime(e.occurred_at),
-      Tipe: e.direction === 'debit' ? 'Pemasukan' : 'Pengeluaran',
-      Kategori: categoryName(e.category_id),
-      Sumber: e.source === 'sale' ? 'Penjualan' : 'Manual',
-      Nominal: e.amount,
-      Catatan: e.note ?? '',
+      التاريخ: formatDateTime(e.occurred_at),
+      النوع: e.direction === 'debit' ? 'إيراد' : 'مصروف',
+      التصنيف: categoryName(e.category_id),
+      المصدر: e.source === 'sale' ? 'المبيعات' : 'يدوي',
+      المبلغ: e.amount,
+      ملاحظات: e.note ?? '',
     }))
 
     // Ringkasan per kategori + total.
@@ -162,7 +175,7 @@ export const useCashflowStore = defineStore('cashflow', () => {
       if (!byCat.has(k)) {
         byCat.set(k, {
           name: categoryName(e.category_id),
-          type: cat?.type === 'income' ? 'Pemasukan' : cat?.type === 'expense' ? 'Pengeluaran' : '-',
+          type: cat?.type === 'income' ? 'إيراد' : cat?.type === 'expense' ? 'مصروف' : '-',
           total: 0,
         })
       }
@@ -170,15 +183,15 @@ export const useCashflowStore = defineStore('cashflow', () => {
     }
     const summaryRows: Record<string, string | number>[] = Array.from(byCat.values())
       .sort((a, b) => b.total - a.total)
-      .map((c) => ({ Kategori: c.name, Tipe: c.type, Total: c.total }))
-    summaryRows.push({ Kategori: '', Tipe: '', Total: '' })
-    summaryRows.push({ Kategori: 'Total Pemasukan', Tipe: '', Total: income })
-    summaryRows.push({ Kategori: 'Total Pengeluaran', Tipe: '', Total: expense })
-    summaryRows.push({ Kategori: 'Saldo (Net)', Tipe: '', Total: income - expense })
+      .map((c) => ({ التصنيف: c.name, النوع: c.type, الإجمالي: c.total }))
+    summaryRows.push({ التصنيف: '', النوع: '', الإجمالي: '' })
+    summaryRows.push({ التصنيف: 'إجمالي الإيرادات', النوع: '', الإجمالي: income })
+    summaryRows.push({ التصنيف: 'إجمالي المصروفات', النوع: '', الإجمالي: expense })
+    summaryRows.push({ التصنيف: 'صافي الرصيد', النوع: '', الإجمالي: income - expense })
 
     return [
-      { name: 'Cashflow', rows: detail },
-      { name: 'Ringkasan', rows: summaryRows },
+      { name: 'الحركة المالية', rows: detail },
+      { name: 'الملخص', rows: summaryRows },
     ]
   }
 
