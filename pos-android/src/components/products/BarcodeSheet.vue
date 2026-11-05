@@ -4,7 +4,7 @@ import BottomSheet from '@/components/common/BottomSheet.vue'
 import { Button } from '@/components/ui/button'
 import { Share2, Loader2 } from 'lucide-vue-next'
 import type { Product } from '@/db/types'
-import { barcodeToPngDataUrl, barcodeTypeHint, renderBarcodeSvg } from '@/lib/barcode'
+import { barcodeToPngDataUrl, barcodeTypeHint, renderالباركودSvg } from '@/lib/barcode'
 import { saveOrShare, stripDataUrl } from '@/lib/download'
 import { formatRupiah } from '@/lib/money'
 
@@ -54,7 +54,7 @@ watch(
     // Elemennya belum ke-mount. Aman: `svgEl` ikut di-watch, jadi watcher ini
     // jalan lagi begitu ref-nya keisi — statusnya sudah terlanjur di-reset.
     if (!svgEl.value) return
-    const res = await renderBarcodeSvg(svgEl.value, p.barcode, p.barcode_type)
+    const res = await renderالباركودSvg(svgEl.value, p.barcode, p.barcode_type)
     if (token !== renderToken) return // sudah ada render yang lebih baru
     status.value = res.ok ? 'ok' : 'invalid'
     rendered.value = res.rendered
@@ -78,14 +78,14 @@ async function share() {
 </script>
 
 <template>
-  <BottomSheet :open="open" title="Barcode" @update:open="emit('update:open', $event)">
+  <BottomSheet :open="open" title="الباركود" @update:open="emit('update:open', $event)">
     <div v-if="product" class="space-y-4 p-5">
       <div class="text-center">
         <p class="font-semibold">{{ product.name }}</p>
         <p class="text-sm text-info">{{ formatRupiah(product.price) }}</p>
       </div>
 
-      <!-- Barcode wajib latar putih & garis hitam, termasuk di dark mode —
+      <!-- الباركود wajib latar putih & garis hitam, termasuk di dark mode —
            scanner baca kontras, bukan warna tema. -->
       <div class="flex min-h-32 items-center justify-center rounded-2xl bg-white p-4">
         <!-- `:key` maksa elemen SVG BARU tiap nilai/tipe berubah → mustahil ada
@@ -97,11 +97,11 @@ async function share() {
         />
         <Loader2 v-if="status === 'rendering'" class="size-5 animate-spin text-neutral-400" />
         <p v-else-if="status === 'empty'" class="py-6 text-center text-sm text-neutral-500">
-          Produk ini belum punya barcode.
+          هذا المنتج لا يحتوي على باركود.
         </p>
         <p v-else-if="status === 'invalid'" class="py-6 text-center text-sm text-neutral-500">
-          "{{ product.barcode }}" tidak sesuai {{ product.barcode_type }} —
-          butuh {{ barcodeTypeHint(product.barcode_type) }}.
+          "{{ product.barcode }}" لا يتوافق مع {{ product.barcode_type }} —
+          المطلوب {{ barcodeTypeHint(product.barcode_type) }}.
         </p>
       </div>
 
@@ -112,12 +112,12 @@ async function share() {
       <!-- Check digit EAN/UPC/ITF ditambah otomatis → angka di gambar bisa beda
            dari yang tersimpan. Bilang terus terang, daripada user ngira salah. -->
       <p v-if="rendered && rendered !== product.barcode" class="text-center text-xs text-warning">
-        Tergambar sebagai {{ rendered }} — check digit ditambah otomatis.
+        سيظهر بالشكل {{ rendered }} — تمت إضافة رقم التحقق تلقائياً.
       </p>
 
       <Button class="w-full gap-2" :disabled="!valid || sharing" @click="share">
         <component :is="sharing ? Loader2 : Share2" class="size-4" :class="sharing && 'animate-spin'" />
-        {{ sharing ? 'Menyiapkan…' : 'Bagikan / Simpan Gambar' }}
+        {{ sharing ? 'جارٍ التجهيز…' : 'مشاركة / حفظ الصورة' }}
       </Button>
     </div>
   </BottomSheet>
