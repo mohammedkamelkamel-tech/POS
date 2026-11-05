@@ -6,7 +6,8 @@ import PinPad from '@/components/common/PinPad.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useSettingsStore } from '@/stores/settings'
 import { useMediaStore } from '@/stores/media'
-import { ShieldCheck } from 'lucide-vue-next'
+import { ShieldCheck, Fingerprint } from 'lucide-vue-next'
+import { deviceBiometric } from '@/services/auth/deviceBiometric'
 
 const route = useRoute()
 const router = useRouter()
@@ -23,6 +24,16 @@ onMounted(async () => {
   if (storeLogo.value) {
     await media.ensure([storeLogo.value])
     logoUrl.value = media.url(storeLogo.value)
+  }
+  if (settings.biometricEnabled) {
+    try {
+      await deviceBiometric.authenticate()
+      auth.unlocked = true
+      const r = route.query.redirect
+      await router.replace(typeof r === 'string' ? r : '/')
+    } catch {
+      // إلغاء البصمة أو فشلها يعيد المستخدم إلى إدخال الرقم السري.
+    }
   }
 })
 
@@ -50,7 +61,7 @@ async function onComplete(value: string) {
       <div>
         <p class="text-lg font-bold">{{ storeName }}</p>
         <p class="text-sm text-muted-foreground">
-          {{ error ? 'الرقم السري غير صحيح، حاول مجدداً' : 'أدخل الرقم السري لفتح التطبيق' }}
+          {{ error ? 'الرقم السري غير صحيح، حاول مجدداً' : 'أدخل الرقم السري أو استخدم البصمة لفتح التطبيق' }}
         </p>
       </div>
     </div>
