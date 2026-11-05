@@ -37,7 +37,7 @@ function handleCode(code: string) {
   const value = code.trim()
   if (!value) return
 
-  const p = products.byالباركود(value)
+  const p = products.byBarcode(value)
   if (!p) {
     scanFeedback(false)
     unknown.value = value
