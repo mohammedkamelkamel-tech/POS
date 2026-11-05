@@ -1,17 +1,21 @@
 <script setup lang="ts">
 import { RouterLink, useRoute } from 'vue-router'
+import { computed } from 'vue'
+import { useAuthStore } from '@/stores/auth'
 import { cn } from '@/lib/utils'
 import { primaryNavItems, isNavActive } from './navItems'
 
 const route = useRoute()
+const auth = useAuthStore()
+const visibleNavItems = computed(() => auth.isOwner ? primaryNavItems : primaryNavItems.filter(item => item.to === '/' || item.to === '/pos'))
 </script>
 
 <template>
   <nav
-    class="sticky bottom-0 z-30 grid grid-cols-5 border-t border-border bg-card/95 backdrop-blur pb-[env(safe-area-inset-bottom)] md:hidden"
+    class="sticky bottom-0 z-30 grid grid-cols-2 border-t border-border bg-card/95 backdrop-blur pb-[env(safe-area-inset-bottom)] md:hidden"
   >
     <RouterLink
-      v-for="item in primaryNavItems"
+      v-for="item in visibleNavItems"
       :key="item.to"
       :to="item.to"
       class="flex flex-col items-center justify-center gap-1 py-2.5 text-[11px] font-medium transition-colors"
