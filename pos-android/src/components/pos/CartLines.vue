@@ -33,7 +33,7 @@ const media = useMediaStore()
       </div>
       <div class="min-w-0 flex-1">
         <p class="truncate text-sm font-medium">{{ l.name }}</p>
-        <p class="text-xs text-muted-foreground">{{ formatRupiah(l.price) }}</p>
+        <p class="text-xs text-muted-foreground">{{ l.unitLabel ? `${l.unitLabel} · ` : '' }}{{ formatRupiah(l.price) }}</p>
       </div>
       <div class="flex items-center gap-2">
         <button
