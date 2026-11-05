@@ -12,15 +12,15 @@ import {
 } from 'lucide-vue-next'
 import { useReportsStore, type ReportSource } from '@/stores/reports'
 import { useSalesStore } from '@/stores/sales'
-import { useCashflowStore } from '@/stores/cashflow'
+import { useالحركة الماليةStore } from '@/stores/cashflow'
 import { formatRupiah } from '@/lib/money'
 import { formatDate, nowMs } from '@/lib/datetime'
 import { rangeLabel } from '@/lib/dateRange'
 
 const reports = useReportsStore()
 const sales = useSalesStore()
-const cashflow = useCashflowStore()
-const { source, range, todaySalesSummary, todayCashflow, chart, hasChartData } =
+const cashflow = useالحركة الماليةStore()
+const { source, range, todaySalesSummary, todayالحركة المالية, chart, hasChartData } =
   storeToRefs(reports)
 
 const todayLabel = computed(() => formatDate(nowMs()))
@@ -28,7 +28,7 @@ const trendLabel = computed(() => rangeLabel(range.value))
 
 const SOURCES: { key: ReportSource; label: string }[] = [
   { key: 'sales', label: 'Transaksi' },
-  { key: 'cashflow', label: 'Cashflow' },
+  { key: 'cashflow', label: 'الحركة المالية' },
 ]
 
 // Format ringkas untuk label sumbu-Y (mis. 1,2jt / 300rb).
@@ -77,8 +77,8 @@ const chartOptions = computed<ApexOptions>(() => {
 // Konfigurasi export mengikuti sumber aktif — reuse buildExport yang sudah ada.
 const exportConfig = computed(() =>
   source.value === 'sales'
-    ? { title: 'Export Transaksi', filenameBase: 'transaksi', buildSheets: sales.buildExport }
-    : { title: 'Export Cashflow', filenameBase: 'cashflow', buildSheets: cashflow.buildExport },
+    ? { title: 'تصدير الفواتير', filenameBase: 'transaksi', buildSheets: sales.buildExport }
+    : { title: 'Export الحركة المالية', filenameBase: 'cashflow', buildSheets: cashflow.buildExport },
 )
 
 const exportOpen = ref(false)
@@ -107,32 +107,32 @@ onMounted(() => reports.load())
       </p>
 
       <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <!-- Penjualan hari ini -->
+        <!-- المبيعات hari ini -->
         <div
           class="col-span-2 rounded-2xl bg-gradient-to-br from-hero to-hero/90 p-4 text-hero-foreground sm:col-span-1"
         >
           <div class="flex items-center gap-1.5 text-xs opacity-85">
-            <ShoppingCart class="size-3.5" /> Penjualan
+            <ShoppingCart class="size-3.5" /> المبيعات
           </div>
           <p class="mt-1 text-2xl font-bold">{{ formatRupiah(todaySalesSummary.total) }}</p>
           <p class="text-xs opacity-85">{{ todaySalesSummary.count }} transaksi</p>
         </div>
 
-        <!-- Pemasukan vs Pengeluaran hari ini -->
+        <!-- الإيرادات vs المصروفات hari ini -->
         <div class="rounded-2xl border border-border bg-card p-4">
           <div class="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <ArrowDownLeft class="size-3.5 text-success" /> Pemasukan
+            <ArrowDownLeft class="size-3.5 text-success" /> الإيرادات
           </div>
           <p class="mt-1 text-lg font-bold text-success">
-            {{ formatRupiah(todayCashflow.income) }}
+            {{ formatRupiah(todayالحركة المالية.income) }}
           </p>
         </div>
         <div class="rounded-2xl border border-border bg-card p-4">
           <div class="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <ArrowUpRight class="size-3.5 text-destructive" /> Pengeluaran
+            <ArrowUpRight class="size-3.5 text-destructive" /> المصروفات
           </div>
           <p class="mt-1 text-lg font-bold text-destructive">
-            {{ formatRupiah(todayCashflow.expense) }}
+            {{ formatRupiah(todayالحركة المالية.expense) }}
           </p>
         </div>
       </div>
@@ -180,8 +180,8 @@ onMounted(() => reports.load())
         <EmptyState
           v-else
           :icon="BarChart3"
-          title="Belum ada data"
-          :description="`Tidak ada ${source === 'sales' ? 'penjualan' : 'catatan kas'} pada rentang ${trendLabel.toLowerCase()}.`"
+          title="لا توجد بيانات"
+          :description="`Tidak ada ${source === 'sales' ? 'penjualan' : 'حركات مالية'} pada rentang ${trendLabel.toLowerCase()}.`"
         />
       </div>
     </section>
