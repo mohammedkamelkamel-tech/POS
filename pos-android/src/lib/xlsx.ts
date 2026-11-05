@@ -15,7 +15,7 @@ const MAX_ZIP_ENTRIES = 256
 const MAX_ROWS = 10_000
 const MAX_COLUMNS = 64
 const UTF8_DECODER = new TextDecoder('utf-8', { fatal: true })
-const UNSUPPORTED_SPREADSHEET_MESSAGE = 'Berkas spreadsheet tidak valid atau tidak didukung.'
+const UNSUPPORTED_SPREADSHEET_MESSAGE = 'ملف جدول البيانات غير صالح أو غير مدعوم.'
 
 class UnsupportedSpreadsheetError extends Error {
   readonly name = 'UnsupportedSpreadsheetError'
