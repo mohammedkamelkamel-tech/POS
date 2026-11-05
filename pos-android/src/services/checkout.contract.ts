@@ -127,7 +127,10 @@ export function saleAmounts(
       line.price < 0 ||
       !Number.isSafeInteger(line.qty) ||
       line.qty <= 0 ||
-      line.productId.trim().length === 0
+      line.productId.trim().length === 0 ||
+      !Number.isSafeInteger(line.price * line.qty) ||
+      (line.quantityKind === 'weight' && (!Number.isSafeInteger(line.weightGrams) || (line.weightGrams ?? 0) <= 0)) ||
+      (line.quantityKind === 'meal' && ![1, 2, 4, 6, 8].includes(line.portionQuarters ?? 0))
     ) {
       throw new CheckoutError({ kind: 'invalid-input', reason: 'Baris keranjang tidak valid' })
     }
@@ -136,7 +139,13 @@ export function saleAmounts(
   if (!Number.isSafeInteger(discount) || discount < 0) {
     throw new CheckoutError({ kind: 'invalid-input', reason: 'Diskon tidak valid' })
   }
-  const subtotal = lines.reduce((sum, line) => sum + line.price * line.qty, 0)
+  const subtotal = lines.reduce((sum, line) => {
+    const next = sum + line.price * line.qty
+    if (!Number.isSafeInteger(next)) {
+      throw new CheckoutError({ kind: 'invalid-input', reason: 'إجمالي الفاتورة أكبر من المسموح' })
+    }
+    return next
+  }, 0)
   const appliedDiscount = Math.min(discount, subtotal)
   return { subtotal, discount: appliedDiscount, total: subtotal - appliedDiscount }
 }
