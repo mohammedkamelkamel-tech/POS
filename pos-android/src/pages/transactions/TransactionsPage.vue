@@ -21,7 +21,7 @@ const label = computed(() => rangeLabel(range.value))
 
 const exportOpen = ref(false)
 
-const PAY_LABEL: Record<string, string> = { cash: 'Tunai', qris: 'QRIS', transfer: 'Transfer' }
+const PAY_LABEL: Record<string, string> = { cash: 'نقداً', qris: 'QRIS', transfer: 'تحويل' }
 
 function activityTime(sale: Sale): number {
   if (sale.status === 'open') return sale.opened_at ?? sale.created_at
@@ -76,7 +76,7 @@ onMounted(() => sales.load())
 
     <!-- Ringkasan rentang aktif -->
     <div class="border-b border-border bg-gradient-to-br from-hero to-hero/90 px-5 py-5 text-hero-foreground">
-      <p class="text-xs opacity-80">Penjualan · {{ label }}</p>
+      <p class="text-xs opacity-80">المبيعات · {{ label }}</p>
       <p class="mt-1 text-2xl font-bold">{{ formatRupiah(summary.total) }}</p>
       <p class="mt-0.5 text-xs opacity-80">{{ summary.count }} transaksi</p>
     </div>
@@ -99,19 +99,19 @@ onMounted(() => sales.load())
             </div>
             <div class="min-w-0 flex-1">
               <p class="truncate text-sm font-medium">
-                {{ s.status === 'open' ? s.open_bill_label ?? 'Tanpa label' : s.number }}
+                {{ s.status === 'open' ? s.open_bill_label ?? 'بدون تسمية' : s.number }}
               </p>
               <div class="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
                 <span>{{ formatTime(activityTime(s)) }}</span>
                 <span>·</span>
-                <span v-if="s.status === 'open'">Ditahan · {{ s.number }}</span>
+                <span v-if="s.status === 'open'">معلقة · {{ s.number }}</span>
                 <span v-else>{{ PAY_LABEL[s.payment_method] ?? s.payment_method }}</span>
               </div>
             </div>
             <div class="text-right">
               <p class="text-sm font-semibold">{{ formatRupiah(s.total) }}</p>
-              <Badge v-if="s.status === 'open'" variant="warning" class="mt-0.5">Open Bill</Badge>
-              <Badge v-if="s.status === 'void'" variant="secondary" class="mt-0.5">Batal</Badge>
+              <Badge v-if="s.status === 'open'" variant="warning" class="mt-0.5">فاتورة معلقة</Badge>
+              <Badge v-if="s.status === 'void'" variant="secondary" class="mt-0.5">ملغاة</Badge>
             </div>
             <ChevronRight class="size-4 text-muted-foreground" />
           </RouterLink>
@@ -122,13 +122,13 @@ onMounted(() => sales.load())
     <EmptyState
       v-else
       :icon="Receipt"
-      title="Tidak ada transaksi"
-      :description="`Tidak ada transaksi pada rentang ${label.toLowerCase()}. Coba ubah filter tanggal.`"
+      title="لا توجد فواتير"
+      :description="`لا توجد فواتير pada rentang ${label.toLowerCase()}. جرّب تغيير نطاق التاريخ.`"
     />
 
     <ExportDialog
       v-model:open="exportOpen"
-      title="Export Transaksi"
+      title="تصدير الفواتير"
       filename-base="transaksi"
       :initial-range="range"
       :build-sheets="sales.buildExport"
