@@ -44,7 +44,7 @@ function setFilter(id: string | null) {
 
 <template>
   <div>
-    <AppHeader title="المنتجات" :subtitle="`${count} item`" back>
+    <AppHeader title="المنتجات" :subtitle="`${count} منتج`" back>
       <template #actions>
         <Button
           variant="outline"
@@ -58,7 +58,7 @@ function setFilter(id: string | null) {
         <RouterLink to="/categories">
           <Button variant="outline" size="sm" class="gap-1.5" title="إدارة التصنيفات">
             <Tag class="size-4" />
-            <span>Kategori</span>
+            <span>التصنيفات</span>
           </Button>
         </RouterLink>
       </template>
