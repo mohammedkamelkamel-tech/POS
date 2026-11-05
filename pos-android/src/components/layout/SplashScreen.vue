@@ -27,7 +27,7 @@ onMounted(() => {
     :class="BG[splashBg] || BG.brand"
   >
     <div
-      class="flex size-24 items-center justify-center overflow-hidden rounded-3xl shadow-lg"
+      class="flex size-28 items-center justify-center overflow-hidden rounded-3xl p-1 shadow-lg"
       :class="splashBg === 'brand' ? 'bg-white/15' : 'bg-primary/10'"
     >
       <img
@@ -36,7 +36,7 @@ onMounted(() => {
         alt="شعار المتجر"
         class="size-full object-contain p-1.5"
       />
-      <Store v-else class="size-12" :class="splashBg === 'brand' ? '' : 'text-primary'" />
+      <Store v-else class="size-14" :class="splashBg === 'brand' ? '' : 'text-primary'" />
     </div>
     <div class="text-center">
       <p class="text-xl font-bold">{{ storeName }}</p>
