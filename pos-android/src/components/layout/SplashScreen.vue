@@ -1,12 +1,9 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useSettingsStore } from '@/stores/settings'
-import { useMediaStore } from '@/stores/media'
 
 const settings = useSettingsStore()
-const media = useMediaStore()
-const { storeName, storeLogo, splashBg } = storeToRefs(settings)
+const { storeName, splashBg } = storeToRefs(settings)
 
 const BG: Record<string, string> = {
   brand: 'bg-gradient-to-b from-hero to-hero/90 text-hero-foreground',
@@ -14,10 +11,6 @@ const BG: Record<string, string> = {
   dark: 'bg-slate-900 text-white',
 }
 
-onMounted(() => {
-  // Pastikan logo ada di cache biar langsung tampil.
-  if (storeLogo.value) media.ensure([storeLogo.value])
-})
 </script>
 
 <template>
