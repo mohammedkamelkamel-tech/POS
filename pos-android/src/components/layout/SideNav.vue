@@ -33,7 +33,7 @@ onMounted(() => {
         <img
           v-if="media.url(storeLogo)"
           :src="media.url(storeLogo)!"
-          alt="Logo toko"
+          alt="شعار المتجر"
           class="size-full object-contain p-1"
         />
         <Store v-else class="size-5" />
@@ -41,7 +41,7 @@ onMounted(() => {
       <div class="min-w-0">
         <p class="truncate text-sm font-bold leading-tight">{{ storeName }}</p>
         <p class="truncate text-xs text-muted-foreground">
-          {{ storeOwner || 'POS Kacaw' }}
+          {{ storeOwner || 'الكامل-كاشير' }}
         </p>
       </div>
     </RouterLink>
