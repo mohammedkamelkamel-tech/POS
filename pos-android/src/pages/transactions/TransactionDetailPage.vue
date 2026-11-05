@@ -23,7 +23,7 @@ const sale = ref<Sale | null>(null)
 const items = ref<SaleItem[]>([])
 const loading = ref(true)
 
-const PAY_LABEL: Record<string, string> = { cash: 'نقداً', qris: 'QRIS', transfer: 'Transfer' }
+const PAY_LABEL: Record<string, string> = { cash: 'نقداً', qris: 'رمز QR', transfer: 'تحويل بنكي' }
 
 function activityTime(value: Sale): number {
   if (value.status === 'open') return value.opened_at ?? value.created_at
@@ -55,7 +55,7 @@ async function printReceipt() {
   <div>
     <AppHeader title="تفاصيل الفاتورة" :subtitle="sale?.number" back />
 
-    <div v-if="loading" class="p-8 text-center text-sm text-muted-foreground">Memuat…</div>
+    <div v-if="loading" class="p-8 text-center text-sm text-muted-foreground">جارٍ التحميل…</div>
 
     <div v-else-if="!sale" class="flex flex-col items-center gap-2 p-12 text-center text-muted-foreground">
       <Receipt class="size-10" />
@@ -66,23 +66,23 @@ async function printReceipt() {
       <!-- Info -->
       <div class="rounded-2xl border border-border bg-card p-4">
         <div class="flex items-center justify-between text-sm">
-          <span class="text-muted-foreground">Nomor</span>
+          <span class="text-muted-foreground">رقم الفاتورة</span>
           <span class="font-medium">{{ sale.number }}</span>
         </div>
         <div class="mt-1.5 flex items-center justify-between text-sm">
-          <span class="text-muted-foreground">{{ sale.status === 'open' ? 'Ditahan' : 'Waktu' }}</span>
+          <span class="text-muted-foreground">{{ sale.status === 'open' ? 'معلّقة' : 'الوقت' }}</span>
           <span>{{ formatDateTime(activityTime(sale)) }}</span>
         </div>
         <div v-if="sale.status === 'open'" class="mt-1.5 flex items-center justify-between gap-3 text-sm">
-          <span class="text-muted-foreground">Label</span>
-          <span class="truncate text-right font-medium">{{ sale.open_bill_label ?? 'Tanpa label' }}</span>
+          <span class="text-muted-foreground">التسمية</span>
+          <span class="truncate text-right font-medium">{{ sale.open_bill_label ?? 'بلا تسمية' }}</span>
         </div>
         <div v-if="sale.status !== 'open'" class="mt-1.5 flex items-center justify-between text-sm">
-          <span class="text-muted-foreground">Metode</span>
+          <span class="text-muted-foreground">طريقة الدفع</span>
           <span>{{ PAY_LABEL[sale.payment_method] ?? sale.payment_method }}</span>
         </div>
         <div v-if="sale.status === 'open'" class="mt-3">
-          <Badge variant="warning">Open Bill</Badge>
+          <Badge variant="warning">فاتورة معلّقة</Badge>
         </div>
       </div>
 
@@ -98,10 +98,10 @@ async function printReceipt() {
             <span class="text-sm font-semibold">{{ formatRupiah(it.line_total) }}</span>
           </div>
         </div>
-        <!-- Total -->
+        <!-- الإجمالي -->
         <div class="space-y-1.5 border-t border-border bg-muted/30 p-4">
           <div class="flex justify-between text-sm">
-            <span class="text-muted-foreground">Subtotal</span>
+            <span class="text-muted-foreground">المجموع الفرعي</span>
             <span>{{ formatRupiah(sale.subtotal) }}</span>
           </div>
           <div v-if="sale.discount > 0" class="flex justify-between text-sm">
@@ -109,7 +109,7 @@ async function printReceipt() {
             <span>-{{ formatRupiah(sale.discount) }}</span>
           </div>
           <div class="flex justify-between text-base font-bold">
-            <span>Total</span>
+            <span>الإجمالي</span>
             <span>{{ formatRupiah(sale.total) }}</span>
           </div>
           <div v-if="sale.status !== 'open'" class="flex justify-between text-sm">
