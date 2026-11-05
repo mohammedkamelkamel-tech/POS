@@ -44,7 +44,14 @@ export const useSettingsStore = defineStore('settings', () => {
 
   async function load() {
     const all = await repo().getAll()
-    storeName.value = all[KEYS.storeName] || 'POS Kacaw'
+    const savedStoreName = all[KEYS.storeName]
+    // ترحيل الاسم الافتراضي القديم فقط، مع الحفاظ على اسم المتجر المخصص.
+    if (!savedStoreName || savedStoreName === 'POS Kacaw') {
+      storeName.value = 'الكامل-كاشير'
+      await repo().set(KEYS.storeName, storeName.value)
+    } else {
+      storeName.value = savedStoreName
+    }
     storeOwner.value = all[KEYS.storeOwner] || ''
     storeLogo.value = all[KEYS.storeLogo] || null
     loginEnabled.value = all[KEYS.loginEnabled] === '1'
