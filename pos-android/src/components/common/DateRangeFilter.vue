@@ -69,7 +69,7 @@ function applyCustom() {
         "
         @click="toggleCustom"
       >
-        Kustom
+        مخصص
       </button>
     </div>
 
@@ -85,7 +85,7 @@ function applyCustom() {
         </div>
       </div>
       <Button size="sm" class="h-9 w-full" :disabled="!fromDay || !toDay" @click="applyCustom">
-        Terapkan
+        تطبيق
       </Button>
     </div>
   </div>
