@@ -149,16 +149,16 @@ function confirm() {
           <span v-else class="px-4 text-xs text-destructive">تعذر إنشاء رمز QR. تحقق من إعدادات رمز QR.</span>
         </div>
         <p v-if="qrisDynamicReady" class="text-xs text-muted-foreground">
-          Pembeli scan QR ini — nominal sudah terkunci
+          امسح رمز QR لإتمام الدفع؛ المبلغ محدد مسبقاً
           <span class="font-semibold text-foreground">{{ formatRupiah(total) }}</span>.
         </p>
         <p v-else class="text-xs text-muted-foreground">
-          Pembeli scan QR ini lalu masukkan nominal
+          امسح رمز QR ثم أدخل المبلغ
           <span class="font-semibold text-foreground">{{ formatRupiah(total) }}</span> يدوياً.
         </p>
       </div>
       <p v-else class="text-center text-xs text-muted-foreground">
-        الدفع non-tunai dianggap lunas sejumlah total.
+        تُعدّ المدفوعات غير النقدية مسددة بالكامل بقيمة الإجمالي.
       </p>
 
       <!-- الباقي -->
