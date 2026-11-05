@@ -11,11 +11,11 @@ export interface DateRange {
 }
 
 export const PRESET_LABEL: Record<RangePreset, string> = {
-  today: 'Hari ini',
+  today: 'اليوم',
   yesterday: 'Kemarin',
-  week: 'Minggu ini',
-  month: 'Bulan ini',
-  custom: 'Kustom',
+  week: 'هذا الأسبوع',
+  month: 'هذا الشهر',
+  custom: 'مخصص',
 }
 
 /** Bangun rentang dari preset. `to` di-cap ke akhir hari ini (tak ada data masa depan). */
