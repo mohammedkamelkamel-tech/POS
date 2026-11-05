@@ -6,21 +6,21 @@ import type { ApexOptions } from 'apexcharts'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import DateRangeFilter from '@/components/common/DateRangeFilter.vue'
-import ExportDialog from '@/components/common/ExportDialog.vue'
+import تصديرDialog from '@/components/common/تصديرDialog.vue'
 import {
   BarChart3, Download, ShoppingCart, ArrowDownLeft, ArrowUpRight,
 } from 'lucide-vue-next'
 import { useReportsStore, type ReportSource } from '@/stores/reports'
 import { useSalesStore } from '@/stores/sales'
-import { useCashflowStore } from '@/stores/cashflow'
+import { useالحركة الماليةStore } from '@/stores/cashflow'
 import { formatRupiah } from '@/lib/money'
 import { formatDate, nowMs } from '@/lib/datetime'
 import { rangeLabel } from '@/lib/dateRange'
 
 const reports = useReportsStore()
 const sales = useSalesStore()
-const cashflow = useCashflowStore()
-const { source, range, todaySalesSummary, todayCashflow, chart, hasChartData } =
+const cashflow = useالحركة الماليةStore()
+const { source, range, todaySalesSummary, todayالحركة المالية, chart, hasChartData } =
   storeToRefs(reports)
 
 const todayLabel = computed(() => formatDate(nowMs()))
@@ -47,7 +47,7 @@ const chartOptions = computed<ApexOptions>(() => {
       background: 'transparent',
     },
     theme: { mode: dark ? 'dark' : 'light' },
-    // Charcoal (brand) untuk المبيعات; hijau/merah untuk pemasukan/pengeluaran.
+    // اللون الداكن للمبيعات، والأخضر للإيرادات، والأحمر للمصروفات.
     colors: source.value === 'sales' ? [dark ? '#a1a1aa' : '#3f4756'] : ['#3f9c5a', '#e5484d'],
     plotOptions: { bar: { borderRadius: 4, columnWidth: '58%' } },
     dataLabels: { enabled: false },
@@ -74,11 +74,11 @@ const chartOptions = computed<ApexOptions>(() => {
   }
 })
 
-// Konfigurasi export mengikuti sumber aktif — reuse buildExport yang sudah ada.
+// Konfigurasi export mengikuti sumber aktif — reuse buildتصدير yang sudah ada.
 const exportConfig = computed(() =>
   source.value === 'sales'
-    ? { title: 'تصدير الفواتير', filenameBase: 'عملية بيع', buildSheets: sales.buildExport }
-    : { title: 'تصدير الحركة المالية', filenameBase: 'الحركة-المالية', buildSheets: cashflow.buildExport },
+    ? { title: 'تصدير الفواتير', filenameBase: 'عملية بيع', buildSheets: sales.buildتصدير }
+    : { title: 'تصدير الحركة المالية', filenameBase: 'الحركة-المالية', buildSheets: cashflow.buildتصدير },
 )
 
 const exportOpen = ref(false)
@@ -100,14 +100,14 @@ onMounted(() => reports.load())
       </template>
     </AppHeader>
 
-    <!-- KPI Hari Ini (selalu hari ini, tak ikut filter) -->
+    <!-- KPI اليوم (selalu اليوم, tak ikut filter) -->
     <section class="space-y-3 p-4">
       <p class="px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         اليوم · {{ todayLabel }}
       </p>
 
       <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <!-- المبيعات hari ini -->
+        <!-- المبيعات اليوم -->
         <div
           class="col-span-2 rounded-2xl bg-gradient-to-br from-hero to-hero/90 p-4 text-hero-foreground sm:col-span-1"
         >
@@ -118,13 +118,13 @@ onMounted(() => reports.load())
           <p class="text-xs opacity-85">{{ todaySalesSummary.count }} عملية بيع</p>
         </div>
 
-        <!-- الإيرادات vs المصروفات hari ini -->
+        <!-- الإيرادات vs المصروفات اليوم -->
         <div class="rounded-2xl border border-border bg-card p-4">
           <div class="flex items-center gap-1.5 text-xs text-muted-foreground">
             <ArrowDownLeft class="size-3.5 text-success" /> الإيرادات
           </div>
           <p class="mt-1 text-lg font-bold text-success">
-            {{ formatRupiah(todayCashflow.income) }}
+            {{ formatRupiah(todayالحركة المالية.income) }}
           </p>
         </div>
         <div class="rounded-2xl border border-border bg-card p-4">
@@ -132,7 +132,7 @@ onMounted(() => reports.load())
             <ArrowUpRight class="size-3.5 text-destructive" /> المصروفات
           </div>
           <p class="mt-1 text-lg font-bold text-destructive">
-            {{ formatRupiah(todayCashflow.expense) }}
+            {{ formatRupiah(todayالحركة المالية.expense) }}
           </p>
         </div>
       </div>
@@ -186,7 +186,7 @@ onMounted(() => reports.load())
       </div>
     </section>
 
-    <ExportDialog
+    <تصديرDialog
       v-model:open="exportOpen"
       :title="exportConfig.title"
       :filename-base="exportConfig.filenameBase"
