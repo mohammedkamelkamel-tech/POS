@@ -4,13 +4,13 @@ export function nowMs(): number {
   return Date.now()
 }
 
-const dateFmt = new Intl.DateTimeFormat('id-ID', {
+const dateFmt = new Intl.DateTimeFormat('ar-YE', {
   day: '2-digit',
   month: 'short',
   year: 'numeric',
 })
 
-const dateTimeFmt = new Intl.DateTimeFormat('id-ID', {
+const dateTimeFmt = new Intl.DateTimeFormat('ar-YE', {
   day: '2-digit',
   month: 'short',
   year: 'numeric',
@@ -18,7 +18,7 @@ const dateTimeFmt = new Intl.DateTimeFormat('id-ID', {
   minute: '2-digit',
 })
 
-const timeFmt = new Intl.DateTimeFormat('id-ID', {
+const timeFmt = new Intl.DateTimeFormat('ar-YE', {
   hour: '2-digit',
   minute: '2-digit',
 })
@@ -64,7 +64,7 @@ export function monthKey(ms: number): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
 }
 
-const monthFmt = new Intl.DateTimeFormat('id-ID', { month: 'long', year: 'numeric' })
+const monthFmt = new Intl.DateTimeFormat('ar-YE', { month: 'long', year: 'numeric' })
 
 /** 175... -> "Agustus 2026" */
 export function formatMonth(ms: number): string {
