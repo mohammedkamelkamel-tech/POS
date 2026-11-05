@@ -6,36 +6,36 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
-  Printer, CheckCircle2, XCircle, Bluetooth, Usb, Loader2, RefreshCw, Trash2, Check,
+  الطابعة, CheckCircle2, XCircle, Bluetooth, Usb, Loader2, RefreshCw, Trash2, Check,
 } from 'lucide-vue-next'
 import { capabilities } from '@/services/capabilities/registry'
-import type { PrinterCapability } from '@/services/capabilities/registry'
-import { usePrinterStore } from '@/stores/printer'
-import type { PrinterConnection, DiscoveredPrinter } from '@/services/capabilities/printers/transport'
+import type { الطابعةCapability } from '@/services/capabilities/registry'
+import { useالطابعةStore } from '@/stores/printer'
+import type { الطابعةConnection, Discoveredالطابعة } from '@/services/capabilities/printers/transport'
 import { formatDateTime, nowMs } from '@/lib/datetime'
 import { storeToRefs } from 'pinia'
 
 const isNative = Capacitor.isNativePlatform()
-const printer = usePrinterStore()
+const printer = useالطابعةStore()
 const {
   connection, deviceName, paperWidth, devices, scanning, error,
   transportAvailable, supportedConnections, selected,
 } = storeToRefs(printer)
 
-const cap = ref<PrinterCapability | null>(null)
+const cap = ref<الطابعةCapability | null>(null)
 const canPrint = ref(false)
 const printing = ref(false)
 const message = ref('')
 
-const CONN_META: Record<PrinterConnection, { label: string; icon: unknown }> = {
+const CONN_META: Record<الطابعةConnection, { label: string; icon: unknown }> = {
   bluetooth: { label: 'Bluetooth', icon: Bluetooth },
   usb: { label: 'USB', icon: Usb },
 }
 
-const activeConn = ref<PrinterConnection>('bluetooth')
+const activeConn = ref<الطابعةConnection>('bluetooth')
 
 onMounted(async () => {
-  cap.value = capabilities.get<PrinterCapability>('printer')
+  cap.value = capabilities.get<الطابعةCapability>('printer')
   await printer.load()
   if (supportedConnections.value.length) activeConn.value = supportedConnections.value[0]
   await refreshCanPrint()
@@ -45,12 +45,12 @@ async function refreshCanPrint() {
   canPrint.value = await capabilities.has('printer')
 }
 
-async function scan(conn: PrinterConnection) {
+async function scan(conn: الطابعةConnection) {
   activeConn.value = conn
   await printer.scan(conn)
 }
 
-async function pick(d: DiscoveredPrinter) {
+async function pick(d: Discoveredالطابعة) {
   await printer.select(d)
   await refreshCanPrint()
 }
@@ -69,17 +69,17 @@ async function testPrint() {
     await cap.value.print({
       title: 'Test Print',
       lines: [
-        { text: 'POS KACAW', align: 'center', bold: true, size: 'large' },
+        { text: 'الكامل-كاشير', align: 'center', bold: true, size: 'large' },
         { text: 'Struk Percobaan', align: 'center' },
         { text: '' },
         { text: formatDateTime(nowMs()), align: 'center' },
         { text: '-'.repeat(w), align: 'center' },
-        { text: 'Printer berfungsi', align: 'center' },
+        { text: 'الطابعة تعمل بشكل صحيح', align: 'center' },
       ],
     })
-    message.value = 'Perintah cetak terkirim.'
+    message.value = 'تم إرسال أمر الطباعة.'
   } catch (e) {
-    message.value = e instanceof Error ? e.message : 'Gagal mencetak.'
+    message.value = e instanceof Error ? e.message : 'تعذرت الطباعة.'
   } finally {
     printing.value = false
   }
@@ -88,26 +88,26 @@ async function testPrint() {
 
 <template>
   <div>
-    <AppHeader title="Printer" back />
+    <AppHeader title="الطابعة" back />
     <div class="space-y-4 p-4">
       <!-- Status -->
       <Card>
         <CardContent class="flex items-center gap-3 p-4">
           <div class="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <Printer class="size-5" />
+            <الطابعة class="size-5" />
           </div>
           <div class="flex-1">
             <p class="text-sm font-semibold">
-              {{ isNative ? 'Printer Thermal (ESC/POS)' : 'Preview Web Printer' }}
+              {{ isNative ? 'الطابعة Thermal (ESC/POS)' : 'Preview Web الطابعة' }}
             </p>
             <p class="text-xs text-muted-foreground">
-              {{ isNative ? (selected ? deviceName : 'Belum ada printer dipilih') : 'Cetak via dialog browser' }}
+              {{ isNative ? (selected ? deviceName : 'لم يتم اختيار طابعة') : 'الطباعة عبر نافذة المتصفح' }}
             </p>
           </div>
           <Badge :variant="canPrint ? 'success' : 'secondary'" class="gap-1">
             <CheckCircle2 v-if="canPrint" class="size-3" />
             <XCircle v-else class="size-3" />
-            {{ canPrint ? 'Siap' : 'Belum siap' }}
+            {{ canPrint ? 'جاهزة' : 'غير جاهزة' }}
           </Badge>
         </CardContent>
       </Card>
@@ -117,7 +117,7 @@ async function testPrint() {
         <!-- Transport belum terpasang -->
         <Card v-if="!transportAvailable">
           <CardContent class="space-y-1 p-4">
-            <p class="text-sm font-semibold">Transport printer belum terpasang</p>
+            <p class="text-sm font-semibold">لم يتم تفعيل خدمة الطباعة</p>
             <p class="text-xs text-muted-foreground">
               Layer software (encoder ESC/POS + pemilihan device) sudah siap. Plugin
               koneksi Bluetooth/USB akan diaktifkan pada update berikutnya — setelah
@@ -167,7 +167,7 @@ async function testPrint() {
             </button>
           </div>
 
-          <!-- Printer terpilih -->
+          <!-- الطابعة terpilih -->
           <Card v-if="selected">
             <CardContent class="flex items-center gap-3 p-4">
               <component :is="CONN_META[connection ?? 'bluetooth'].icon" class="size-5 text-primary" />
