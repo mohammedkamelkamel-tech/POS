@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli'
 
 const config: CapacitorConfig = {
   appId: 'com.karuhundeveloper.poskacaw',
-  appName: 'POS Kacaw',
+  appName: 'الكامل-كاشير',
   webDir: 'dist',
   plugins: {
     CapacitorSQLite: {
