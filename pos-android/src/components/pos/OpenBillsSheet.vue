@@ -45,7 +45,7 @@ function discard(bill: Sale) {
 <template>
   <BottomSheet
     :open="open"
-    title="Open Bills"
+    title="الفواتير المعلقة"
     @update:open="emit('update:open', $event)"
   >
     <div class="space-y-4 p-5">
@@ -53,7 +53,7 @@ function discard(bill: Sale) {
         v-if="cartHasLines"
         class="rounded-xl border border-warning/30 bg-warning/10 p-3 text-xs leading-relaxed text-warning-foreground"
       >
-        Kosongkan atau tahan keranjang aktif terlebih dahulu sebelum melanjutkan Open Bill lain.
+        Kosongkan atau tahan keranjang aktif terlebih dahulu sebelum melanjutkan فاتورة معلقة lain.
       </p>
 
       <div
@@ -67,8 +67,8 @@ function discard(bill: Sale) {
             </div>
             <div class="min-w-0 flex-1">
               <div class="flex flex-wrap items-center gap-2">
-                <p class="truncate text-sm font-semibold">{{ bill.open_bill_label ?? 'Tanpa label' }}</p>
-                <Badge variant="warning">Open Bill</Badge>
+                <p class="truncate text-sm font-semibold">{{ bill.open_bill_label ?? 'بدون تسمية' }}</p>
+                <Badge variant="warning">فاتورة معلقة</Badge>
               </div>
               <p class="mt-1 text-xs text-muted-foreground">{{ bill.number }}</p>
               <p class="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -112,7 +112,7 @@ function discard(bill: Sale) {
         <div class="flex size-11 items-center justify-center rounded-xl bg-muted text-muted-foreground">
           <ReceiptText class="size-5" />
         </div>
-        <p class="text-sm font-semibold">Belum ada Open Bill</p>
+        <p class="text-sm font-semibold">Belum ada فاتورة معلقة</p>
         <p class="max-w-64 text-xs leading-relaxed text-muted-foreground">
           Tahan pesanan dari keranjang untuk melanjutkannya nanti.
         </p>
