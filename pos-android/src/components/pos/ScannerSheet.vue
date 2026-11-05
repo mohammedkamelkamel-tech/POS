@@ -21,13 +21,13 @@ function onScan(r: ScanResult) {
 <template>
   <BottomSheet
     :open="open"
-    :title="title ?? 'Scan Barcode'"
+    :title="title ?? 'مسح الباركود'"
     @update:open="emit('update:open', $event)"
   >
     <div class="p-4">
       <!-- v-if: kamera cuma hidup selama sheet kebuka (onBeforeUnmount → stop) -->
       <div class="h-64 overflow-hidden rounded-2xl">
-        <CameraScanner v-if="open" hint="Arahkan barcode produk ke dalam kotak" @scan="onScan" />
+        <CameraScanner v-if="open" hint="وجّه باركود المنتج إلى داخل الإطار" @scan="onScan" />
       </div>
     </div>
   </BottomSheet>
