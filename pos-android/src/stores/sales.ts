@@ -104,9 +104,9 @@ export const useSalesStore = defineStore('sales', () => {
     const txRows = sales.map((s) => ({
       التاريخ: formatDateTime(s.sold_at),
       'رقم الفاتورة': s.number,
-      طريقة الدفع: s.payment_method,
-      الحالة: s.status === 'completed' ? 'Selesai' : 'Void',
-      المجموع الفرعي: s.subtotal,
+      'طريقة الدفع': ({ cash: 'نقداً', qris: 'رمز QR', transfer: 'تحويل بنكي' }[s.payment_method] ?? s.payment_method),
+      الحالة: s.status === 'completed' ? 'مكتملة' : 'ملغاة',
+      'المجموع الفرعي': s.subtotal,
       الخصم: s.discount,
       الضريبة: s.tax,
       الإجمالي: s.total,
@@ -114,13 +114,13 @@ export const useSalesStore = defineStore('sales', () => {
       الباقي: s.change_due,
     }))
     const itemRows = items.map((it) => ({
-      Tanggal: formatDateTime(it.sold_at),
-      'No Struk': it.number,
+      التاريخ: formatDateTime(it.sold_at),
+      'رقم الفاتورة': it.number,
       الصنف: it.name_snapshot,
       السعر: it.price_snapshot,
       الكمية: it.qty,
-      Diskon: it.discount,
-      Subtotal: it.line_total,
+      الخصم: it.discount,
+      'المجموع الفرعي': it.line_total,
     }))
     return [
       { name: 'الفواتير', rows: txRows },
