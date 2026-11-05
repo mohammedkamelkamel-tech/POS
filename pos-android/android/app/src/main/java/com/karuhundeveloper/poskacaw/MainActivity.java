@@ -10,6 +10,7 @@ public class MainActivity extends BridgeActivity {
         // Daftarin plugin lokal (printer thermal BT/USB) sebelum bridge dibuat.
         registerPlugin(ThermalPrinterPlugin.class);
         registerPlugin(SecureCredentialPlugin.class);
+        registerPlugin(DeviceBiometricPlugin.class);
         super.onCreate(savedInstanceState);
     }
 }
