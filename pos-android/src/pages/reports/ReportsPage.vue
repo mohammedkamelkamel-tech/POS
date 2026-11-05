@@ -27,14 +27,14 @@ const todayLabel = computed(() => formatDate(nowMs()))
 const trendLabel = computed(() => rangeLabel(range.value))
 
 const SOURCES: { key: ReportSource; label: string }[] = [
-  { key: 'sales', label: 'Transaksi' },
+  { key: 'sales', label: 'المبيعات' },
   { key: 'cashflow', label: 'الحركة المالية' },
 ]
 
 // Format ringkas untuk label sumbu-Y (mis. 1,2jt / 300rb).
 function compact(v: number): string {
-  if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(v % 1_000_000 === 0 ? 0 : 1)}jt`
-  if (v >= 1_000) return `${Math.round(v / 1_000)}rb`
+  if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(v % 1_000_000 === 0 ? 0 : 1)} مليون`
+  if (v >= 1_000) return `${Math.round(v / 1_000)} ألف`
   return String(v)
 }
 
@@ -77,8 +77,8 @@ const chartOptions = computed<ApexOptions>(() => {
 // Konfigurasi export mengikuti sumber aktif — reuse buildExport yang sudah ada.
 const exportConfig = computed(() =>
   source.value === 'sales'
-    ? { title: 'تصدير الفواتير', filenameBase: 'transaksi', buildSheets: sales.buildExport }
-    : { title: 'Export الحركة المالية', filenameBase: 'cashflow', buildSheets: cashflow.buildExport },
+    ? { title: 'تصدير الفواتير', filenameBase: 'المبيعات', buildSheets: sales.buildExport }
+    : { title: 'تصدير الحركة المالية', filenameBase: 'الحركة-المالية', buildSheets: cashflow.buildExport },
 )
 
 const exportOpen = ref(false)
@@ -88,11 +88,11 @@ onMounted(() => reports.load())
 
 <template>
   <div class="pb-6">
-    <AppHeader title="Laporan" :subtitle="`Tren · ${trendLabel}`" back>
+    <AppHeader title="التقارير" :subtitle="`الاتجاه · ${trendLabel}`" back>
       <template #actions>
         <button
           class="flex size-9 items-center justify-center rounded-full text-foreground hover:bg-accent"
-          aria-label="Export Excel"
+          aria-label="تصدير PDF"
           @click="exportOpen = true"
         >
           <Download class="size-5" />
@@ -103,7 +103,7 @@ onMounted(() => reports.load())
     <!-- KPI Hari Ini (selalu hari ini, tak ikut filter) -->
     <section class="space-y-3 p-4">
       <p class="px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-        Hari ini · {{ todayLabel }}
+        اليوم · {{ todayLabel }}
       </p>
 
       <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -115,7 +115,7 @@ onMounted(() => reports.load())
             <ShoppingCart class="size-3.5" /> المبيعات
           </div>
           <p class="mt-1 text-2xl font-bold">{{ formatRupiah(todaySalesSummary.total) }}</p>
-          <p class="text-xs opacity-85">{{ todaySalesSummary.count }} transaksi</p>
+          <p class="text-xs opacity-85">{{ todaySalesSummary.count }} عملية بيع</p>
         </div>
 
         <!-- الإيرادات vs المصروفات hari ini -->
@@ -142,7 +142,7 @@ onMounted(() => reports.load())
     <section class="border-t border-border">
       <div class="flex items-center justify-between px-4 pt-4">
         <p class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          Grafik Tren
+          الرسم البياني
         </p>
         <!-- Toggle sumber data -->
         <div class="flex gap-1 rounded-full border border-border p-0.5">
