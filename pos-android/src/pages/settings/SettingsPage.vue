@@ -21,6 +21,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useAccountStore } from '@/stores/account'
 import { pickImage, downscale } from '@/lib/image'
 import { decodeQrFromDataUrl, encodeQrToDataUrl, isValidQris } from '@/lib/qris'
+import { deviceBiometric } from '@/services/auth/deviceBiometric'
 
 const settings = useSettingsStore()
 const media = useMediaStore()
@@ -28,7 +29,7 @@ const auth = useAuthStore()
 const account = useAccountStore()
 const router = useRouter()
 const { storeName, storeOwner, storeLogo, loginEnabled, hasPin, theme, devicePrefix,
-  splashEnabled, splashBg, qrisPayload, qrisDynamic } = storeToRefs(settings)
+  splashEnabled, splashBg, qrisPayload, qrisDynamic, biometricEnabled } = storeToRefs(settings)
 
 const name = ref('')
 const owner = ref('')
@@ -38,6 +39,8 @@ const logoBusy = ref(false)
 const qrisBusy = ref(false)
 const qrisError = ref('')
 const qrisPreview = ref<string | null>(null)
+const biometricAvailable = ref(false)
+const biometricError = ref('')
 
 const SPLASH_BGS: Array<{ id: SplashBg; label: string; swatch: string }> = [
   { id: 'brand', label: 'الهوية', swatch: 'bg-gradient-to-b from-hero to-hero/80' },
@@ -50,6 +53,7 @@ onMounted(async () => {
   owner.value = storeOwner.value
   if (storeLogo.value) media.ensure([storeLogo.value])
   await renderQrisPreview()
+  biometricAvailable.value = await deviceBiometric.isAvailable()
 })
 
 async function renderQrisPreview() {
@@ -160,6 +164,15 @@ async function onPinComplete(value: string) {
   await auth.setPin(value)
   if (pinMode.value === 'set') await auth.enableLogin()
   pinSheetOpen.value = false
+}
+
+async function onToggleBiometric(enabled: boolean) {
+  biometricError.value = ''
+  if (enabled && !biometricAvailable.value) {
+    biometricError.value = 'ميزة البصمة غير متاحة. تأكد من تسجيل بصمة في إعدادات الجهاز.'
+    return
+  }
+  await settings.setBiometricEnabled(enabled)
 }
 
 function lockNow() {
@@ -307,7 +320,7 @@ function lockNow() {
       <!-- Keamanan -->
       <section class="space-y-3">
         <p class="px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          Keamanan
+          الأمان والحماية
         </p>
         <Card>
           <CardContent class="divide-y divide-border p-0">
@@ -337,6 +350,19 @@ function lockNow() {
                 <p class="text-xs text-muted-foreground">تغيير الرقم السري المكوّن من 6 أرقام</p>
               </div>
             </button>
+            <div v-if="loginEnabled && hasPin" class="flex items-center gap-3 p-4">
+              <div class="flex size-10 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+                <LockKeyhole class="size-5" />
+              </div>
+              <div class="flex-1">
+                <p class="text-sm font-medium">الدخول بالبصمة</p>
+                <p class="text-xs text-muted-foreground">
+                  {{ biometricAvailable ? 'استخدم بصمة الإصبع لفتح التطبيق بدلاً من الرقم السري.' : 'سجّل بصمة إصبع في إعدادات الجهاز أولاً.' }}
+                </p>
+              </div>
+              <Switch :model-value="biometricEnabled" :disabled="!biometricAvailable" @update:model-value="onToggleBiometric" />
+            </div>
+            <p v-if="biometricError" class="px-4 pb-3 text-xs text-destructive">{{ biometricError }}</p>
             <button
               v-if="loginEnabled && hasPin"
               type="button"
