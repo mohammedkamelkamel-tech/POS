@@ -54,7 +54,7 @@ function openEntry(e: CashflowEntry) {
       <template #actions>
         <button
           class="flex size-9 items-center justify-center rounded-full text-foreground hover:bg-accent"
-          aria-label="Export Excel"
+          aria-label="تصدير إلى Excel"
           @click="exportOpen = true"
         >
           <Download class="size-5" />
@@ -62,7 +62,7 @@ function openEntry(e: CashflowEntry) {
         <RouterLink to="/cashflow/categories">
           <Button variant="outline" size="sm" class="gap-1.5" title="إدارة التصنيفات">
             <Tag class="size-4" />
-            <span>Kategori</span>
+            <span>التصنيفات</span>
           </Button>
         </RouterLink>
       </template>
@@ -76,7 +76,7 @@ function openEntry(e: CashflowEntry) {
 
     <!-- Ringkasan rentang aktif -->
     <div class="border-b border-border bg-gradient-to-br from-hero to-hero/90 px-5 py-5 text-hero-foreground">
-      <p class="text-xs opacity-80">Saldo · {{ label }}</p>
+      <p class="text-xs opacity-80">صافي الرصيد · {{ label }}</p>
       <p class="mt-1 text-2xl font-bold">{{ formatRupiah(summary.net) }}</p>
       <div class="mt-3 grid grid-cols-2 gap-3">
         <div class="rounded-xl bg-white/12 p-3 backdrop-blur">
@@ -97,7 +97,7 @@ function openEntry(e: CashflowEntry) {
     <!-- Breakdown per kategori -->
     <section v-if="byCategory.length" class="border-b border-border p-4">
       <p class="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-        Per Kategori · {{ label }}
+        حسب التصنيف · {{ label }}
       </p>
       <div class="space-y-1.5">
         <div
@@ -180,7 +180,7 @@ function openEntry(e: CashflowEntry) {
 
     <ExportDialog
       v-model:open="exportOpen"
-      title="Export الحركة المالية"
+      title="تصدير الحركة المالية"
       filename-base="cashflow"
       :initial-range="range"
       :build-sheets="cashflow.buildExport"
