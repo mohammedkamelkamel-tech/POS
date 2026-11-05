@@ -22,13 +22,13 @@ const previewChanges = computed(() => props.changes.slice(0, 3))
 function readableEntity(entity: string): string {
   switch (entity) {
     case 'categories': return 'Kategori'
-    case 'products': return 'Produk'
+    case 'products': return 'المنتجات'
     case 'media': return 'Media'
     case 'cashier_sessions': return 'Sesi kasir'
     case 'sales': return 'Penjualan'
     case 'sale_items': return 'Item penjualan'
     case 'cashflow_categories': return 'Kategori arus kas'
-    case 'cashflow_entries': return 'Catatan arus kas'
+    case 'cashflow_entries': return 'ملاحظات arus kas'
     default: return entity.replaceAll('_', ' ')
   }
 }
@@ -49,7 +49,7 @@ function readableEntity(entity: string): string {
         <p class="text-xs text-muted-foreground">{{ failedCount }} perubahan perlu dicoba lagi.</p>
       </div>
     </div>
-    <ul class="space-y-2" aria-label="Daftar perubahan gagal">
+    <ul class="space-y-2" aria-label="إنشاء حساب perubahan gagal">
       <li v-for="change in previewChanges" :key="change.id" class="rounded-lg bg-background/70 p-2 text-xs">
         <p class="break-words font-medium text-foreground">{{ readableEntity(change.entity) }} · {{ change.entityId }}</p>
         <p class="break-words text-muted-foreground">{{ change.lastError ?? 'Alasan kegagalan tidak tersedia.' }}</p>
@@ -62,7 +62,7 @@ function readableEntity(entity: string): string {
       @click="emit('retry')"
     >
       <RotateCcw class="size-4" :class="retrying && 'animate-spin'" />
-      Coba lagi
+      حاول مرة أخرى
     </Button>
   </section>
 </template>
