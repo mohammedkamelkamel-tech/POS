@@ -137,7 +137,7 @@ async function runImport() {
     result.value = await products.bulkImport(p.rows, (done, total) => {
       progress.value = total ? Math.round((done / total) * 100) : 100
     })
-    // استيراد bisa bikin kategori baru → daftar kategori di halaman ikut segar.
+    // قد ينشئ الاستيراد تصنيفات جديدة، لذا نحدّث قائمة التصنيفات.
     await categories.load()
     stage.value = 'done'
   } catch (e) {
@@ -179,9 +179,9 @@ async function runImport() {
 
         <template v-if="stage === 'idle' || stage === 'reading'">
           <p class="text-xs text-muted-foreground">
-            File .csv / .xlsx dengan kolom <b>nama</b>, kategori, sku, barcode, tipe_barcode,
+            ملفات CSV أو Excel بالأعمدة <b>اسم المنتج</b>، التصنيف, sku, barcode, tipe_barcode,
             harga_jual, harga_modal, lacak_stok, stok, aktif.
-            <b>سيتم تخطي الصفوف التي يكون باركودها مسجلاً مسبقاً</b> — produk tanpa barcode
+            <b>سيتم تخطي الصفوف التي يكون باركودها مسجلاً مسبقاً</b> — المنتجات التي لا تحتوي على باركود
             سيتم استيرادها.
           </p>
           <div class="flex gap-2">
@@ -235,12 +235,12 @@ async function runImport() {
           <div class="flex gap-2 rounded-xl bg-success/10 p-3 text-sm">
             <CircleCheck class="mt-0.5 size-4 shrink-0 text-success" />
             <div>
-              <p><b>{{ result.imported }}</b> produk diimpor</p>
+              <p><b>{{ result.imported }}</b> منتجاً تم استيراده</p>
               <p v-if="result.skippedDuplicate" class="text-muted-foreground">
                 {{ result.skippedDuplicate }} dilewati (barcode sudah ada)
               </p>
               <p v-if="result.createdCategories" class="text-muted-foreground">
-                {{ result.createdCategories }} kategori baru dibuat
+                {{ result.createdCategories }} تصنيفاً جديداً تم إنشاؤه
               </p>
               <p v-if="result.errors.length" class="text-destructive">
                 {{ result.errors.length }} صفاً تعذر حفظها
