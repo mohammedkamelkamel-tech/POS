@@ -30,7 +30,7 @@ const emit = defineEmits<{ sync: []; retry: [] }>()
   <Card>
     <CardContent class="space-y-3 p-4">
       <div class="flex items-center justify-between text-sm">
-        <span class="font-semibold">Sinkronisasi</span>
+        <span class="font-semibold">المزامنة</span>
         <Badge :variant="syncStatus === 'error' || failedCount > 0 ? 'destructive' : 'secondary'">{{ syncLabel }}</Badge>
       </div>
       <div class="flex items-center justify-between text-xs text-muted-foreground">
