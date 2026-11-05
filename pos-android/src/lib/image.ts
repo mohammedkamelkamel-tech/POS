@@ -26,6 +26,9 @@ export async function pickImage(): Promise<string | null> {
         allowEditing: false,
         resultType: CameraResultType.DataUrl,
         source: CameraSource.Prompt,
+        promptLabelHeader: 'اختيار صورة',
+        promptLabelPhoto: 'اختيار من الصور',
+        promptLabelPicture: 'التقاط صورة',
       })
       return photo.dataUrl ?? null
     } catch {
@@ -49,6 +52,7 @@ function pickImageWeb(): Promise<string | null> {
       input.remove()
       resolve(v)
     }
+    input.addEventListener('cancel', () => done(null))
     input.addEventListener('change', () => {
       const file = input.files?.[0]
       if (!file) return done(null)
@@ -64,6 +68,27 @@ function pickImageWeb(): Promise<string | null> {
   })
 }
 
+/** ضع الصورة داخل مساحة مربعة شفافة مع الحفاظ على أبعادها؛ مناسبة لشعارات المتاجر. */
+export function fitImageSquare(dataUrl: string, size = 256): Promise<ProcessedImage> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width = size
+      canvas.height = size
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return reject(new Error('تعذر تجهيز الصورة'))
+      const scale = Math.min(size / img.width, size / img.height)
+      const width = Math.max(1, Math.round(img.width * scale))
+      const height = Math.max(1, Math.round(img.height * scale))
+      ctx.drawImage(img, Math.round((size - width) / 2), Math.round((size - height) / 2), width, height)
+      const data = stripDataUrlPrefix(canvas.toDataURL('image/png'))
+      resolve({ data, mime: 'image/png', width: size, height: size, bytes: estimateBase64Bytes(data) })
+    }
+    img.onerror = () => reject(new Error('تعذر تحميل الصورة'))
+    img.src = dataUrl
+  })
+}
 export interface DownscaleOptions {
   maxDim?: number
   quality?: number
