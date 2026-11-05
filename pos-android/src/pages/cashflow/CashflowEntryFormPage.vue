@@ -112,7 +112,7 @@ async function remove() {
 
       <!-- Kategori -->
       <div class="space-y-1.5">
-        <Label>Kategori</Label>
+        <Label>التصنيف</Label>
         <div v-if="cats.length" class="flex flex-wrap gap-2">
           <button
             v-for="c in cats"
@@ -126,20 +126,20 @@ async function remove() {
           </button>
         </div>
         <p v-else class="text-xs text-muted-foreground">
-          لا توجد تصنيفات لـ {{ type === 'income' ? 'pemasukan' : 'pengeluaran' }}.
+          لا توجد تصنيفات لـ {{ type === 'income' ? 'الإيرادات' : 'المصروفات' }}.
           <RouterLink to="/cashflow/categories" class="text-primary underline">أضف تصنيفاً أولاً</RouterLink>.
         </p>
       </div>
 
       <!-- Nominal -->
       <div class="space-y-1.5">
-        <Label for="amount">Nominal</Label>
+        <Label for="amount">المبلغ</Label>
         <MoneyInput id="amount" v-model="amount" class="h-12 text-lg font-semibold" />
       </div>
 
       <!-- Catatan -->
       <div class="space-y-1.5">
-        <Label for="note">Catatan (opsional)</Label>
+        <Label for="note">ملاحظات (اختياري)</Label>
         <Input id="note" v-model="note" placeholder="مثال: شراء غاز أو دفع الكهرباء" />
       </div>
 
