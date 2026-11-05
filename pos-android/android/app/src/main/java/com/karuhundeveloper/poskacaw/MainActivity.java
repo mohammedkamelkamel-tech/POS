@@ -11,6 +11,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(ThermalPrinterPlugin.class);
         registerPlugin(SecureCredentialPlugin.class);
         registerPlugin(DeviceBiometricPlugin.class);
+        registerPlugin(PdfExportPlugin.class);
         super.onCreate(savedInstanceState);
     }
 }
