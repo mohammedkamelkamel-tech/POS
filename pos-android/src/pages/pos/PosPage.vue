@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import {
-  Package, Search, ShoppingCart, Check, الطابعة, PlusCircle, DoorOpen, DoorClosed, ScanLine,
+  Package, Search, ShoppingCart, Check, Printer, PlusCircle, DoorOpen, DoorClosed, ScanLine,
   ReceiptText, Trash2, X,
 } from 'lucide-vue-next'
 import { useProductsStore } from '@/stores/products'
@@ -22,9 +22,9 @@ import { useCartStore } from '@/stores/cart'
 import { useSalesStore } from '@/stores/sales'
 import { useSettingsStore } from '@/stores/settings'
 import { useCashierStore } from '@/stores/cashier'
-import { useالطابعةStore } from '@/stores/printer'
+import { usePrinterStore } from '@/stores/printer'
 import { capabilities } from '@/services/capabilities/registry'
-import type { الطابعةCapability } from '@/services/capabilities/registry'
+import type { PrinterCapability } from '@/services/capabilities/registry'
 import { CheckoutError, type CheckoutResult } from '@/services/checkout.service'
 import type { CartLine } from '@/stores/cart'
 import type { Product, Sale } from '@/db/types'
@@ -339,9 +339,9 @@ async function pay({ paid, paymentMethod }: { paid: number; paymentMethod: strin
 
 async function printReceipt() {
   if (!lastResult.value || printing.value) return
-  const printer = capabilities.get<الطابعةCapability>('printer')
+  const printer = capabilities.get<PrinterCapability>('printer')
   if (!printer) {
-    operationError.value = 'الطابعة غير متصلة أو غير مهيأة. افتح إعدادات الطابعة ثم أعد المحاولة.'
+    operationError.value = 'Printer غير متصلة أو غير مهيأة. افتح إعدادات Printer ثم أعد المحاولة.'
     return
   }
   printing.value = true
@@ -351,11 +351,11 @@ async function printReceipt() {
       buildReceipt(lastResult.value.sale, lastResult.value.items, {
         storeName: settings.storeName,
         storeOwner: settings.storeOwner,
-        width: useالطابعةStore().paperWidth,
+        width: usePrinterStore().paperWidth,
       }),
     )
   } catch (error) {
-    operationError.value = error instanceof Error ? `تعذرت طباعة الإيصال: ${error.message}` : 'تعذرت طباعة الإيصال. تحقق من اتصال الطابعة.'
+    operationError.value = error instanceof Error ? `تعذرت طباعة الإيصال: ${error.message}` : 'تعذرت طباعة الإيصال. تحقق من اتصال Printer.'
   } finally {
     printing.value = false
   }
@@ -647,7 +647,7 @@ function newTransaction() {
 
             <div class="mt-6 grid w-full grid-cols-2 gap-3">
               <Button type="button" variant="outline" class="gap-2" :disabled="printing" @click="printReceipt">
-                <الطابعة class="size-4" /> {{ printing ? 'جارٍ الطباعة…' : 'طباعة الإيصال' }}
+                <Printer class="size-4" /> {{ printing ? 'جارٍ الطباعة…' : 'طباعة الإيصال' }}
               </Button>
               <Button type="button" class="gap-2" @click="newTransaction">
                 <PlusCircle class="size-4" /> عملية بيع جديدة
