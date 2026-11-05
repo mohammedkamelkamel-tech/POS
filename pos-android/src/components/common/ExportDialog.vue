@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Loader2, FileSpreadsheet } from 'lucide-vue-next'
 import { dayKey } from '@/lib/datetime'
 import { rangeLabel, type DateRange } from '@/lib/dateRange'
-import { exportXlsx, type ExportSheet } from '@/lib/xlsx'
+import { exportXlsx, type تصديرSheet } from '@/lib/xlsx'
 
 const props = defineProps<{
   open: boolean
@@ -16,7 +16,7 @@ const props = defineProps<{
   /** Rentang awal (biasanya = rentang aktif halaman). */
   initialRange: DateRange
   /** Bangun sheet-sheet Excel untuk rentang terpilih. */
-  buildSheets: (range: DateRange) => Promise<ExportSheet[]>
+  buildSheets: (range: DateRange) => Promise<تصديرSheet[]>
 }>()
 const emit = defineEmits<{ 'update:open': [value: boolean] }>()
 
@@ -70,7 +70,7 @@ async function run() {
         اختر نطاق التاريخ، ثم صدّر البيانات إلى ملف Excel (.xlsx).
       </p>
 
-      <!-- Filter tanggal (sama seperti di halaman) -->
+      <!-- تصفية حسب التاريخ (sama seperti di halaman) -->
       <DateRangeFilter :model-value="range" @update:model-value="range = $event" />
 
       <div class="px-4 text-sm">
