@@ -34,15 +34,15 @@ const emit = defineEmits<{ sync: []; retry: [] }>()
         <Badge :variant="syncStatus === 'error' || failedCount > 0 ? 'destructive' : 'secondary'">{{ syncLabel }}</Badge>
       </div>
       <div class="flex items-center justify-between text-xs text-muted-foreground">
-        <span>Antre belum terkirim</span>
+        <span>عمليات لم تتم مزامنتها بعد</span>
         <span>{{ pending }}</span>
       </div>
-      <p v-if="lastSyncedAt" class="text-xs text-muted-foreground">Terakhir sync: {{ new Date(lastSyncedAt).toLocaleString('id-ID') }}</p>
+      <p v-if="lastSyncedAt" class="text-xs text-muted-foreground">آخر مزامنة: {{ new Date(lastSyncedAt).toLocaleString('ar-YE') }}</p>
       <p v-if="lastError" class="flex items-center gap-1.5 text-xs text-destructive"><AlertCircle class="size-3.5" /> {{ lastError }}</p>
       <SyncFailurePanel :changes="failedChanges" :failed-count="failedCount" :retrying="syncStatus === 'syncing'" @retry="emit('retry')" />
       <Button class="w-full" :disabled="syncStatus === 'syncing'" @click="emit('sync')">
         <RefreshCw class="size-4" :class="syncStatus === 'syncing' && 'animate-spin'" />
-        Sync sekarang
+        مزامنة الآن
       </Button>
     </CardContent>
   </Card>
