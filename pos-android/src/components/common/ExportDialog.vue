@@ -5,13 +5,13 @@ import DateRangeFilter from '@/components/common/DateRangeFilter.vue'
 import { Button } from '@/components/ui/button'
 import { Loader2, FileSpreadsheet } from 'lucide-vue-next'
 import { dayKey } from '@/lib/datetime'
-import { rangeLabel, type DateRange } from '@/lib/dateRange'
+import { rangeالتسمية, type DateRange } from '@/lib/dateRange'
 import { exportXlsx, type ExportSheet } from '@/lib/xlsx'
 
 const props = defineProps<{
   open: boolean
   title: string
-  /** Prefix nama file, mis. "transaksi" → transaksi-2026-08-01_2026-08-05.xlsx */
+  /** Prefix nama file, mis. "عملية بيع" → عملية بيع-2026-08-01_2026-08-05.xlsx */
   filenameBase: string
   /** Rentang awal (biasanya = rentang aktif halaman). */
   initialRange: DateRange
@@ -67,7 +67,7 @@ async function run() {
   <BottomSheet :open="open" :title="title" @update:open="close">
     <div class="space-y-4 px-1 pb-5">
       <p class="px-4 pt-1 text-sm text-muted-foreground">
-        Pilih rentang tanggal, lalu ekspor ke file Excel (.xlsx).
+        اختر نطاق التاريخ، ثم صدّر البيانات إلى ملف Excel (.xlsx).
       </p>
 
       <!-- Filter tanggal (sama seperti di halaman) -->
@@ -75,7 +75,7 @@ async function run() {
 
       <div class="px-4 text-sm">
         <span class="text-muted-foreground">الفترة: </span>
-        <span class="font-medium">{{ rangeLabel(range) }}</span>
+        <span class="font-medium">{{ rangeالتسمية(range) }}</span>
       </div>
 
       <p v-if="error" class="px-4 text-sm text-destructive">{{ error }}</p>
