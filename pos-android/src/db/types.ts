@@ -103,6 +103,10 @@ export interface SaleItem extends SyncEntity {
   qty: number
   discount: number
   line_total: number
+  quantity_kind: 'unit' | 'weight' | 'meal'
+  weight_grams: number | null
+  portion_quarters: number | null
+  unit_label: string | null
 }
 
 export interface CashflowCategory extends SyncEntity {
