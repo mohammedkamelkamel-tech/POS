@@ -43,9 +43,22 @@ export async function createLocalBackup(): Promise<string> {
   backupInProgress = (async () => {
     await getDb().query('SELECT 1')
     const exported = await CapacitorSQLite.exportToJson({ database: DATABASE, jsonexportmode: 'full' })
-    const json = JSON.stringify({ ...exported, overwrite: true, mode: 'full' })
+    // بعض إصدارات Capacitor SQLite تعيد كائن التصدير داخل الخاصية export،
+    // بينما إصدارات أخرى تعيد كائن قاعدة البيانات مباشرة.
+    const exportResult = exported as unknown as Record<string, unknown>
+    const payload = exportResult.export ?? exportResult.result ?? exported
+    let databaseJson: Record<string, unknown>
+    try {
+      databaseJson = (typeof payload === 'string' ? JSON.parse(payload) : payload) as Record<string, unknown>
+    } catch {
+      throw new Error('أعاد محرك قاعدة البيانات ملفاً غير قابل للقراءة. لم يتم حفظ نسخة احتياطية.')
+    }
+    if (!databaseJson || typeof databaseJson !== 'object' || !Array.isArray(databaseJson.tables)) {
+      throw new Error('بيانات التصدير غير مكتملة؛ لم يتم حفظ نسخة احتياطية حتى لا نحفظ ملفاً تالفاً.')
+    }
+    const json = JSON.stringify({ ...databaseJson, database: DATABASE, overwrite: true, mode: 'full' })
     const valid = await CapacitorSQLite.isJsonValid({ jsonstring: json })
-    if (!valid.result) throw new Error('تعذر التحقق من سلامة ملف النسخة الاحتياطية.')
+    if (!valid.result) throw new Error('رفض محرك SQLite ملف النسخة بعد فحصه. لم يتم حفظ الملف؛ حدّث التطبيق ثم أعد المحاولة.')
     await ensureFolder()
     const name = backupFileName()
     await Filesystem.writeFile({
