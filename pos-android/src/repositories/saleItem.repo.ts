@@ -6,6 +6,10 @@ export interface SaleItemSnapshot {
   readonly name: string
   readonly price: number
   readonly qty: number
+  readonly quantityKind?: 'unit' | 'weight' | 'meal'
+  readonly weightGrams?: number | null
+  readonly portionQuarters?: number | null
+  readonly unitLabel?: string | null
 }
 
 export class SaleItemRepository extends BaseRepository<SaleItem> {
@@ -33,6 +37,10 @@ export class SaleItemRepository extends BaseRepository<SaleItem> {
         qty: snapshot.qty,
         discount: 0,
         line_total: snapshot.price * snapshot.qty,
+        quantity_kind: snapshot.quantityKind ?? 'unit',
+        weight_grams: snapshot.weightGrams ?? null,
+        portion_quarters: snapshot.portionQuarters ?? null,
+        unit_label: snapshot.unitLabel ?? null,
       })
       items.push(item)
     }
