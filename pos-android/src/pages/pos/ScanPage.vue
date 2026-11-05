@@ -30,14 +30,14 @@ function say(text: string, tone: 'ok' | 'warn' = 'ok') {
   toastTimer = setTimeout(() => (toast.value = null), 2200)
 }
 
-/** Barcode yang gak ketemu di katalog — ditawarin bikin produk baru. */
+/** الباركود yang gak ketemu di katalog — ditawarin bikin produk baru. */
 const unknown = ref<string | null>(null)
 
 function handleCode(code: string) {
   const value = code.trim()
   if (!value) return
 
-  const p = products.byBarcode(value)
+  const p = products.byالباركود(value)
   if (!p) {
     scanFeedback(false)
     unknown.value = value
@@ -107,14 +107,14 @@ onBeforeUnmount(() => {
 <template>
   <div class="flex h-full flex-col">
     <AppHeader
-      title="Scan Barcode"
-      :subtitle="cart.count ? `${cart.count} item di keranjang` : 'Arahkan barcode ke kamera'"
+      title="مسح الباركود"
+      :subtitle="cart.count ? `${cart.count} أصناف في السلة` : 'وجّه الباركود نحو الكاميرا'"
       back
     />
 
     <!-- Kamera: setengah layar bagian atas, sisanya keranjang -->
     <div class="relative h-[45dvh] shrink-0 bg-black">
-      <CameraScanner ref="scanner" hint="Arahkan barcode produk ke dalam kotak" @scan="onScan" />
+      <CameraScanner ref="scanner" hint="ضع باركود المنتج داخل الإطار" @scan="onScan" />
 
       <Transition name="toast">
         <div
@@ -127,21 +127,21 @@ onBeforeUnmount(() => {
       </Transition>
     </div>
 
-    <!-- Barcode asing: kartu inline, bukan confirm() — biar kamera tetap jalan -->
+    <!-- الباركود asing: kartu inline, bukan confirm() — biar kamera tetap jalan -->
     <div
       v-if="unknown"
       class="flex shrink-0 items-center gap-3 border-b border-warning/40 bg-warning/15 px-4 py-3"
     >
       <div class="min-w-0 flex-1">
-        <p class="truncate text-sm font-medium">Barcode {{ unknown }} belum terdaftar</p>
-        <p class="text-xs text-muted-foreground">Buat produknya sekarang?</p>
+        <p class="truncate text-sm font-medium">الباركود {{ unknown }} غير مسجل</p>
+        <p class="text-xs text-muted-foreground">هل تريد إنشاء المنتج الآن؟</p>
       </div>
       <Button size="sm" class="gap-1.5 shrink-0" @click="createFromUnknown">
-        <PackagePlus class="size-4" /> Buat
+        <PackagePlus class="size-4" /> إنشاء
       </Button>
       <button
         class="flex size-8 shrink-0 items-center justify-center rounded-full text-muted-foreground active:scale-95"
-        title="Lewati"
+        title="تخطي"
         @click="unknown = null"
       >
         <X class="size-4" />
@@ -154,7 +154,7 @@ onBeforeUnmount(() => {
       <div v-else class="flex h-full flex-col items-center justify-center gap-2 p-6 text-center">
         <ScanLine class="size-8 text-muted-foreground" />
         <p class="text-sm text-muted-foreground">
-          Belum ada yang di-scan. Produk yang ke-scan langsung masuk ke sini.
+          لم يتم مسح أي منتج بعد. ستظهر المنتجات الممسوحة هنا مباشرة.
         </p>
       </div>
     </div>
@@ -162,10 +162,10 @@ onBeforeUnmount(() => {
     <!-- Total + bayar -->
     <div class="shrink-0 space-y-3 border-t border-border bg-background p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
       <div class="flex items-center justify-between">
-        <span class="text-sm text-muted-foreground">Total ({{ cart.count }} item)</span>
+        <span class="text-sm text-muted-foreground">الإجمالي ({{ cart.count }} أصناف)</span>
         <span class="text-lg font-bold">{{ formatRupiah(cart.total) }}</span>
       </div>
-      <Button class="w-full" size="lg" :disabled="cart.isEmpty" @click="pay">Bayar</Button>
+      <Button class="w-full" size="lg" :disabled="cart.isEmpty" @click="pay">الدفع</Button>
     </div>
   </div>
 </template>
