@@ -3,6 +3,8 @@ import { ref, computed } from 'vue'
 import type { Product } from '@/db/types'
 
 export interface CartLine {
+  /** Identificador único de línea: permite varias pesadas/porciones del mismo producto. */
+  cartKey: string
   productId: string
   name: string
   price: number // snapshot harga jual (minor units)
@@ -59,6 +61,7 @@ export const useCartStore = defineStore('cart', () => {
     }
     if (p.track_stock && p.stock <= 0) return // habis
     lines.value.push({
+      cartKey: p.id,
       productId: p.id,
       name: p.name,
       price: p.price,
@@ -71,26 +74,28 @@ export const useCartStore = defineStore('cart', () => {
 
   function addButcher(p: Product, price: number, details: { quantityKind: 'weight' | 'meal'; weightGrams?: number; portionQuarters?: number; unitLabel: string }) {
     if (!Number.isSafeInteger(price) || price < 0) return
-    const index = lines.value.findIndex((line) => line.productId === p.id)
-    const line: CartLine = { productId: p.id, name: p.name, price, qty: 1, image_path: p.image_path, track_stock: p.track_stock, stock: p.stock, quantityKind: details.quantityKind, weightGrams: details.weightGrams ?? null, portionQuarters: details.portionQuarters ?? null, unitLabel: details.unitLabel }
-    if (index >= 0) lines.value.splice(index, 1, line)
-    else lines.value.push(line)
+    const line: CartLine = { cartKey: crypto.randomUUID(), productId: p.id, name: p.name, price, qty: 1, image_path: p.image_path, track_stock: p.track_stock, stock: p.stock, quantityKind: details.quantityKind, weightGrams: details.weightGrams ?? null, portionQuarters: details.portionQuarters ?? null, unitLabel: details.unitLabel }
+    lines.value.push(line)
   }
 
-  function inc(productId: string) {
-    const l = find(productId)
+  function findLine(key: string) {
+    return lines.value.find((line) => line.cartKey === key) ?? find(key)
+  }
+
+  function inc(key: string) {
+    const l = findLine(key)
     if (l && l.qty < maxQty(l)) l.qty++
   }
 
-  function dec(productId: string) {
-    const l = find(productId)
+  function dec(key: string) {
+    const l = findLine(key)
     if (!l) return
     l.qty--
-    if (l.qty <= 0) remove(productId)
+    if (l.qty <= 0) remove(l.cartKey)
   }
 
-  function remove(productId: string) {
-    lines.value = lines.value.filter((l) => l.productId !== productId)
+  function remove(key: string) {
+    lines.value = lines.value.filter((line) => line.cartKey !== key && line.productId !== key)
   }
 
   function clear() {
@@ -133,6 +138,7 @@ export const useCartStore = defineStore('cart', () => {
     isEmpty,
     maxQty,
     find,
+    findLine,
     add,
     addButcher,
     inc,
