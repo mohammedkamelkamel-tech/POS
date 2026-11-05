@@ -22,17 +22,17 @@ export class ReceiptError extends Error {
 }
 
 const PAY_LABEL: Record<string, string> = {
-  cash: 'Tunai',
+  cash: 'نقداً',
   qris: 'QRIS',
-  transfer: 'Transfer',
+  transfer: 'تحويل بنكي',
 }
 
 function receiptErrorMessage(detail: ReceiptErrorDetail): string {
   switch (detail.kind) {
     case 'open-sale':
-      return `Open Bill ${detail.number} belum dapat dicetak`
+      return `فاتورة معلّقة ${detail.number} لا يمكن طباعتها حالياً`
     case 'missing-sold-at':
-      return `Waktu pembayaran untuk transaksi ${detail.number} tidak tersedia`
+      return `وقت دفع العملية ${detail.number} tidak tersedia`
   }
 }
 
@@ -68,8 +68,8 @@ export function buildReceipt(
   lines.push({ text: opts.storeName, align: 'center', bold: true, size: 'large' })
   if (opts.storeOwner) lines.push({ text: opts.storeOwner, align: 'center' })
   lines.push({ text: div })
-  lines.push({ text: `No  : ${sale.number}` })
-  lines.push({ text: `Tgl : ${formatDateTime(soldAt)}` })
+  lines.push({ text: `رقم الفاتورة: ${sale.number}` })
+  lines.push({ text: `التاريخ: ${formatDateTime(soldAt)}` })
   lines.push({ text: div })
 
   for (const it of items) {
@@ -83,17 +83,17 @@ export function buildReceipt(
   }
 
   lines.push({ text: div })
-  lines.push({ text: row('Subtotal', formatRupiah(sale.subtotal), w) })
+  lines.push({ text: row('المجموع الفرعي', formatRupiah(sale.subtotal), w) })
   if (sale.discount > 0) {
-    lines.push({ text: row('Diskon', `-${formatRupiah(sale.discount)}`, w) })
+    lines.push({ text: row('الخصم', `-${formatRupiah(sale.discount)}`, w) })
   }
-  lines.push({ text: row('TOTAL', formatRupiah(sale.total), w), bold: true })
-  lines.push({ text: row(PAY_LABEL[sale.payment_method] ?? 'Bayar', formatRupiah(sale.paid), w) })
+  lines.push({ text: row('الإجمالي', formatRupiah(sale.total), w), bold: true })
+  lines.push({ text: row(PAY_LABEL[sale.payment_method] ?? 'المدفوع', formatRupiah(sale.paid), w) })
   if (sale.change_due > 0) {
-    lines.push({ text: row('Kembali', formatRupiah(sale.change_due), w) })
+    lines.push({ text: row('الباقي', formatRupiah(sale.change_due), w) })
   }
   lines.push({ text: div })
-  lines.push({ text: 'Terima kasih 🙏', align: 'center' })
+  lines.push({ text: 'شكراً لتعاملكم معنا 🙏', align: 'center' })
 
-  return { title: `Struk ${sale.number}`, lines }
+  return { title: `إيصال ${sale.number}`, lines }
 }
