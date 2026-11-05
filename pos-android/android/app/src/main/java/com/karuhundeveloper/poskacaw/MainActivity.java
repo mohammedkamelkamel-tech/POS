@@ -12,6 +12,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(SecureCredentialPlugin.class);
         registerPlugin(DeviceBiometricPlugin.class);
         registerPlugin(PdfExportPlugin.class);
+        registerPlugin(BackupDirectoryPlugin.class);
         super.onCreate(savedInstanceState);
     }
 }
