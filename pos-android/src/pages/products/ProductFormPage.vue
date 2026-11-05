@@ -47,7 +47,7 @@ const form = reactive<ProductInput>({
   name: '',
   sku: null,
   barcode: null,
-  barcode_type: DEFAULT_BARCODE_TYPE,
+  barcode_type: 'CODE128',
   price: 0,
   cost: 0,
   track_stock: 0,
@@ -256,17 +256,17 @@ async function remove() {
           >
             Hapus foto
           </button>
-          <p v-else class="text-xs text-muted-foreground">JPG/PNG — otomatis dikecilkan.</p>
+          <p v-else class="text-xs text-muted-foreground">صور JPG أو PNG — يتم تصغيرها تلقائياً.</p>
         </div>
       </div>
 
       <div class="space-y-1.5">
         <Label for="name">اسم المنتج <span class="text-destructive">*</span></Label>
-        <Input id="name" v-model="form.name" placeholder="مثال: لحم بلدي" />
+        <Input id="name" v-model="form.name" placeholder="مثال: لحم بلدي" dir="rtl" />
       </div>
 
       <div class="space-y-1.5">
-        <Label for="category">Kategori</Label>
+        <Label for="category">التصنيف</Label>
         <select
           id="category"
           v-model="form.category_id"
@@ -292,11 +292,11 @@ async function remove() {
 
       <div class="space-y-1.5">
         <Label for="sku">SKU</Label>
-        <Input id="sku" v-model="form.sku as string" placeholder="opsional" />
+        <Input id="sku" v-model="form.sku as string" placeholder="اختياري" />
       </div>
 
       <div class="space-y-1.5">
-        <Label for="barcode">Barcode</Label>
+        <Label for="barcode">الباركود</Label>
         <div class="flex gap-2">
           <Input
             id="barcode"
@@ -310,7 +310,7 @@ async function remove() {
             type="button"
             variant="outline"
             size="icon"
-            title="Scan barcode"
+            title="مسح الباركود"
             @click="scanOpen = true"
           >
             <ScanLine class="size-5" />
@@ -326,12 +326,12 @@ async function remove() {
           </option>
         </select>
         <p v-if="barcodeValid === true" class="text-xs text-success">
-          ✓ Barcode valid untuk {{ form.barcode_type }}
+          ✓ الباركود صالح وفق معيار {{ form.barcode_type }}
         </p>
         <p v-else-if="barcodeValid === false" class="text-xs text-destructive">
-          Tidak sesuai {{ form.barcode_type }} — butuh {{ barcodeTypeHint(form.barcode_type) }}.
-          Tetap bisa disimpan, tapi barcode-nya <strong>gak bisa digambar sama sekali</strong>:
-          sheet "Lihat barcode" bakal kosong dan tombol bagikan mati.
+          غير متوافق مع {{ form.barcode_type }} — المطلوب {{ barcodeTypeHint(form.barcode_type) }}.
+          يمكن حفظه، لكن لن يمكن إنشاء صورة للباركود:
+          ستكون معاينة الباركود فارغة ولن يعمل زر المشاركة.
         </p>
         <!-- Saran, bukan koreksi otomatis — lihat useSuggestedType(). -->
         <button
@@ -340,10 +340,10 @@ async function remove() {
           class="text-xs font-medium text-info underline underline-offset-2"
           @click="useSuggestedType"
         >
-          Kode ini cocoknya {{ barcodeTypeLabel(suggestedType) }} — pakai itu?
+          الرمز يناسب {{ barcodeTypeLabel(suggestedType) }} — هل تريد استخدامه؟
         </button>
         <p v-else class="text-xs text-muted-foreground">
-          Kosongkan kalau produk ini gak punya barcode.
+          اترك الحقل فارغاً إذا لم يكن للمنتج باركود.
         </p>
         <!-- Check digit ditambah otomatis → angka di gambar beda dari yang diketik. -->
         <p v-if="barcodeAutoCheckDigit" class="text-xs text-warning">
