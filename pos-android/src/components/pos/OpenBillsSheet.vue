@@ -94,7 +94,7 @@ function discard(bill: Sale) {
               :disabled="!isOwnBill(bill) || cartHasLines || busyBillId !== null"
               @click="resume(bill)"
             >
-              <Play class="size-4" /> Lanjutkan
+              <Play class="size-4" /> استئناف
             </Button>
             <Button
               variant="destructive"
@@ -102,7 +102,7 @@ function discard(bill: Sale) {
               :disabled="!isOwnBill(bill) || busyBillId !== null"
               @click="discard(bill)"
             >
-              <Trash2 class="size-4" /> Buang
+              <Trash2 class="size-4" /> حذف
             </Button>
           </div>
         </article>
@@ -112,7 +112,7 @@ function discard(bill: Sale) {
         <div class="flex size-11 items-center justify-center rounded-xl bg-muted text-muted-foreground">
           <ReceiptText class="size-5" />
         </div>
-        <p class="text-sm font-semibold">لا يوجد بعد فاتورة معلقة</p>
+        <p class="text-sm font-semibold">لا توجد فواتير معلّقة بعد</p>
         <p class="max-w-64 text-xs leading-relaxed text-muted-foreground">
           Tahan pesanan dari keranjang untuk melanjutkannya nanti.
         </p>
