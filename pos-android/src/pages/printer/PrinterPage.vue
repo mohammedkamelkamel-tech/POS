@@ -9,9 +9,9 @@ import {
   CheckCircle2, XCircle, Bluetooth, Usb, Loader2, RefreshCw, Trash2, Check,
 } from 'lucide-vue-next'
 import { capabilities } from '@/services/capabilities/registry'
-import type { الطابعةCapability } from '@/services/capabilities/registry'
+import type { PrinterCapability } from '@/services/capabilities/registry'
 import { useالطابعةStore } from '@/stores/printer'
-import type { الطابعةConnection, Discoveredالطابعة } from '@/services/capabilities/printers/transport'
+import type { PrinterConnection, Discoveredالطابعة } from '@/services/capabilities/printers/transport'
 import { formatDateTime, nowMs } from '@/lib/datetime'
 import { storeToRefs } from 'pinia'
 
@@ -22,20 +22,20 @@ const {
   transportAvailable, supportedConnections, selected,
 } = storeToRefs(printer)
 
-const cap = ref<الطابعةCapability | null>(null)
+const cap = ref<PrinterCapability | null>(null)
 const canPrint = ref(false)
 const printing = ref(false)
 const message = ref('')
 
-const CONN_META: Record<الطابعةConnection, { label: string; icon: unknown }> = {
+const CONN_META: Record<PrinterConnection, { label: string; icon: unknown }> = {
   bluetooth: { label: 'Bluetooth', icon: Bluetooth },
   usb: { label: 'USB', icon: Usb },
 }
 
-const activeConn = ref<الطابعةConnection>('bluetooth')
+const activeConn = ref<PrinterConnection>('bluetooth')
 
 onMounted(async () => {
-  cap.value = capabilities.get<الطابعةCapability>('printer')
+  cap.value = capabilities.get<PrinterCapability>('printer')
   await printer.load()
   if (supportedConnections.value.length) activeConn.value = supportedConnections.value[0]
   await refreshCanPrint()
@@ -45,7 +45,7 @@ async function refreshCanPrint() {
   canPrint.value = await capabilities.has('printer')
 }
 
-async function scan(conn: الطابعةConnection) {
+async function scan(conn: PrinterConnection) {
   activeConn.value = conn
   await printer.scan(conn)
 }
@@ -67,10 +67,10 @@ async function testPrint() {
   const w = paperWidth.value
   try {
     await cap.value.print({
-      title: 'Test Print',
+      title: 'اختبار الطباعة',
       lines: [
         { text: 'الكامل-كاشير', align: 'center', bold: true, size: 'large' },
-        { text: 'Struk Percobaan', align: 'center' },
+        { text: 'إيصال تجريبي', align: 'center' },
         { text: '' },
         { text: formatDateTime(nowMs()), align: 'center' },
         { text: '-'.repeat(w), align: 'center' },
@@ -94,11 +94,11 @@ async function testPrint() {
       <Card>
         <CardContent class="flex items-center gap-3 p-4">
           <div class="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <الطابعة class="size-5" />
+            <Printer class="size-5" />
           </div>
           <div class="flex-1">
             <p class="text-sm font-semibold">
-              {{ isNative ? 'الطابعة Thermal (ESC/POS)' : 'Preview Web الطابعة' }}
+              {{ isNative ? 'الطابعة Thermal (ESC/POS)' : 'معاينة الطباعة عبر الويب' }}
             </p>
             <p class="text-xs text-muted-foreground">
               {{ isNative ? (selected ? deviceName : 'لم يتم اختيار طابعة') : 'الطباعة عبر نافذة المتصفح' }}
@@ -203,7 +203,7 @@ async function testPrint() {
       <!-- Test print -->
       <Button class="w-full" size="lg" :disabled="!canPrint || printing" @click="testPrint">
         <Loader2 v-if="printing" class="mr-1.5 size-4 animate-spin" />
-        Test Print Struk
+        اختبار الطباعة Struk
       </Button>
       <p v-if="message" class="px-1 text-center text-xs text-muted-foreground">{{ message }}</p>
 
