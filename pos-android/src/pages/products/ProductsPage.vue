@@ -139,7 +139,7 @@ function setFilter(id: string | null) {
     <EmptyState
       v-else
       :icon="Package"
-      :title="query || categoryFilter ? 'المنتجات tidak ditemukan' : 'لا توجد منتجات بعد'"
+      :title="query || categoryFilter ? 'لم يتم العثور على منتجات' : 'لا توجد منتجات بعد'"
       description="أضف أول منتج لبدء البيع."
     >
       <Button class="gap-2" @click="router.push('/products/new')">
