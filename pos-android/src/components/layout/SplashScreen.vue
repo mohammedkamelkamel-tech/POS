@@ -33,14 +33,14 @@ onMounted(() => {
       <img
         v-if="media.url(storeLogo)"
         :src="media.url(storeLogo)!"
-        alt="Logo toko"
+        alt="شعار المتجر"
         class="size-full object-contain p-1.5"
       />
       <Store v-else class="size-12" :class="splashBg === 'brand' ? '' : 'text-primary'" />
     </div>
     <div class="text-center">
       <p class="text-xl font-bold">{{ storeName }}</p>
-      <p class="mt-1 text-xs opacity-70">Point of Sale</p>
+      <p class="mt-1 text-xs opacity-70">نظام نقاط البيع</p>
     </div>
     <div class="absolute bottom-16">
       <div
