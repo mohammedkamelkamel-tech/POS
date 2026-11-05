@@ -181,9 +181,9 @@ async function testPrint() {
             </CardContent>
           </Card>
 
-          <!-- Lebar kertas -->
+          <!-- عرض الورق -->
           <div class="flex items-center gap-2">
-            <span class="text-sm text-muted-foreground">Lebar kertas</span>
+            <span class="text-sm text-muted-foreground">عرض الورق</span>
             <div class="ml-auto flex gap-1.5">
               <Button
                 :variant="paperWidth === 32 ? 'default' : 'outline'"
