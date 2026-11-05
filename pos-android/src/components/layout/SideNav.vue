@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { cn } from '@/lib/utils'
 import { useSettingsStore } from '@/stores/settings'
+import { useAuthStore } from '@/stores/auth'
 import { useMediaStore } from '@/stores/media'
 import { navItems, isNavActive } from './navItems'
 
 const route = useRoute()
 const settings = useSettingsStore()
 const media = useMediaStore()
+const auth = useAuthStore()
+const visibleNavItems = computed(() => auth.isOwner ? navItems : navItems.filter(item => item.to === '/' || item.to === '/pos'))
 const { storeName, storeOwner, storeLogo } = storeToRefs(settings)
 
 onMounted(() => {
@@ -53,7 +56,7 @@ onMounted(() => {
     <!-- Menu -->
     <nav class="no-scrollbar flex-1 space-y-1 overflow-y-auto p-3">
       <RouterLink
-        v-for="item in navItems"
+        v-for="item in visibleNavItems"
         :key="item.to"
         :to="item.to"
         class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors"
