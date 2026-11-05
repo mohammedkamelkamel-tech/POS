@@ -5,28 +5,20 @@ import { storeToRefs } from 'pinia'
 import PinPad from '@/components/common/PinPad.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useSettingsStore } from '@/stores/settings'
-import { useMediaStore } from '@/stores/media'
-import { ShieldCheck } from 'lucide-vue-next'
 import { deviceBiometric } from '@/services/auth/deviceBiometric'
 
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 const settings = useSettingsStore()
-const media = useMediaStore()
-const { storeName, storeLogo } = storeToRefs(settings)
+const { storeName } = storeToRefs(settings)
 
 const pin = ref('')
 const error = ref(false)
-const logoUrl = ref<string | null>(null)
 const biometricBusy = ref(false)
 const biometricMessage = ref('')
 
 onMounted(async () => {
-  if (storeLogo.value) {
-    await media.ensure([storeLogo.value])
-    logoUrl.value = media.url(storeLogo.value)
-  }
   if (settings.biometricEnabled) {
     // Let the lock screen finish rendering before Android opens its biometric sheet.
     await nextTick()
@@ -68,9 +60,8 @@ async function onComplete(value: string) {
 <template>
   <div class="flex min-h-full flex-col items-center justify-center gap-10 px-6 py-12">
     <div class="flex flex-col items-center gap-3 text-center">
-      <div class="flex size-28 items-center justify-center overflow-hidden rounded-3xl bg-primary/10 p-2">
-        <img v-if="logoUrl" :src="logoUrl" alt="الشعار" class="size-full object-contain p-1" />
-        <ShieldCheck v-else class="size-9 text-primary" />
+      <div class="flex size-32 items-center justify-center overflow-hidden rounded-[1.8rem] border border-primary/15 bg-white p-2.5 shadow-lg shadow-primary/10">
+        <img src="/alkamel-cashier-logo.jpg" alt="شعار الكامل-كاشير" class="h-full w-full rounded-[1.25rem] object-contain" />
       </div>
       <div>
         <p class="text-lg font-bold">{{ storeName }}</p>
