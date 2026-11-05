@@ -23,15 +23,15 @@ export interface NavItem {
 
 /** Sumber tunggal item navigasi — dipakai BottomNav (HP) & SideNav (tablet). */
 export const navItems: NavItem[] = [
-  { to: '/', label: 'Home', icon: Home, exact: true, primary: true },
-  { to: '/pos', label: 'Kasir', icon: ShoppingCart, primary: true },
-  { to: '/products', label: 'Produk', icon: Package },
-  { to: '/transactions', label: 'Transaksi', icon: Receipt, primary: true },
-  { to: '/cashflow', label: 'Cashflow', icon: Wallet, primary: true },
-  { to: '/reports', label: 'Laporan', icon: BarChart3 },
-  { to: '/cashier', label: 'Sesi Kasir', icon: CalendarClock },
-  { to: '/printer', label: 'Printer', icon: Printer },
-  { to: '/settings', label: 'Akun', icon: Settings, primary: true },
+  { to: '/', label: 'الرئيسية', icon: Home, exact: true, primary: true },
+  { to: '/pos', label: 'الكاشير', icon: ShoppingCart, primary: true },
+  { to: '/products', label: 'المنتجات', icon: Package },
+  { to: '/transactions', label: 'الفواتير', icon: Receipt, primary: true },
+  { to: '/cashflow', label: 'الحركة المالية', icon: Wallet, primary: true },
+  { to: '/reports', label: 'التقارير', icon: BarChart3 },
+  { to: '/cashier', label: 'جلسة الكاشير', icon: CalendarClock },
+  { to: '/printer', label: 'الطابعة', icon: Printer },
+  { to: '/settings', label: 'الإعدادات', icon: Settings, primary: true },
 ]
 
 export const primaryNavItems = navItems.filter((i) => i.primary)
