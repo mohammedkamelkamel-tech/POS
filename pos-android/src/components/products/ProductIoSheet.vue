@@ -20,7 +20,7 @@ import {
   buildProductSheet,
   buildTemplateSheet,
   parseProductRows,
-  type ImportResult,
+  type استيرادtResult,
   type ParseResult,
 } from '@/services/products/productIo'
 
@@ -36,7 +36,7 @@ const busyExport = ref(false)
 const error = ref('')
 const fileName = ref('')
 const parsed = ref<ParseResult | null>(null)
-const result = ref<ImportResult | null>(null)
+const result = ref<استيرادtResult | null>(null)
 const progress = ref(0)
 
 watch(
@@ -60,7 +60,7 @@ function close() {
   emit('update:open', false)
 }
 
-// ── Ekspor ─────────────────────────────────────────────────────────────────
+// ── تصدير ─────────────────────────────────────────────────────────────────
 async function runExport(format: 'xlsx' | 'csv') {
   if (busyExport.value) return
   busyExport.value = true
@@ -94,7 +94,7 @@ async function downloadTemplate() {
   }
 }
 
-// ── Impor ──────────────────────────────────────────────────────────────────
+// ── استيراد ──────────────────────────────────────────────────────────────────
 const ACCEPTED_EXTS = ['.csv', '.xlsx']
 
 async function chooseFile() {
@@ -127,17 +127,17 @@ async function chooseFile() {
   }
 }
 
-async function runImport() {
+async function runاستيرادt() {
   const p = parsed.value
   if (!p || !p.rows.length) return
   stage.value = 'importing'
   progress.value = 0
   error.value = ''
   try {
-    result.value = await products.bulkImport(p.rows, (done, total) => {
+    result.value = await products.bulkاستيرادt(p.rows, (done, total) => {
       progress.value = total ? Math.round((done / total) * 100) : 100
     })
-    // Impor bisa bikin kategori baru → daftar kategori di halaman ikut segar.
+    // استيراد bisa bikin kategori baru → daftar kategori di halaman ikut segar.
     await categories.load()
     stage.value = 'done'
   } catch (e) {
@@ -148,18 +148,18 @@ async function runImport() {
 </script>
 
 <template>
-  <BottomSheet :open="open" title="Impor / Ekspor Produk" @update:open="close">
+  <BottomSheet :open="open" title="استيراد / تصدير المنتجات" @update:open="close">
     <div class="space-y-5 p-5 pb-6">
       <p v-if="error" class="flex gap-2 rounded-xl bg-destructive/10 p-3 text-sm text-destructive">
         <CircleAlert class="mt-0.5 size-4 shrink-0" />
         <span>{{ error }}</span>
       </p>
 
-      <!-- Ekspor -->
+      <!-- تصدير -->
       <section class="space-y-2">
-        <h3 class="text-sm font-semibold">Ekspor</h3>
+        <h3 class="text-sm font-semibold">تصدير</h3>
         <p class="text-xs text-muted-foreground">
-          {{ products.count }} produk akan diekspor beserta kategori & barcode-nya.
+          {{ products.count }} منتجاً سيتم تصديرها مع التصنيفات والباركود.
         </p>
         <div class="flex gap-2">
           <Button variant="outline" class="flex-1 gap-2" :disabled="busyExport" @click="runExport('xlsx')">
@@ -173,24 +173,24 @@ async function runImport() {
 
       <div class="h-px bg-border" />
 
-      <!-- Impor -->
+      <!-- استيراد -->
       <section class="space-y-3">
-        <h3 class="text-sm font-semibold">Impor</h3>
+        <h3 class="text-sm font-semibold">استيراد</h3>
 
         <template v-if="stage === 'idle' || stage === 'reading'">
           <p class="text-xs text-muted-foreground">
             File .csv / .xlsx dengan kolom <b>nama</b>, kategori, sku, barcode, tipe_barcode,
             harga_jual, harga_modal, lacak_stok, stok, aktif.
-            <b>Baris yang barcode-nya sudah terdaftar akan dilewati</b> — produk tanpa barcode
-            tetap diimpor.
+            <b>سيتم تخطي الصفوف التي يكون باركودها مسجلاً مسبقاً</b> — produk tanpa barcode
+            سيتم استيرادها.
           </p>
           <div class="flex gap-2">
             <Button class="flex-1 gap-2" :disabled="stage === 'reading'" @click="chooseFile">
               <Loader2 v-if="stage === 'reading'" class="size-4 animate-spin" />
               <Upload v-else class="size-4" />
-              {{ stage === 'reading' ? 'Membaca…' : 'Pilih File' }}
+              {{ stage === 'reading' ? 'جارٍ القراءة…' : 'اختيار ملف' }}
             </Button>
-            <Button variant="ghost" size="icon" title="Unduh template" :disabled="busyExport" @click="downloadTemplate">
+            <Button variant="ghost" size="icon" title="تنزيل قالب" :disabled="busyExport" @click="downloadTemplate">
               <Download class="size-4" />
             </Button>
           </div>
@@ -213,8 +213,8 @@ async function runImport() {
           </div>
           <div class="flex gap-2">
             <Button variant="outline" class="flex-1" @click="reset">Batal</Button>
-            <Button class="flex-1" :disabled="!parsed.rows.length" @click="runImport">
-              Impor {{ parsed.rows.length }} Baris
+            <Button class="flex-1" :disabled="!parsed.rows.length" @click="runاستيرادt">
+              استيراد {{ parsed.rows.length }} Baris
             </Button>
           </div>
         </template>
