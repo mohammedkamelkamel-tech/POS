@@ -45,14 +45,14 @@ async function saveEdit() {
 
 async function remove(c: CashflowCategory) {
   if (c.is_system) return
-  if (!confirm(`Hapus kategori "${c.name}"? Catatan lama tetap tersimpan.`)) return
+  if (!confirm(`هل تريد حذف التصنيف "${c.name}"؟ ستبقى الحركات القديمة محفوظة.`)) return
   await cashflow.removeCategory(c.id)
 }
 </script>
 
 <template>
   <div>
-    <AppHeader title="Kategori Cashflow" back />
+    <AppHeader title="تصنيفات الحركة المالية" back />
 
     <!-- Form tambah -->
     <div class="space-y-3 border-b border-border p-4">
@@ -63,7 +63,7 @@ async function remove(c: CashflowCategory) {
           :class="cn(newType === 'income' ? 'border-success bg-success/5 text-success' : 'border-border text-muted-foreground')"
           @click="newType = 'income'"
         >
-          <ArrowDownLeft class="size-4" /> Pemasukan
+          <ArrowDownLeft class="size-4" /> الإيرادات
         </button>
         <button
           type="button"
@@ -71,21 +71,21 @@ async function remove(c: CashflowCategory) {
           :class="cn(newType === 'expense' ? 'border-destructive bg-destructive/5 text-destructive' : 'border-border text-muted-foreground')"
           @click="newType = 'expense'"
         >
-          <ArrowUpRight class="size-4" /> Pengeluaran
+          <ArrowUpRight class="size-4" /> المصروفات
         </button>
       </div>
       <div class="flex gap-2">
-        <Input v-model="newName" placeholder="Nama kategori baru" @keyup.enter="add" />
+        <Input v-model="newName" placeholder="اسم التصنيف الجديد" @keyup.enter="add" />
         <Button class="shrink-0 gap-1" :disabled="!newName.trim()" @click="add">
-          <Plus class="size-4" /> Tambah
+          <Plus class="size-4" /> إضافة
         </Button>
       </div>
     </div>
 
     <!-- Daftar per tipe -->
     <template v-for="section in [
-      { key: 'income', label: 'Pemasukan', rows: income, icon: ArrowDownLeft, tint: 'bg-success/10 text-success' },
-      { key: 'expense', label: 'Pengeluaran', rows: expense, icon: ArrowUpRight, tint: 'bg-destructive/10 text-destructive' },
+      { key: 'income', label: 'الإيرادات', rows: income, icon: ArrowDownLeft, tint: 'bg-success/10 text-success' },
+      { key: 'expense', label: 'المصروفات', rows: expense, icon: ArrowUpRight, tint: 'bg-destructive/10 text-destructive' },
     ]" :key="section.key">
       <p class="bg-muted/40 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         {{ section.label }}
