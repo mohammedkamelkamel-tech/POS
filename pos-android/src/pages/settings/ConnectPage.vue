@@ -105,7 +105,7 @@ function askSwitch(s: { id: string | number; name: string }) {
   pendingSwitch.value = { id: String(s.id), name: s.name }
 }
 
-async function prepareOutletTransition(): Promise<boolean> {
+async function prepareالفرعTransition(): Promise<boolean> {
   outletTransitionError.value = ''
   await sync.syncNow()
   await sync.refreshPending()
@@ -124,7 +124,7 @@ async function confirmSwitch() {
   if (!target || switching.value) return
   switching.value = true
   try {
-    if (!(await prepareOutletTransition())) return
+    if (!(await prepareالفرعTransition())) return
     if (!(await account.setCurrentStore(target.id))) {
       outletTransitionError.value = account.error ?? outletTransitionError.value
       return
@@ -147,7 +147,7 @@ async function onAddStore() {
   if (!storeName || switching.value) return
   switching.value = true
   try {
-    if (!(await prepareOutletTransition())) return
+    if (!(await prepareالفرعTransition())) return
     if (!(await account.createStore(storeName))) {
       outletTransitionError.value = account.error ?? outletTransitionError.value
       return
@@ -191,7 +191,7 @@ const syncLabel = computed(() => {
 
 <template>
   <div class="min-h-screen bg-background pb-10">
-    <AppHeader title="Sambungkan ke POS Pro" subtitle="Login online & sync cloud" back />
+    <AppHeader title="الاتصال بالكامل برو" subtitle="تسجيل الدخول والمزامنة السحابية" back />
     <div class="space-y-5 p-4">
       <ConnectAuthCard
         v-if="!isAuthenticated"
@@ -212,12 +212,12 @@ const syncLabel = computed(() => {
         </Card>
         <section v-if="stores.length" class="space-y-2">
           <div class="flex items-center justify-between">
-            <Label>Outlet</Label>
-            <Button variant="ghost" size="sm" class="h-7 gap-1 text-primary" @click="showAddStore = !showAddStore"><Plus class="size-4" /> Tambah</Button>
+            <Label>الفرع</Label>
+            <Button variant="ghost" size="sm" class="h-7 gap-1 text-primary" @click="showAddStore = !showAddStore"><Plus class="size-4" /> إضافة</Button>
           </div>
           <div v-if="showAddStore" class="flex items-center gap-2">
-            <Input v-model="newStoreName" placeholder="Nama outlet baru" @keyup.enter="onAddStore" />
-            <Button size="sm" :disabled="status === 'loading' || switching || !newStoreName.trim()" @click="onAddStore">Simpan</Button>
+            <Input v-model="newStoreName" placeholder="اسم الفرع الجديد" @keyup.enter="onAddStore" />
+            <Button size="sm" :disabled="status === 'loading' || switching || !newStoreName.trim()" @click="onAddStore">حفظ</Button>
           </div>
           <p v-if="outletTransitionError" class="flex items-start gap-1.5 text-xs text-destructive" role="alert"><AlertCircle class="mt-0.5 size-3.5 shrink-0" /> {{ outletTransitionError }}</p>
           <div class="space-y-2">
@@ -225,7 +225,7 @@ const syncLabel = computed(() => {
               <template v-if="editingId === String(s.id)">
                 <Input v-model="editName" class="h-8 flex-1" @keyup.enter="onRename(s)" />
                 <Button size="sm" class="h-8" @click="onRename(s)">OK</Button>
-                <Button size="sm" variant="ghost" class="h-8" @click="editingId = null">Batal</Button>
+                <Button size="sm" variant="ghost" class="h-8" @click="editingId = null">إلغاء</Button>
               </template>
               <template v-else>
                 <div class="flex min-w-0 flex-1 items-center gap-2">
@@ -243,7 +243,7 @@ const syncLabel = computed(() => {
             <p class="text-sm text-muted-foreground">Pindah ke <span class="font-semibold text-foreground">{{ pendingSwitch?.name }}</span>? Data outlet saat ini akan dibersihkan dari perangkat lalu diganti data outlet tujuan. Perubahan yang belum tersinkron dikirim dulu — data di server tetap aman.</p>
             <p v-if="outletTransitionError" class="flex items-start gap-1.5 text-xs text-destructive" role="alert"><AlertCircle class="mt-0.5 size-3.5 shrink-0" /> {{ outletTransitionError }}</p>
             <div class="flex gap-2">
-              <Button variant="outline" class="flex-1" :disabled="switching" @click="pendingSwitch = null">Batal</Button>
+              <Button variant="outline" class="flex-1" :disabled="switching" @click="pendingSwitch = null">إلغاء</Button>
               <Button class="flex-1" :disabled="switching" @click="confirmSwitch"><Loader2 v-if="switching" class="size-4 animate-spin" /> Ya, ganti</Button>
             </div>
           </div>
