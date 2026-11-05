@@ -53,11 +53,11 @@ async function onSubmit() {
   let ok = false
   if (mode.value === 'register') {
     if (!name.value.trim()) {
-      localError.value = 'Nama wajib diisi.'
+      localError.value = 'الاسم مطلوب.'
       return
     }
     if (password.value !== password2.value) {
-      localError.value = 'Konfirmasi kata sandi tidak cocok.'
+      localError.value = 'تأكيد كلمة المرور غير متطابق.'
       return
     }
     ok = await account.registerEmail(name.value.trim(), email.value.trim(), password.value)
@@ -88,14 +88,14 @@ async function onLogout() {
       error instanceof SecureCredentialUnavailableError ||
       error instanceof LegacyCredentialRemovalError
     ) {
-      account.error = 'Gagal keluar dengan aman. Kredensial perangkat belum dihapus.'
+      account.error = 'تعذر تسجيل الخروج بأمان. لم تُحذف بيانات الدخول من الجهاز.'
       return
     }
-    account.error = 'Gagal keluar. Coba lagi.'
+    account.error = 'تعذر تسجيل الخروج. حاول مرة أخرى.'
   }
 }
 
-// Ganti outlet = destruktif (data lokal outlet lama di-reset) → wajib konfirmasi.
+// تبديل outlet = destruktif (data lokal outlet lama di-reset) → wajib konfirmasi.
 const pendingSwitch = ref<{ id: string; name: string } | null>(null)
 const switching = ref(false)
 const outletTransitionError = ref('')
@@ -171,19 +171,19 @@ async function onRename(s: { id: string | number }) {
 }
 
 const syncLabel = computed(() => {
-  if (failedCount.value > 0) return 'Perlu perhatian'
+  if (failedCount.value > 0) return 'يتطلب الانتباه'
 
   switch (syncStatus.value) {
     case 'syncing':
-      return 'Menyinkronkan…'
+      return 'جارٍ مزامنة البيانات…'
     case 'idle':
-      return 'Tersinkron'
+      return 'تمت المزامنة'
     case 'offline':
-      return 'Offline'
+      return 'غير متصل'
     case 'error':
-      return 'Gagal sync'
+      return 'فشلت المزامنة'
     default:
-      return 'Nonaktif'
+      return 'غير نشط'
   }
 })
 
@@ -230,21 +230,21 @@ const syncLabel = computed(() => {
               <template v-else>
                 <div class="flex min-w-0 flex-1 items-center gap-2">
                   <span class="truncate font-medium">{{ s.name }}</span><Badge variant="secondary">{{ s.role }}</Badge>
-                  <Badge v-if="String(s.id) === currentStoreId" class="bg-primary/15 text-primary hover:bg-primary/15">Aktif</Badge>
+                  <Badge v-if="String(s.id) === currentStoreId" class="bg-primary/15 text-primary hover:bg-primary/15">نشط</Badge>
                 </div>
-                <Button v-if="String(s.id) !== currentStoreId" size="sm" variant="outline" class="h-8" @click="askSwitch(s)">Ganti</Button>
-                <button v-if="s.role === 'owner'" class="text-muted-foreground transition active:text-foreground" aria-label="Ganti nama outlet" @click="startRename(s)"><Pencil class="size-4" /></button>
+                <Button v-if="String(s.id) !== currentStoreId" size="sm" variant="outline" class="h-8" @click="askSwitch(s)">تبديل</Button>
+                <button v-if="s.role === 'owner'" class="text-muted-foreground transition active:text-foreground" aria-label="تبديل nama outlet" @click="startRename(s)"><Pencil class="size-4" /></button>
               </template>
             </div>
           </div>
         </section>
-        <BottomSheet :open="!!pendingSwitch" title="Ganti outlet?" @update:open="(v: boolean) => { if (!v && !switching) pendingSwitch = null }">
+        <BottomSheet :open="!!pendingSwitch" title="تبديل outlet?" @update:open="(v: boolean) => { if (!v && !switching) pendingSwitch = null }">
           <div class="space-y-4 p-5">
-            <p class="text-sm text-muted-foreground">Pindah ke <span class="font-semibold text-foreground">{{ pendingSwitch?.name }}</span>? Data outlet saat ini akan dibersihkan dari perangkat lalu diganti data outlet tujuan. Perubahan yang belum tersinkron dikirim dulu — data di server tetap aman.</p>
+            <p class="text-sm text-muted-foreground">الانتقال إلى <span class="font-semibold text-foreground">{{ pendingSwitch?.name }}</span>? سيتم استبدال بيانات الفرع الحالي ببيانات الفرع المحدد على هذا الجهاز. ستتم مزامنة التغييرات غير المرسلة أولاً، وستبقى بيانات الخادم آمنة.</p>
             <p v-if="outletTransitionError" class="flex items-start gap-1.5 text-xs text-destructive" role="alert"><AlertCircle class="mt-0.5 size-3.5 shrink-0" /> {{ outletTransitionError }}</p>
             <div class="flex gap-2">
               <Button variant="outline" class="flex-1" :disabled="switching" @click="pendingSwitch = null">إلغاء</Button>
-              <Button class="flex-1" :disabled="switching" @click="confirmSwitch"><Loader2 v-if="switching" class="size-4 animate-spin" /> Ya, ganti</Button>
+              <Button class="flex-1" :disabled="switching" @click="confirmSwitch"><Loader2 v-if="switching" class="size-4 animate-spin" /> نعم، بدّل الفرع</Button>
             </div>
           </div>
         </BottomSheet>
@@ -253,7 +253,7 @@ const syncLabel = computed(() => {
           :last-synced-at="lastSyncedAt" :failed-changes="failedChanges" :failed-count="failedCount"
           @sync="sync.syncNow()" @retry="sync.retryFailed()"
         />
-        <Button variant="outline" class="w-full text-destructive" @click="onLogout"><LogOut class="size-4" /> Keluar</Button>
+        <Button variant="outline" class="w-full text-destructive" @click="onLogout"><LogOut class="size-4" /> تسجيل الخروج</Button>
       </template>
     </div>
   </div>
