@@ -40,7 +40,7 @@ onMounted(() => {
     </div>
     <div class="text-center">
       <p class="text-xl font-bold">{{ storeName }}</p>
-      <p class="mt-1 text-xs opacity-70">نظام نقاط البيع</p>
+      <p class="mt-1 text-xs opacity-70">الكامل-كاشير</p>
     </div>
     <div class="absolute bottom-16">
       <div
