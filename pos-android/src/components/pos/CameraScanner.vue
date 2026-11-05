@@ -13,7 +13,7 @@ const props = withDefaults(
     /** Hint di bawah bingkai. */
     hint?: string
   }>(),
-  { sameCodeMs: 1500, hint: 'Arahkan barcode ke dalam kotak' },
+  { sameCodeMs: 1500, hint: 'وجّه الباركود إلى داخل الإطار' },
 )
 
 const emit = defineEmits<{ scan: [result: ScanResult] }>()
@@ -28,10 +28,10 @@ const gate = createScanGate({ sameCodeMs: props.sameCodeMs })
 
 const MESSAGES: Record<string, string> = {
   denied:
-    'Izin kamera ditolak. Buka Setelan → Aplikasi → POS Kacaw → Izin → Kamera, lalu coba lagi.',
-  notfound: 'Kamera tidak ditemukan di perangkat ini.',
-  unsupported: 'Perangkat ini tidak mendukung akses kamera dari aplikasi.',
-  other: 'Kamera gagal dinyalakan.',
+    'تم رفض إذن الكاميرا. افتح إعدادات الجهاز ← التطبيقات ← الكامل-كاشير ← الأذونات ← الكاميرا، ثم حاول مجدداً.',
+  notfound: 'لم يتم العثور على كاميرا في هذا الجهاز.',
+  unsupported: 'هذا الجهاز لا يدعم الوصول إلى الكاميرا من داخل التطبيق.',
+  other: 'تعذر تشغيل الكاميرا.',
 }
 
 async function start() {
@@ -122,14 +122,14 @@ defineExpose({ stop, start })
     >
       <CameraOff class="size-8 text-muted-foreground" />
       <p class="text-sm text-muted-foreground">{{ MESSAGES[error] }}</p>
-      <Button variant="outline" size="sm" @click="start">Coba lagi</Button>
+      <Button variant="outline" size="sm" @click="start">حاول مرة أخرى</Button>
     </div>
 
     <button
       v-if="session?.torchAvailable"
       type="button"
       class="absolute right-3 top-3 flex size-10 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur active:scale-95"
-      :title="torchOn ? 'Matikan senter' : 'Nyalakan senter'"
+      :title="torchOn ? 'إيقاف الفلاش' : 'تشغيل الفلاش'"
       @click="toggleTorch"
     >
       <component :is="torchOn ? FlashlightOff : Flashlight" class="size-5" />
