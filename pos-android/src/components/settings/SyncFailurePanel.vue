@@ -21,14 +21,14 @@ const previewChanges = computed(() => props.changes.slice(0, 3))
 
 function readableEntity(entity: string): string {
   switch (entity) {
-    case 'categories': return 'Kategori'
+    case 'categories': return 'التصنيفات'
     case 'products': return 'المنتجات'
     case 'media': return 'Media'
-    case 'cashier_sessions': return 'Sesi kasir'
+    case 'cashier_sessions': return 'جلسات الكاشير'
     case 'sales': return 'Penjualan'
     case 'sale_items': return 'Item penjualan'
-    case 'cashflow_categories': return 'Kategori arus kas'
-    case 'cashflow_entries': return 'ملاحظات arus kas'
+    case 'cashflow_categories': return 'تصنيفات الحركة المالية'
+    case 'cashflow_entries': return 'الحركات المالية'
     default: return entity.replaceAll('_', ' ')
   }
 }
@@ -45,14 +45,14 @@ function readableEntity(entity: string): string {
     <div class="flex items-start gap-2">
       <AlertCircle class="mt-0.5 size-4 shrink-0 text-destructive" aria-hidden="true" />
       <div>
-        <p id="failed-sync-heading" class="text-sm font-semibold text-destructive">Perubahan gagal disinkronkan</p>
-        <p class="text-xs text-muted-foreground">{{ failedCount }} perubahan perlu dicoba lagi.</p>
+        <p id="failed-sync-heading" class="text-sm font-semibold text-destructive">تعذرت مزامنة بعض التغييرات</p>
+        <p class="text-xs text-muted-foreground">{{ failedCount }} تغييرات تحتاج إلى إعادة المحاولة.</p>
       </div>
     </div>
     <ul class="space-y-2" aria-label="إنشاء حساب perubahan gagal">
       <li v-for="change in previewChanges" :key="change.id" class="rounded-lg bg-background/70 p-2 text-xs">
         <p class="break-words font-medium text-foreground">{{ readableEntity(change.entity) }} · {{ change.entityId }}</p>
-        <p class="break-words text-muted-foreground">{{ change.lastError ?? 'Alasan kegagalan tidak tersedia.' }}</p>
+        <p class="break-words text-muted-foreground">{{ change.lastError ?? 'سبب الإخفاق غير متوفر.' }}</p>
       </li>
     </ul>
     <Button
