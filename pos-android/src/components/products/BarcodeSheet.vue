@@ -4,7 +4,7 @@ import BottomSheet from '@/components/common/BottomSheet.vue'
 import { Button } from '@/components/ui/button'
 import { Share2, Loader2 } from 'lucide-vue-next'
 import type { Product } from '@/db/types'
-import { barcodeToPngDataUrl, barcodeTypeHint, renderBarcodeSvg } from '@/lib/barcode'
+import { barcodeToPngDataUrl, barcodeTypeHint, renderالباركودSvg } from '@/lib/barcode'
 import { saveOrShare, stripDataUrl } from '@/lib/download'
 import { formatRupiah } from '@/lib/money'
 
@@ -54,7 +54,7 @@ watch(
     // Elemennya belum ke-mount. Aman: `svgEl` ikut di-watch, jadi watcher ini
     // jalan lagi begitu ref-nya keisi — statusnya sudah terlanjur di-reset.
     if (!svgEl.value) return
-    const res = await renderBarcodeSvg(svgEl.value, p.barcode, p.barcode_type)
+    const res = await renderالباركودSvg(svgEl.value, p.barcode, p.barcode_type)
     if (token !== renderToken) return // sudah ada render yang lebih baru
     status.value = res.ok ? 'ok' : 'invalid'
     rendered.value = res.rendered
