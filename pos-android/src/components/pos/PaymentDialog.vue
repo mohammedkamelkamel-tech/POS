@@ -19,11 +19,25 @@ const emit = defineEmits<{
   confirm: [payload: { paid: number; paymentMethod: string; paymentBank?: string; paymentProofPath?: string }]
 }>()
 
-type Method = 'cash' | 'qris' | 'transfer'
+type Method = string
 const METHODS: Array<{ id: Method; label: string; icon: typeof Banknote }> = [
   { id: 'cash', label: 'نقداً', icon: Banknote },
   { id: 'qris', label: 'رمز QR', icon: QrCode },
   { id: 'transfer', label: 'تحويل بنكي', icon: ArrowLeftRight },
+  { id: 'wallet:jeeb', label: 'محفظة جيب', icon: Banknote },
+  { id: 'wallet:jwali', label: 'محفظة جوالي', icon: Banknote },
+  { id: 'wallet:onecash', label: 'محفظة ون كاش', icon: Banknote },
+  { id: 'wallet:flousak', label: 'محفظة فلوسك', icon: Banknote },
+  { id: 'wallet:omflous', label: 'محفظة أم فلوس', icon: Banknote },
+  { id: 'wallet:mahfazati', label: 'محفظة محفظتي', icon: Banknote },
+  { id: 'wallet:pees', label: 'محفظة بيس', icon: Banknote },
+  { id: 'wallet:shamil', label: 'شامل موني', icon: Banknote },
+  { id: 'wallet:sabacash', label: 'سبأ كاش', icon: Banknote },
+  { id: 'wallet:mobilemoney', label: 'موبايل موني', icon: Banknote },
+  { id: 'wallet:yemenwallet', label: 'يمن والت', icon: Banknote },
+  { id: 'wallet:aldawli', label: 'الدولي موني', icon: Banknote },
+  { id: 'wallet:wecash', label: 'وي كاش', icon: Banknote },
+  { id: 'wallet:reyalmobile', label: 'ريال موبايل', icon: Banknote },
 ]
 
 const method = ref<Method>('cash')
