@@ -2,6 +2,10 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useSettingsStore } from '@/stores/settings'
 
+declare module 'vue-router' {
+  interface RouteMeta { hideNav?: boolean; ownerOnly?: boolean }
+}
+
 const routes: RouteRecordRaw[] = [
   { path: '/', name: 'home', component: () => import('@/pages/HomePage.vue') },
 
