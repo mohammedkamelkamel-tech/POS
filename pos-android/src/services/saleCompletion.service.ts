@@ -24,7 +24,7 @@ export async function validateSaleStock(
       }
       stockQty = (line.weightGrams as number) / 1000
     } else if (line.quantityKind === 'meal') {
-      if (![1, 2, 4, 6, 8].includes(line.portionQuarters ?? 0) || line.qty !== 1) {
+      if (!Number.isSafeInteger(line.portionQuarters) || (line.portionQuarters ?? 0) < 1 || (line.portionQuarters ?? 0) > 40 || line.qty !== 1) {
         throw new CheckoutError({ kind: 'invalid-input', reason: 'حصة الوجبة غير صحيحة' })
       }
       stockQty = (line.portionQuarters as number) / 4
