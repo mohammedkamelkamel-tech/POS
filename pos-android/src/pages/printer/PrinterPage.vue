@@ -120,7 +120,7 @@ async function testPrint() {
             <p class="text-sm font-semibold">لم يتم تفعيل خدمة الطباعة</p>
             <p class="text-xs text-muted-foreground">
               طبقة البرنامج (ومشفّر ESC/POS واختيار الجهاز) جاهزان. Plugin
-              koneksi Bluetooth/USB akan diaktifkan pada update berikutnya — setelah
+              koneksi البلوتوث أو USB akan diaktifkan pada update berikutnya — setelah
               ستعمل أزرار البحث والطباعة مباشرة دون تغيير طريقة الاستخدام.
             </p>
           </CardContent>
