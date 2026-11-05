@@ -8,17 +8,15 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import { Badge } from '@/components/ui/badge'
 import BottomSheet from '@/components/common/BottomSheet.vue'
 import PinPad from '@/components/common/PinPad.vue'
 import {
-  Store, Lock, Moon, Cloud, Smartphone, Save, ImagePlus, Sparkles, Check,
+  Store, Lock, Moon, Smartphone, Save, ImagePlus, Sparkles, Check,
   QrCode, Loader2, KeyRound, LockKeyhole, MessageCircle,
 } from 'lucide-vue-next'
 import { useSettingsStore, type SplashBg } from '@/stores/settings'
 import { useMediaStore } from '@/stores/media'
 import { useAuthStore } from '@/stores/auth'
-import { useAccountStore } from '@/stores/account'
 import { pickImage, fitImageSquare } from '@/lib/image'
 import { decodeQrFromDataUrl, encodeQrToDataUrl, isValidQris } from '@/lib/qris'
 import { deviceBiometric } from '@/services/auth/deviceBiometric'
@@ -26,7 +24,6 @@ import { deviceBiometric } from '@/services/auth/deviceBiometric'
 const settings = useSettingsStore()
 const media = useMediaStore()
 const auth = useAuthStore()
-const account = useAccountStore()
 const router = useRouter()
 const { storeName, storeOwner, storeLogo, loginEnabled, hasPin, theme, devicePrefix,
   splashEnabled, splashBg, qrisPayload, qrisDynamic, biometricEnabled } = storeToRefs(settings)

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -8,13 +7,11 @@ import { Badge } from '@/components/ui/badge'
 import { AlertTriangle, Archive, CalendarClock, CheckCircle2, FileJson, Loader2, RefreshCw, RotateCcw, Trash2 } from 'lucide-vue-next'
 import { createLocalBackup, deleteLocalBackup, listLocalBackups, restoreLocalBackup, type LocalBackupFile } from '@/services/backup/localBackup'
 
-const router = useRouter()
 const backups = ref<LocalBackupFile[]>([])
 const loading = ref(true)
 const working = ref(false)
 const error = ref('')
 const success = ref('')
-const selected = ref<string | null>(null)
 
 async function refresh() {
   loading.value = true

@@ -45,7 +45,7 @@ export async function createLocalBackup(): Promise<string> {
     const exported = await CapacitorSQLite.exportToJson({ database: DATABASE, jsonexportmode: 'full' })
     const json = JSON.stringify({ ...exported, overwrite: true, mode: 'full' })
     const valid = await CapacitorSQLite.isJsonValid({ jsonstring: json })
-    if (!valid.result) throw new Error(valid.message || 'تعذر التحقق من سلامة ملف النسخة الاحتياطية.')
+    if (!valid.result) throw new Error('تعذر التحقق من سلامة ملف النسخة الاحتياطية.')
     await ensureFolder()
     const name = backupFileName()
     await Filesystem.writeFile({
@@ -107,7 +107,7 @@ export async function restoreLocalBackup(name: string): Promise<void> {
   }
   const json = JSON.stringify({ ...parsed, overwrite: true, mode: 'full' })
   const valid = await CapacitorSQLite.isJsonValid({ jsonstring: json })
-  if (!valid.result) throw new Error(valid.message || 'تعذر التحقق من سلامة النسخة الاحتياطية.')
+  if (!valid.result) throw new Error('تعذر التحقق من سلامة النسخة الاحتياطية.')
   await closeDb()
   try {
     await CapacitorSQLite.importFromJson({ jsonstring: json })
