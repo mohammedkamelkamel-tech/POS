@@ -19,7 +19,7 @@ import { useSettingsStore, type SplashBg } from '@/stores/settings'
 import { useMediaStore } from '@/stores/media'
 import { useAuthStore } from '@/stores/auth'
 import { useAccountStore } from '@/stores/account'
-import { pickImage, downscale } from '@/lib/image'
+import { pickImage, fitImageSquare } from '@/lib/image'
 import { decodeQrFromDataUrl, encodeQrToDataUrl, isValidQris } from '@/lib/qris'
 import { deviceBiometric } from '@/services/auth/deviceBiometric'
 
@@ -94,7 +94,7 @@ async function chooseLogo() {
   logoBusy.value = true
   try {
     // نحافظ على شفافية الشعار مع تصغيره إلى 256 بكسل.
-    const img = await downscale(dataUrl, { maxDim: 256, mime: 'image/png' })
+    const img = await fitImageSquare(dataUrl, 256)
     const ref_ = await media.save(img)
     await settings.setLogo(ref_) // langsung ke-update di Home & splash
   } finally {
@@ -172,7 +172,16 @@ async function onToggleBiometric(enabled: boolean) {
     biometricError.value = 'ميزة البصمة غير متاحة. تأكد من تسجيل بصمة في إعدادات الجهاز.'
     return
   }
-  await settings.setBiometricEnabled(enabled)
+  if (enabled) {
+    try {
+      await deviceBiometric.authenticate()
+      await settings.setBiometricEnabled(true)
+    } catch {
+      biometricError.value = 'لم يتم التحقق بالبصمة؛ بقي الدخول بالرقم السري كما هو.'
+    }
+    return
+  }
+  await settings.setBiometricEnabled(false)
 }
 
 function lockNow() {
@@ -227,7 +236,7 @@ function lockNow() {
                   v-if="media.url(storeLogo)"
                   :src="media.url(storeLogo)!"
                   alt="شعار المتجر"
-                  class="max-h-full max-w-full object-contain"
+                  class="h-full w-full object-contain"
                 />
                 <Store v-else class="size-6" />
               </div>
