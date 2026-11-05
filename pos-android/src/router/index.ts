@@ -34,19 +34,19 @@ const routes: RouteRecordRaw[] = [
     path: '/products/new',
     name: 'product-new', meta: { ownerOnly: true },
     component: () => import('@/pages/products/ProductFormPage.vue'),
-    meta: { hideNav: true },
+    meta: { hideNav: true, ownerOnly: true },
   },
   {
     path: '/products/:id/edit',
     name: 'product-edit', meta: { ownerOnly: true },
     component: () => import('@/pages/products/ProductFormPage.vue'),
-    meta: { hideNav: true },
+    meta: { hideNav: true, ownerOnly: true },
   },
   {
     path: '/categories',
     name: 'categories', meta: { ownerOnly: true },
     component: () => import('@/pages/products/CategoriesPage.vue'),
-    meta: { hideNav: true },
+    meta: { hideNav: true, ownerOnly: true },
   },
 
   // POS + transaksi (Phase 2)
@@ -66,9 +66,9 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/transactions/:id',
-    name: 'transaction-detail',
+    name: 'transaction-detail', meta: { ownerOnly: true },
     component: () => import('@/pages/transactions/TransactionDetailPage.vue'),
-    meta: { hideNav: true },
+    meta: { hideNav: true, ownerOnly: true },
   },
 
   // Kasir (Phase 3)
@@ -86,21 +86,21 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/cashflow/new',
-    name: 'cashflow-new',
+    name: 'cashflow-new', meta: { ownerOnly: true },
     component: () => import('@/pages/cashflow/CashflowEntryFormPage.vue'),
-    meta: { hideNav: true },
+    meta: { hideNav: true, ownerOnly: true },
   },
   {
     path: '/cashflow/categories',
-    name: 'cashflow-categories',
+    name: 'cashflow-categories', meta: { ownerOnly: true },
     component: () => import('@/pages/cashflow/CashflowCategoriesPage.vue'),
-    meta: { hideNav: true },
+    meta: { hideNav: true, ownerOnly: true },
   },
   {
     path: '/cashflow/:id/edit',
-    name: 'cashflow-edit',
+    name: 'cashflow-edit', meta: { ownerOnly: true },
     component: () => import('@/pages/cashflow/CashflowEntryFormPage.vue'),
-    meta: { hideNav: true },
+    meta: { hideNav: true, ownerOnly: true },
   },
 
   // Laporan / analitik
@@ -116,7 +116,7 @@ const routes: RouteRecordRaw[] = [
     name: 'printer', meta: { ownerOnly: true },
     component: () => import('@/pages/printer/PrinterPage.vue'),
   },
-  { path: '/backups', name: 'backups', component: () => import('@/pages/settings/BackupsPage.vue'), meta: { hideNav: true } },
+  { path: '/backups', name: 'backups', component: () => import('@/pages/settings/BackupsPage.vue'), meta: { hideNav: true, ownerOnly: true } },
   {
     path: '/settings',
     name: 'settings', meta: { ownerOnly: true },
