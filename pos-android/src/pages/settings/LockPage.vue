@@ -70,9 +70,19 @@ async function onComplete(value: string) {
       <div>
         <p class="text-lg font-bold">{{ storeName }}</p>
         <p class="text-sm text-muted-foreground">
-          {{ error ? 'الرقم السري غير صحيح، حاول مجدداً' : 'أدخل الرقم السري أو استخدم البصمة لفتح التطبيق' }}
+          {{ error ? 'الرقم السري غير صحيح، حاول مجدداً' : 'أدخل الرقم السري لفتح التطبيق' }}
         </p>
       </div>
+      <p v-if="biometricMessage" class="max-w-xs text-center text-xs text-destructive">{{ biometricMessage }}</p>
+      <button
+        v-if="settings.biometricEnabled"
+        type="button"
+        class="rounded-xl border border-primary/30 px-4 py-2 text-sm font-medium text-primary disabled:opacity-50"
+        :disabled="biometricBusy"
+        @click="unlockWithBiometric"
+      >
+        {{ biometricBusy ? 'جارٍ التحقق بالبصمة…' : 'المحاولة بالبصمة مرة أخرى' }}
+      </button>
     </div>
 
     <PinPad v-model="pin" :error="error" @complete="onComplete" />
