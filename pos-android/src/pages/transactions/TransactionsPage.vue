@@ -5,7 +5,7 @@ import { storeToRefs } from 'pinia'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import DateRangeFilter from '@/components/common/DateRangeFilter.vue'
-import تصديرDialog from '@/components/common/تصديرDialog.vue'
+import ExportDialog from '@/components/common/ExportDialog.vue'
 import { Badge } from '@/components/ui/badge'
 import { Receipt, ChevronRight, Download } from 'lucide-vue-next'
 import { useSalesStore } from '@/stores/sales'
@@ -21,7 +21,7 @@ const label = computed(() => rangeLabel(range.value))
 
 const exportOpen = ref(false)
 
-const PAY_LABEL: Record<string, string> = { cash: 'نقداً', qris: 'رمز QR', transfer: 'تحويل' }
+const PAY_LABEL: Record<string, string> = { cash: 'نقداً', qris: 'QRIS', transfer: 'تحويل' }
 
 function activityTime(sale: Sale): number {
   if (sale.status === 'open') return sale.opened_at ?? sale.created_at
@@ -32,7 +32,7 @@ const visibleSales = computed<Sale[]>(() =>
   [...openBills.value, ...recent.value].sort((left, right) => activityTime(right) - activityTime(left)),
 )
 
-// تجميع العمليات حسب اليوم لعرض التاريخ.
+// Kelompokkan per hari buat header tanggal.
 const groups = computed(() => {
   const map = new Map<string, { key: string; label: string; rows: Sale[] }>()
   for (const sale of visibleSales.value) {
@@ -56,11 +56,11 @@ onMounted(() => sales.load())
 
 <template>
   <div>
-    <AppHeader title="المبيعات" :subtitle="`${label}: ${summary.count} عملية بيع`">
+    <AppHeader title="Transaksi" :subtitle="`${label}: ${summary.count} transaksi`">
       <template #actions>
         <button
           class="flex size-9 items-center justify-center rounded-full text-foreground hover:bg-accent"
-          aria-label="تصدير إلى Excel"
+          aria-label="Export Excel"
           @click="exportOpen = true"
         >
           <Download class="size-5" />
@@ -68,17 +68,17 @@ onMounted(() => sales.load())
       </template>
     </AppHeader>
 
-    <!-- تصفية حسب التاريخ -->
+    <!-- Filter tanggal -->
     <DateRangeFilter
       :model-value="range"
       @update:model-value="sales.setRange($event)"
     />
 
-    <!-- ملخص الفترة المحددة -->
+    <!-- Ringkasan rentang aktif -->
     <div class="border-b border-border bg-gradient-to-br from-hero to-hero/90 px-5 py-5 text-hero-foreground">
       <p class="text-xs opacity-80">المبيعات · {{ label }}</p>
       <p class="mt-1 text-2xl font-bold">{{ formatRupiah(summary.total) }}</p>
-      <p class="mt-0.5 text-xs opacity-80">{{ summary.count }} عملية بيع</p>
+      <p class="mt-0.5 text-xs opacity-80">{{ summary.count }} transaksi</p>
     </div>
 
     <template v-if="visibleSales.length">
@@ -123,15 +123,15 @@ onMounted(() => sales.load())
       v-else
       :icon="Receipt"
       title="لا توجد فواتير"
-      :description="`لا توجد فواتير خلال الفترة ${label}. جرّب تغيير نطاق التاريخ.`"
+      :description="`لا توجد فواتير pada rentang ${label.toLowerCase()}. جرّب تغيير نطاق التاريخ.`"
     />
 
-    <تصديرDialog
+    <ExportDialog
       v-model:open="exportOpen"
       title="تصدير الفواتير"
-      filename-base="عملية بيع"
+      filename-base="transaksi"
       :initial-range="range"
-      :build-sheets="sales.buildتصدير"
+      :build-sheets="sales.buildExport"
     />
   </div>
 </template>
