@@ -11,13 +11,13 @@ import { Receipt, ChevronRight, Download } from 'lucide-vue-next'
 import { useSalesStore } from '@/stores/sales'
 import { formatRupiah } from '@/lib/money'
 import { formatTime, formatDate, dayKey } from '@/lib/datetime'
-import { rangeالتسمية } from '@/lib/dateRange'
+import { rangeLabel } from '@/lib/dateRange'
 import type { Sale } from '@/db/types'
 
 const sales = useSalesStore()
 const { recent, openBills, summary, range } = storeToRefs(sales)
 
-const label = computed(() => rangeالتسمية(range.value))
+const label = computed(() => rangeLabel(range.value))
 
 const exportOpen = ref(false)
 
