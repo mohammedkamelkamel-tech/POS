@@ -60,7 +60,7 @@ export class CheckoutService {
         total: amounts.total,
         paid: input.paid,
         change_due: Math.max(0, input.paid - amounts.total),
-        payment_method: input.paymentMethod,
+        payment_method: input.paymentMethod,\n        payment_bank: input.paymentBank ?? null,\n        payment_proof_path: input.paymentProofPath ?? null,
         status: 'completed',
         open_bill_label: null,
         opened_at: null,
