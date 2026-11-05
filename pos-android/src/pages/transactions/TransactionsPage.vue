@@ -5,7 +5,7 @@ import { storeToRefs } from 'pinia'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import DateRangeFilter from '@/components/common/DateRangeFilter.vue'
-import ExportDialog from '@/components/common/ExportDialog.vue'
+import تصديرDialog from '@/components/common/تصديرDialog.vue'
 import { Badge } from '@/components/ui/badge'
 import { Receipt, ChevronRight, Download } from 'lucide-vue-next'
 import { useSalesStore } from '@/stores/sales'
@@ -32,7 +32,7 @@ const visibleSales = computed<Sale[]>(() =>
   [...openBills.value, ...recent.value].sort((left, right) => activityTime(right) - activityTime(left)),
 )
 
-// Kelompokkan per hari buat header tanggal.
+// تجميع العمليات حسب اليوم لعرض التاريخ.
 const groups = computed(() => {
   const map = new Map<string, { key: string; label: string; rows: Sale[] }>()
   for (const sale of visibleSales.value) {
@@ -68,13 +68,13 @@ onMounted(() => sales.load())
       </template>
     </AppHeader>
 
-    <!-- Filter tanggal -->
+    <!-- تصفية حسب التاريخ -->
     <DateRangeFilter
       :model-value="range"
       @update:model-value="sales.setRange($event)"
     />
 
-    <!-- Ringkasan rentang aktif -->
+    <!-- ملخص الفترة المحددة -->
     <div class="border-b border-border bg-gradient-to-br from-hero to-hero/90 px-5 py-5 text-hero-foreground">
       <p class="text-xs opacity-80">المبيعات · {{ label }}</p>
       <p class="mt-1 text-2xl font-bold">{{ formatRupiah(summary.total) }}</p>
@@ -126,12 +126,12 @@ onMounted(() => sales.load())
       :description="`لا توجد فواتير خلال الفترة ${label}. جرّب تغيير نطاق التاريخ.`"
     />
 
-    <ExportDialog
+    <تصديرDialog
       v-model:open="exportOpen"
       title="تصدير الفواتير"
       filename-base="عملية بيع"
       :initial-range="range"
-      :build-sheets="sales.buildExport"
+      :build-sheets="sales.buildتصدير"
     />
   </div>
 </template>
