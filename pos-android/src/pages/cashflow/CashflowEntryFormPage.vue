@@ -10,6 +10,7 @@ import { ArrowDownLeft, ArrowUpRight, Trash2 } from 'lucide-vue-next'
 import { useCashflowStore } from '@/stores/cashflow'
 import { useCashierStore } from '@/stores/cashier'
 import { cn } from '@/lib/utils'
+import { goBackOrHome } from '@/composables/useHardwareBack'
 
 const route = useRoute()
 const router = useRouter()
@@ -71,7 +72,7 @@ async function save() {
         sessionId: cashier.current?.id ?? null,
       })
     }
-    router.back()
+    goBackOrHome(router)
   } finally {
     saving.value = false
   }
@@ -81,7 +82,7 @@ async function remove() {
   if (!id.value) return
   if (!confirm('هل تريد حذف هذه الحركة المالية؟')) return
   await cashflow.deleteEntry(id.value)
-  router.back()
+  goBackOrHome(router)
 }
 </script>
 
