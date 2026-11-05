@@ -12,7 +12,7 @@ export interface DateRange {
 
 export const PRESET_LABEL: Record<RangePreset, string> = {
   today: 'اليوم',
-  yesterday: 'Kemarin',
+  yesterday: 'أمس',
   week: 'هذا الأسبوع',
   month: 'هذا الشهر',
   custom: 'مخصص',
