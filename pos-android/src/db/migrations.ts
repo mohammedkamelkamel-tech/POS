@@ -274,7 +274,7 @@ const migrations: Migration[] = [
         );
       }
     },
-  },,
+  },
   {
     version: 8,
     name: 'butcher-sale-quantities',
