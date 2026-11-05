@@ -20,7 +20,7 @@ type Method = 'cash' | 'qris' | 'transfer'
 const METHODS: Array<{ id: Method; label: string; icon: typeof Banknote }> = [
   { id: 'cash', label: 'نقداً', icon: Banknote },
   { id: 'qris', label: 'QRIS', icon: QrCode },
-  { id: 'transfer', label: 'Transfer', icon: ArrowLeftRight },
+  { id: 'transfer', label: 'تحويل بنكي', icon: ArrowLeftRight },
 ]
 
 const method = ref<Method>('cash')
@@ -172,7 +172,7 @@ function confirm() {
       <!-- QRIS: pembeli scan dulu, kasir konfirmasi "تم الدفع" / batal -->
       <div v-if="showQris" class="grid grid-cols-2 gap-2">
         <Button variant="outline" class="h-12 text-base" :disabled="busy" @click="cancel">
-          Batal
+          إلغاء
         </Button>
         <Button class="h-12 gap-2 text-base" :disabled="!canConfirm" @click="confirm">
           <Loader2 v-if="busy" class="size-4 animate-spin" />
