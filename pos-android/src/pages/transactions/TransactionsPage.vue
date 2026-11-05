@@ -11,17 +11,17 @@ import { Receipt, ChevronRight, Download } from 'lucide-vue-next'
 import { useSalesStore } from '@/stores/sales'
 import { formatRupiah } from '@/lib/money'
 import { formatTime, formatDate, dayKey } from '@/lib/datetime'
-import { rangeLabel } from '@/lib/dateRange'
+import { rangeالتسمية } from '@/lib/dateRange'
 import type { Sale } from '@/db/types'
 
 const sales = useSalesStore()
 const { recent, openBills, summary, range } = storeToRefs(sales)
 
-const label = computed(() => rangeLabel(range.value))
+const label = computed(() => rangeالتسمية(range.value))
 
 const exportOpen = ref(false)
 
-const PAY_LABEL: Record<string, string> = { cash: 'نقداً', qris: 'QRIS', transfer: 'تحويل' }
+const PAY_LABEL: Record<string, string> = { cash: 'نقداً', qris: 'رمز QR', transfer: 'تحويل' }
 
 function activityTime(sale: Sale): number {
   if (sale.status === 'open') return sale.opened_at ?? sale.created_at
@@ -56,11 +56,11 @@ onMounted(() => sales.load())
 
 <template>
   <div>
-    <AppHeader title="Transaksi" :subtitle="`${label}: ${summary.count} transaksi`">
+    <AppHeader title="المبيعات" :subtitle="`${label}: ${summary.count} عملية بيع`">
       <template #actions>
         <button
           class="flex size-9 items-center justify-center rounded-full text-foreground hover:bg-accent"
-          aria-label="Export Excel"
+          aria-label="تصدير إلى Excel"
           @click="exportOpen = true"
         >
           <Download class="size-5" />
@@ -78,7 +78,7 @@ onMounted(() => sales.load())
     <div class="border-b border-border bg-gradient-to-br from-hero to-hero/90 px-5 py-5 text-hero-foreground">
       <p class="text-xs opacity-80">المبيعات · {{ label }}</p>
       <p class="mt-1 text-2xl font-bold">{{ formatRupiah(summary.total) }}</p>
-      <p class="mt-0.5 text-xs opacity-80">{{ summary.count }} transaksi</p>
+      <p class="mt-0.5 text-xs opacity-80">{{ summary.count }} عملية بيع</p>
     </div>
 
     <template v-if="visibleSales.length">
@@ -129,7 +129,7 @@ onMounted(() => sales.load())
     <ExportDialog
       v-model:open="exportOpen"
       title="تصدير الفواتير"
-      filename-base="transaksi"
+      filename-base="عملية بيع"
       :initial-range="range"
       :build-sheets="sales.buildExport"
     />
