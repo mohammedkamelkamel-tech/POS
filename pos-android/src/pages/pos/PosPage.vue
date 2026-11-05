@@ -209,10 +209,11 @@ async function openOpenBills() {
 
 function restoreOpenBill(result: CheckoutResult): boolean {
   const lines: CartLine[] = []
-  for (const item of result.items) {
+  for (const [index, item] of result.items.entries()) {
     if (item.product_id === null) return false
     const product = products.items.find((entry) => entry.id === item.product_id)
     lines.push({
+      cartKey: `${item.product_id}:${index}`,
       productId: item.product_id,
       name: item.name_snapshot,
       price: item.price_snapshot,
