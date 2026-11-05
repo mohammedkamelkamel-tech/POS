@@ -78,9 +78,9 @@ const butcherPrice = computed(() => {
 
 const headerSubtitle = computed(() => {
   if (cart.activeOpenBillId) {
-    return `Open Bill: ${cart.activeOpenBillLabel ?? cart.activeOpenBillId}`
+    return `فاتورة معلقة: ${cart.activeOpenBillLabel ?? cart.activeOpenBillId}`
   }
-  return cart.count ? `${cart.count} item di keranjang` : 'Ketuk produk untuk menambah'
+  return cart.count ? `${cart.count} أصناف في السلة` : 'اضغط على المنتج لإضافته إلى الفاتورة'
 })
 
 onMounted(async () => {
@@ -239,7 +239,7 @@ function restoreOpenBill(result: CheckoutResult): boolean {
 
 async function resumeOpenBill(bill: Sale) {
   if (!cart.isEmpty) {
-    operationError.value = 'Kosongkan atau tahan keranjang aktif sebelum melanjutkan Open Bill lain.'
+    operationError.value = 'Kosongkan atau tahan keranjang aktif sebelum melanjutkan فاتورة معلقة lain.'
     return
   }
 
@@ -248,7 +248,7 @@ async function resumeOpenBill(bill: Sale) {
   try {
     const result = await sales.resume({ saleId: bill.id, deviceId: settings.deviceId })
     if (!restoreOpenBill(result)) {
-      operationError.value = 'Open Bill tidak dapat dilanjutkan karena ada item tanpa produk.'
+      operationError.value = 'فاتورة معلقة tidak dapat dilanjutkan karena ada item tanpa produk.'
       return
     }
     showOpenBills.value = false
@@ -266,7 +266,7 @@ async function resumeOpenBill(bill: Sale) {
 
 function requestDiscardOpenBill(bill: Sale) {
   if (settings.deviceId === '' || bill.origin_device_id !== settings.deviceId) {
-    operationError.value = 'Open Bill dari perangkat lain hanya dapat dilihat.'
+    operationError.value = 'فاتورة معلقة dari perangkat lain hanya dapat dilihat.'
     return
   }
   operationError.value = null
@@ -356,10 +356,10 @@ function newTransaction() {
 
 <template>
   <div class="flex h-full flex-col">
-    <AppHeader title="Point of Sale" :subtitle="headerSubtitle">
+    <AppHeader title="الكاشير" :subtitle="headerSubtitle">
       <template #actions>
         <Button variant="outline" size="sm" class="gap-1.5" @click="openOpenBills">
-          <ReceiptText class="size-4" /> Open Bills
+          <ReceiptText class="size-4" /> الفواتير المعلقة
         </Button>
       </template>
     </AppHeader>
@@ -369,13 +369,13 @@ function newTransaction() {
       <div class="flex gap-2">
         <div class="relative flex-1">
           <Search class="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input v-model="query" placeholder="Cari produk / SKU / barcode" class="pl-9" />
+          <Input v-model="query" placeholder="ابحث عن منتج أو رمز أو باركود" class="pl-9" />
         </div>
         <Button
           v-if="scannerReady"
           variant="outline"
           size="icon"
-          title="Scan barcode"
+          title="مسح الباركود"
           @click="router.push('/pos/scan')"
         >
           <ScanLine class="size-5" />
@@ -408,8 +408,8 @@ function newTransaction() {
       class="flex shrink-0 items-center gap-2 border-b border-warning/40 bg-warning/15 px-4 py-2 text-xs text-warning-foreground"
     >
       <DoorClosed class="size-3.5" />
-      <span class="flex-1">Kasir belum dibuka — transaksi tidak terhitung ke sesi.</span>
-      <span class="font-semibold underline">Buka</span>
+      <span class="flex-1">جلسة الكاشير غير مفتوحة؛ لن تُحتسب المبيعات ضمن الجلسة.</span>
+      <span class="font-semibold underline">فتح الجلسة</span>
     </RouterLink>
     <RouterLink
       v-else
@@ -417,7 +417,7 @@ function newTransaction() {
       class="flex shrink-0 items-center gap-2 border-b border-success/20 bg-success/10 px-4 py-2 text-xs text-success"
     >
       <DoorOpen class="size-3.5" />
-      <span class="flex-1">Kasir terbuka · perkiraan laci {{ formatRupiah(cashier.summary?.expectedCash ?? 0) }}</span>
+      <span class="flex-1">جلسة الكاشير مفتوحة · الرصيد المتوقع في الدرج {{ formatRupiah(cashier.summary?.expectedCash ?? 0) }}</span>
     </RouterLink>
 
     <!-- Grid produk (area scroll) -->
@@ -488,7 +488,7 @@ function newTransaction() {
             </span>
           </div>
           <span class="flex-1 truncate text-left text-sm font-semibold">
-            {{ cart.activeOpenBillId ? `Open Bill: ${cart.activeOpenBillLabel ?? cart.activeOpenBillId}` : 'Lihat Keranjang' }}
+            {{ cart.activeOpenBillId ? `فاتورة معلقة: ${cart.activeOpenBillLabel ?? cart.activeOpenBillId}` : 'Lihat Keranjang' }}
           </span>
           <span class="text-base font-bold">{{ formatRupiah(cart.total) }}</span>
         </button>
@@ -533,7 +533,7 @@ function newTransaction() {
       @discard="requestDiscardOpenBill"
     />
 
-    <BottomSheet v-model:open="showHoldForm" :title="cart.activeOpenBillId ? 'Simpan Perubahan Open Bill' : 'Tahan Pesanan'">
+    <BottomSheet v-model:open="showHoldForm" :title="cart.activeOpenBillId ? 'Simpan Perubahan فاتورة معلقة' : 'Tahan Pesanan'">
       <form class="space-y-5 p-5" @submit.prevent="submitHold">
         <div class="space-y-2">
           <Label for="open-bill-label">Label pesanan</Label>
@@ -558,14 +558,14 @@ function newTransaction() {
       </form>
     </BottomSheet>
 
-    <BottomSheet v-model:open="showDiscardConfirm" title="Buang Open Bill?">
+    <BottomSheet v-model:open="showDiscardConfirm" title="Buang فاتورة معلقة?">
       <div class="space-y-5 p-5">
         <div class="flex gap-3">
           <div class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-destructive/10 text-destructive">
             <Trash2 class="size-5" />
           </div>
           <p class="text-sm leading-relaxed text-muted-foreground">
-            Open Bill <span class="font-semibold text-foreground">{{ selectedDiscardBill?.open_bill_label ?? selectedDiscardBill?.number }}</span>
+            فاتورة معلقة <span class="font-semibold text-foreground">{{ selectedDiscardBill?.open_bill_label ?? selectedDiscardBill?.number }}</span>
             beserta itemnya akan dibuang dan tidak dapat dilanjutkan lagi.
           </p>
         </div>
@@ -574,7 +574,7 @@ function newTransaction() {
             Batal
           </Button>
           <Button type="button" variant="destructive" :disabled="openBillBusyId !== null" @click="discardOpenBill">
-            {{ openBillBusyId ? 'Membuang…' : 'Buang Open Bill' }}
+            {{ openBillBusyId ? 'Membuang…' : 'Buang فاتورة معلقة' }}
           </Button>
         </div>
       </div>
