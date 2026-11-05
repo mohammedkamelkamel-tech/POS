@@ -16,8 +16,8 @@ defineProps<{
     <AppHeader :title="title" />
     <EmptyState
       :icon="icon ?? Hammer"
-      title="Segera hadir"
-      :description="phase ? `Fitur ini dikerjakan di ${phase}.` : 'Fitur ini sedang dalam pengembangan.'"
+      title="قريباً"
+      :description="phase ? `يجري العمل على هذه الميزة ضمن ${phase}.` : 'هذه الميزة قيد التطوير.'"
     />
   </div>
 </template>
