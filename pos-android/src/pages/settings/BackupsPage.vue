@@ -4,24 +4,42 @@ import AppHeader from '@/components/layout/AppHeader.vue'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { AlertTriangle, Archive, CalendarClock, CheckCircle2, FileJson, Loader2, RefreshCw, RotateCcw, Trash2 } from 'lucide-vue-next'
-import { createLocalBackup, deleteLocalBackup, listLocalBackups, restoreLocalBackup, type LocalBackupFile } from '@/services/backup/localBackup'
+import { AlertTriangle, Archive, CalendarClock, CheckCircle2, FileJson, FolderOpen, Loader2, RefreshCw, RotateCcw, Trash2 } from 'lucide-vue-next'
+import { chooseBackupDirectory, createLocalBackup, deleteLocalBackup, getBackupDirectoryLabel, listLocalBackups, restoreLocalBackup, type LocalBackupFile } from '@/services/backup/localBackup'
 
 const backups = ref<LocalBackupFile[]>([])
 const loading = ref(true)
 const working = ref(false)
 const error = ref('')
 const success = ref('')
+const backupFolder = ref('جارٍ تحديد المجلد...')
 
 async function refresh() {
   loading.value = true
   error.value = ''
   try {
     backups.value = await listLocalBackups()
+    backupFolder.value = await getBackupDirectoryLabel()
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e)
   } finally {
     loading.value = false
+  }
+}
+
+async function chooseFolder() {
+  working.value = true
+  error.value = ''
+  success.value = ''
+  try {
+    backupFolder.value = await chooseBackupDirectory()
+    success.value = 'تم حفظ مجلد النسخ الاحتياطي. ستُحفظ النسخ الجديدة فيه.'
+    await refresh()
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e)
+    if (!/cancel|canceled|cancelled|إلغاء/i.test(message)) error.value = message
+  } finally {
+    working.value = false
   }
 }
 
@@ -114,7 +132,8 @@ onMounted(refresh)
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-sm font-semibold">النسخ المحفوظة على الهاتف</h2>
-            <p class="text-xs text-muted-foreground">المجلد: Documents/AlKamel-Cashier-Backups</p>
+            <p class="text-xs text-muted-foreground">المجلد الحالي: {{ backupFolder }}</p>
+            <Button size="sm" variant="outline" class="mt-2" :disabled="working" @click="chooseFolder"><FolderOpen class="size-4" /> اختيار مجلد الحفظ</Button>
           </div>
           <Button size="icon" variant="ghost" :disabled="loading || working" aria-label="تحديث القائمة" @click="refresh"><RefreshCw class="size-4" /></Button>
         </div>
