@@ -8,7 +8,6 @@ import {
   Wallet,
   Printer,
   UserCog,
-  Store,
   CalendarClock,
   Cloud,
   BarChart3,
