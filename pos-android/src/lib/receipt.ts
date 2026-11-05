@@ -23,7 +23,7 @@ export class ReceiptError extends Error {
 
 const PAY_LABEL: Record<string, string> = {
   cash: 'نقداً',
-  qris: 'QRIS',
+  qris: 'رمز QR',
   transfer: 'تحويل بنكي',
 }
 
@@ -32,7 +32,7 @@ function receiptErrorMessage(detail: ReceiptErrorDetail): string {
     case 'open-sale':
       return `فاتورة معلّقة ${detail.number} لا يمكن طباعتها حالياً`
     case 'missing-sold-at':
-      return `وقت دفع العملية ${detail.number} tidak tersedia`
+      return `وقت دفع العملية ${detail.number} غير متوفر`
   }
 }
 
