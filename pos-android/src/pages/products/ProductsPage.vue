@@ -77,7 +77,7 @@ function setFilter(id: string | null) {
           :class="cn(!categoryFilter ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-muted-foreground')"
           @click="setFilter(null)"
         >
-          Semua
+          الكل
         </button>
         <button
           v-for="c in categories.items"
@@ -143,7 +143,7 @@ function setFilter(id: string | null) {
       description="أضف أول منتج لبدء البيع."
     >
       <Button class="gap-2" @click="router.push('/products/new')">
-        <Plus class="size-4" /> Tambah المنتجات
+        <Plus class="size-4" /> إضافة المنتجات
       </Button>
     </EmptyState>
 
