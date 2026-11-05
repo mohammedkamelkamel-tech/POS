@@ -5,7 +5,7 @@ import DateRangeFilter from '@/components/common/DateRangeFilter.vue'
 import { Button } from '@/components/ui/button'
 import { Loader2, FileSpreadsheet } from 'lucide-vue-next'
 import { dayKey } from '@/lib/datetime'
-import { rangeالتسمية, type DateRange } from '@/lib/dateRange'
+import { rangeLabel, type DateRange } from '@/lib/dateRange'
 import { exportXlsx, type ExportSheet } from '@/lib/xlsx'
 
 const props = defineProps<{
@@ -75,7 +75,7 @@ async function run() {
 
       <div class="px-4 text-sm">
         <span class="text-muted-foreground">الفترة: </span>
-        <span class="font-medium">{{ rangeالتسمية(range) }}</span>
+        <span class="font-medium">{{ rangeLabel(range) }}</span>
       </div>
 
       <p v-if="error" class="px-4 text-sm text-destructive">{{ error }}</p>
