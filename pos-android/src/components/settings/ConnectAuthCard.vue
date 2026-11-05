@@ -52,7 +52,7 @@ const emit = defineEmits<{
         <Input id="password" :model-value="password" type="password" placeholder="••••••" @update:model-value="emit('update:password', String($event))" />
       </div>
       <div v-if="mode === 'register'" class="space-y-2">
-        <Label for="password2">Ulangi kata sandi</Label>
+        <Label for="password2">تأكيد كلمة المرور</Label>
         <Input id="password2" :model-value="password2" type="password" placeholder="••••••" @update:model-value="emit('update:password2', String($event))" />
       </div>
 
@@ -70,9 +70,9 @@ const emit = defineEmits<{
           <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/>
           <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/>
         </svg>
-        تسجيل الدخول dengan Google
+        تسجيل الدخول باستخدام Google
       </button>
-      <p v-if="!hasGoogle" class="text-center text-xs text-muted-foreground">تسجيل الدخول dengan Google hanya tersedia di <span class="whitespace-nowrap">aplikasi Android.</span></p>
+      <p v-if="!hasGoogle" class="text-center text-xs text-muted-foreground">تسجيل الدخول باستخدام Google hanya tersedia di <span class="whitespace-nowrap">aplikasi Android.</span></p>
     </CardContent>
   </Card>
 </template>
