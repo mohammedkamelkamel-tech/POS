@@ -144,7 +144,7 @@ function confirm() {
       </div>
 
       <!-- طريقة الدفع -->
-      <div class="grid grid-cols-3 gap-2">
+      <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
         <button
           v-for="m in METHODS"
           :key="m.id"
