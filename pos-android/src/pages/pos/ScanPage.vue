@@ -45,7 +45,7 @@ function handleCode(code: string) {
   }
   if (!p.active) {
     scanFeedback(false)
-    say(`${p.name} nonaktif — aktifkan dulu di menu Produk`, 'warn')
+    say(`${p.name} nonaktif — aktifkan dulu di menu المنتجات`, 'warn')
     return
   }
   // cart.add() nolak produk habis tanpa bilang apa-apa, jadi dicek di sini
