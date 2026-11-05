@@ -6,13 +6,13 @@ import AppHeader from '@/components/layout/AppHeader.vue'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { التسمية } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
 import BottomSheet from '@/components/common/BottomSheet.vue'
 import PinPad from '@/components/common/PinPad.vue'
 import {
-  Store, Lock, Moon, Cloud, Smartphone, Save, ImagePlus, Sparkles, Check,
+  Store, Lock, Moon, الخدمات السحابية, Smartphone, Save, ImagePlus, Sparkles, Check,
   QrCode, Loader2, KeyRound, LockKeyhole,
 } from 'lucide-vue-next'
 import { useSettingsStore, type SplashBg } from '@/stores/settings'
@@ -172,25 +172,25 @@ function lockNow() {
   <div>
     <AppHeader title="الحساب والإعدادات" />
     <div class="space-y-5 p-4">
-      <!-- POS Pro / Cloud (paling atas) -->
+      <!-- الكامل برو / الخدمات السحابية (paling atas) -->
       <section class="space-y-3">
         <p class="px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          Cloud
+          الخدمات السحابية
         </p>
         <Card class="border-primary/30 bg-primary/5">
           <CardContent class="space-y-3 p-4">
             <div class="flex items-center gap-3">
               <div class="flex size-11 items-center justify-center rounded-xl bg-primary/15 text-primary">
-                <Cloud class="size-5" />
+                <الخدمات السحابية class="size-5" />
               </div>
               <div class="flex-1">
-                <p class="text-sm font-semibold">POS Pro</p>
+                <p class="text-sm font-semibold">الكامل برو</p>
                 <p class="text-xs text-muted-foreground">
-                  Login online, backup & sync data ke cloud
+                  تسجيل الدخول والنسخ الاحتياطي ومزامنة البيانات سحابياً
                 </p>
               </div>
               <Badge :variant="account.isAuthenticated ? 'success' : 'secondary'">
-                {{ account.isAuthenticated ? 'Terhubung' : 'غير متصل' }}
+                {{ account.isAuthenticated ? 'متصل' : 'غير متصل' }}
               </Badge>
             </div>
             <Button variant="outline" class="w-full" @click="router.push('/connect')">
@@ -200,10 +200,10 @@ function lockNow() {
         </Card>
       </section>
 
-      <!-- Profil toko -->
+      <!-- بيانات المتجر -->
       <section class="space-y-3">
         <p class="px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          Profil Toko
+          بيانات المتجر
         </p>
         <Card>
           <CardContent class="space-y-4 p-4">
@@ -227,17 +227,17 @@ function lockNow() {
                     {{ media.url(storeLogo) ? 'تغيير' : 'إضافة' }}
                   </Button>
                   <Button v-if="media.url(storeLogo)" type="button" variant="ghost" size="sm" class="text-destructive" @click="removeLogo">
-                    Hapus
+                    حذف
                   </Button>
                 </div>
               </div>
             </div>
             <div class="space-y-1.5">
-              <Label for="store-name">اسم المتجر</Label>
+              <التسمية for="store-name">اسم المتجر</التسمية>
               <Input id="store-name" v-model="name" placeholder="الكامل-كاشير" />
             </div>
             <div class="space-y-1.5">
-              <Label for="store-owner">المالك</Label>
+              <التسمية for="store-owner">المالك</التسمية>
               <Input id="store-owner" v-model="owner" placeholder="اسم المالك" />
             </div>
             <Button class="w-full gap-2" :disabled="savingProfile" @click="saveProfile">
@@ -248,23 +248,23 @@ function lockNow() {
         </Card>
       </section>
 
-      <!-- Pembayaran QRIS -->
+      <!-- الدفع عبر QR -->
       <section class="space-y-3">
         <p class="px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          Pembayaran QRIS
+          الدفع عبر QR
         </p>
         <Card>
           <CardContent class="space-y-4 p-4">
             <!-- رفع رمز QR statis -->
             <div class="flex items-center gap-4">
               <div class="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-border bg-white text-muted-foreground">
-                <img v-if="qrisPreview" :src="qrisPreview" alt="QRIS" class="size-full object-contain p-0.5" />
+                <img v-if="qrisPreview" :src="qrisPreview" alt="رمز QR" class="size-full object-contain p-0.5" />
                 <QrCode v-else class="size-6" />
               </div>
               <div class="min-w-0 flex-1 space-y-1.5">
                 <p class="text-sm font-medium">رمز QR الثابت للمتجر</p>
                 <p class="text-xs text-muted-foreground">
-                  Upload gambar QRIS toko sekali. Dipakai untuk menerima pembayaran.
+                  ارفع صورة رمز QR الخاص بالمتجر مرة واحدة لاستخدامها في استقبال المدفوعات.
                 </p>
                 <div class="flex items-center gap-2 pt-0.5">
                   <Button type="button" variant="outline" size="sm" class="gap-1.5" :disabled="qrisBusy" @click="chooseQris">
@@ -273,7 +273,7 @@ function lockNow() {
                     {{ qrisPayload ? 'تغيير' : 'رفع رمز QR' }}
                   </Button>
                   <Button v-if="qrisPayload" type="button" variant="ghost" size="sm" class="text-destructive" @click="removeQris">
-                    Hapus
+                    حذف
                   </Button>
                 </div>
               </div>
@@ -288,7 +288,7 @@ function lockNow() {
               <div class="flex-1">
                 <p class="text-sm font-medium">رمز QR المتغير</p>
                 <p class="text-xs text-muted-foreground">
-                  Saat pembeli bayar pakai QRIS, nominal tagihan otomatis dimasukkan ke
+                  Saat pembeli bayar pakai رمز QR, nominal tagihan otomatis dimasukkan ke
                   kode QR — pembeli scan langsung dengan jumlah pas, tanpa ketik manual.
                 </p>
               </div>
@@ -369,7 +369,7 @@ function lockNow() {
       <!-- Tampilan / Splash -->
       <section class="space-y-3">
         <p class="px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          Splash Screen
+          شاشة البداية
         </p>
         <Card>
           <CardContent class="space-y-4 p-4">
@@ -409,7 +409,7 @@ function lockNow() {
       <!-- Info perangkat -->
       <div class="flex items-center justify-center gap-2 pb-2 text-xs text-muted-foreground">
         <Smartphone class="size-3.5" />
-        Device: {{ devicePrefix }} · الكامل-كاشير v0.1
+        الجهاز: {{ devicePrefix }} · الكامل-كاشير v0.1
       </div>
     </div>
 
