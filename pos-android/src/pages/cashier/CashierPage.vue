@@ -78,7 +78,7 @@ function diffLabel(d: number | null): string {
     <AppHeader title="فتح وإغلاق جلسة الكاشير" back />
 
     <div class="space-y-5 p-4">
-      <!-- Sesi aktif -->
+      <!-- الجلسة النشطة -->
       <template v-if="isOpen && current && summary">
         <Card class="border-success/30 bg-success/5">
           <CardContent class="space-y-4 p-4">
@@ -128,7 +128,7 @@ function diffLabel(d: number | null): string {
         </Card>
       </template>
 
-      <!-- Buka kasir -->
+      <!-- فتح جلسة الكاشير -->
       <template v-else>
         <Card>
           <CardContent class="space-y-4 p-4">
@@ -161,7 +161,7 @@ function diffLabel(d: number | null): string {
         </Card>
       </template>
 
-      <!-- Riwayat sesi -->
+      <!-- سجل الجلسات -->
       <section class="space-y-2">
         <p class="flex items-center gap-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           <History class="size-3.5" /> سجل الجلسات
@@ -212,10 +212,10 @@ function diffLabel(d: number | null): string {
       </section>
     </div>
 
-    <!-- Sheet tutup kasir -->
+    <!-- نافذة إغلاق الجلسة -->
     <BottomSheet :open="showClose" title="إغلاق الجلسة" @update:open="showClose = $event">
       <div v-if="summary" class="space-y-5 p-5">
-        <!-- Rincian expected -->
+        <!-- تفاصيل الرصيد المتوقع -->
         <div class="space-y-1.5 rounded-2xl bg-muted/50 p-4 text-sm">
           <div class="flex justify-between">
             <span class="text-muted-foreground">الرصيد الافتتاحي</span>
