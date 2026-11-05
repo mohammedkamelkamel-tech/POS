@@ -62,6 +62,8 @@ export class OpenBillService {
         paid: 0,
         change_due: 0,
         payment_method: 'cash',
+        payment_bank: null,
+        payment_proof_path: null,
         status: 'open',
         open_bill_label: input.label ?? input.note ?? null,
         opened_at: openedAt,
