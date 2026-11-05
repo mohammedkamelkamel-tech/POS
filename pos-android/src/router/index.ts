@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth'\nimport { useSettingsStore } from '@/stores/settings'
 
 const routes: RouteRecordRaw[] = [
   { path: '/', name: 'home', component: () => import('@/pages/HomePage.vue') },
@@ -12,10 +12,13 @@ const routes: RouteRecordRaw[] = [
     meta: { hideNav: true },
   },
 
+  { path: '/owner-unlock', name: 'owner-unlock', component: () => import('@/pages/settings/OwnerUnlockPage.vue'), meta: { hideNav: true } },
+  { path: '/owner-setup', name: 'owner-setup', component: () => import('@/pages/settings/OwnerSetupPage.vue'), meta: { hideNav: true } },
+
   // Sambungkan ke POS Pro / sync cloud (Phase 6C)
   {
     path: '/connect',
-    name: 'connect',
+    name: 'connect', meta: { ownerOnly: true },
     component: () => import('@/pages/settings/ConnectPage.vue'),
     meta: { hideNav: true },
   },
@@ -23,24 +26,24 @@ const routes: RouteRecordRaw[] = [
   // Produk (Phase 1)
   {
     path: '/products',
-    name: 'products',
+    name: 'products', meta: { ownerOnly: true },
     component: () => import('@/pages/products/ProductsPage.vue'),
   },
   {
     path: '/products/new',
-    name: 'product-new',
+    name: 'product-new', meta: { ownerOnly: true },
     component: () => import('@/pages/products/ProductFormPage.vue'),
     meta: { hideNav: true },
   },
   {
     path: '/products/:id/edit',
-    name: 'product-edit',
+    name: 'product-edit', meta: { ownerOnly: true },
     component: () => import('@/pages/products/ProductFormPage.vue'),
     meta: { hideNav: true },
   },
   {
     path: '/categories',
-    name: 'categories',
+    name: 'categories', meta: { ownerOnly: true },
     component: () => import('@/pages/products/CategoriesPage.vue'),
     meta: { hideNav: true },
   },
@@ -57,12 +60,12 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/transactions',
-    name: 'transactions',
+    name: 'transactions', meta: { ownerOnly: true },
     component: () => import('@/pages/transactions/TransactionsPage.vue'),
   },
   {
     path: '/transactions/:id',
-    name: 'transaction-detail',
+    name: 'transaction-detail', meta: { ownerOnly: true },
     component: () => import('@/pages/transactions/TransactionDetailPage.vue'),
     meta: { hideNav: true },
   },
@@ -70,31 +73,31 @@ const routes: RouteRecordRaw[] = [
   // Kasir (Phase 3)
   {
     path: '/cashier',
-    name: 'cashier',
+    name: 'cashier', meta: { ownerOnly: true },
     component: () => import('@/pages/cashier/CashierPage.vue'),
   },
 
   // Cashflow (Phase 4)
   {
     path: '/cashflow',
-    name: 'cashflow',
+    name: 'cashflow', meta: { ownerOnly: true },
     component: () => import('@/pages/cashflow/CashflowPage.vue'),
   },
   {
     path: '/cashflow/new',
-    name: 'cashflow-new',
+    name: 'cashflow-new', meta: { ownerOnly: true },
     component: () => import('@/pages/cashflow/CashflowEntryFormPage.vue'),
     meta: { hideNav: true },
   },
   {
     path: '/cashflow/categories',
-    name: 'cashflow-categories',
+    name: 'cashflow-categories', meta: { ownerOnly: true },
     component: () => import('@/pages/cashflow/CashflowCategoriesPage.vue'),
     meta: { hideNav: true },
   },
   {
     path: '/cashflow/:id/edit',
-    name: 'cashflow-edit',
+    name: 'cashflow-edit', meta: { ownerOnly: true },
     component: () => import('@/pages/cashflow/CashflowEntryFormPage.vue'),
     meta: { hideNav: true },
   },
@@ -102,20 +105,20 @@ const routes: RouteRecordRaw[] = [
   // Laporan / analitik
   {
     path: '/reports',
-    name: 'reports',
+    name: 'reports', meta: { ownerOnly: true },
     component: () => import('@/pages/reports/ReportsPage.vue'),
   },
 
   // Printer & setelan
   {
     path: '/printer',
-    name: 'printer',
+    name: 'printer', meta: { ownerOnly: true },
     component: () => import('@/pages/printer/PrinterPage.vue'),
   },
-  { path: '/backups', name: 'backups', component: () => import('@/pages/settings/BackupsPage.vue'), meta: { hideNav: true } },
+  { path: '/backups', name: 'backups', meta: { ownerOnly: true }, component: () => import('@/pages/settings/BackupsPage.vue'), meta: { hideNav: true } },
   {
     path: '/settings',
-    name: 'settings',
+    name: 'settings', meta: { ownerOnly: true },
     component: () => import('@/pages/settings/SettingsPage.vue'),
   },
 
@@ -135,12 +138,22 @@ export const router = createRouter({
 router.beforeEach((to) => {
   const auth = useAuthStore()
   if (auth.isLocked && to.name !== 'lock') {
-    return {
-      name: 'lock',
-      query: to.fullPath !== '/' ? { redirect: to.fullPath } : undefined,
-    }
+    return { name: 'lock', query: to.fullPath !== '/' ? { redirect: to.fullPath } : undefined }
   }
-  if (!auth.isLocked && to.name === 'lock') {
-    return { path: '/' }
+  if (!auth.isLocked && to.name === 'lock') return { path: '/' }
+
+  if (to.name === 'owner-setup') {
+    if (auth.isOwner) return { path: '/' }
+    if (useSettingsStore().hasPin) return { name: 'owner-unlock', query: { redirect: '/' } }
+    return true
   }
+  if (to.name === 'owner-unlock') {
+    if (auth.isOwner) return { path: '/' }
+    if (!useSettingsStore().hasPin) return { name: 'owner-setup' }
+    return true
+  }
+  if (to.meta.ownerOnly && !auth.isOwner) {
+    return { name: useSettingsStore().hasPin ? 'owner-unlock' : 'owner-setup', query: { redirect: to.fullPath } }
+  }
+  return true
 })
