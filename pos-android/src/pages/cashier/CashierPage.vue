@@ -75,7 +75,7 @@ function diffLabel(d: number | null): string {
 
 <template>
   <div>
-    <AppHeader title="Buka/Tutup Kasir" back />
+    <AppHeader title="فتح وإغلاق جلسة الكاشير" back />
 
     <div class="space-y-5 p-4">
       <!-- Sesi aktif -->
@@ -87,7 +87,7 @@ function diffLabel(d: number | null): string {
                 <DoorOpen class="size-5" />
               </div>
               <div class="flex-1">
-                <p class="text-sm font-semibold">Kasir Terbuka</p>
+                <p class="text-sm font-semibold">جلسة الكاشير مفتوحة</p>
                 <p class="text-xs text-muted-foreground">
                   Dibuka {{ formatDateTime(current.opened_at) }}
                 </p>
@@ -101,11 +101,11 @@ function diffLabel(d: number | null): string {
                 <p class="mt-0.5 text-sm font-bold">{{ formatRupiah(summary.openingCash) }}</p>
               </div>
               <div class="rounded-xl bg-background p-3">
-                <p class="text-xs text-muted-foreground">Penjualan tunai</p>
+                <p class="text-xs text-muted-foreground">المبيعات النقدية</p>
                 <p class="mt-0.5 text-sm font-bold">{{ formatRupiah(summary.cashSales) }}</p>
               </div>
               <div class="rounded-xl bg-background p-3">
-                <p class="text-xs text-muted-foreground">Transaksi</p>
+                <p class="text-xs text-muted-foreground">الفواتير</p>
                 <p class="mt-0.5 text-sm font-bold">
                   {{ summary.salesCount }}
                   <span class="text-xs font-normal text-muted-foreground">
@@ -122,7 +122,7 @@ function diffLabel(d: number | null): string {
             </div>
 
             <Button class="w-full gap-2" variant="destructive" @click="startClose">
-              <DoorClosed class="size-4" /> Tutup Kasir
+              <DoorClosed class="size-4" /> إغلاق الجلسة
             </Button>
           </CardContent>
         </Card>
@@ -137,7 +137,7 @@ function diffLabel(d: number | null): string {
                 <DoorOpen class="size-5" />
               </div>
               <div class="flex-1">
-                <p class="text-sm font-semibold">Buka Kasir</p>
+                <p class="text-sm font-semibold">فتح الجلسة</p>
                 <p class="text-xs text-muted-foreground">
                   Mulai sesi dengan mencatat modal awal di laci.
                 </p>
@@ -155,7 +155,7 @@ function diffLabel(d: number | null): string {
 
             <Button class="w-full gap-2" :disabled="opening" @click="openSession">
               <DoorOpen class="size-4" />
-              {{ opening ? 'Membuka…' : 'Buka Kasir' }}
+              {{ opening ? 'جارٍ الفتح…' : 'فتح الجلسة' }}
             </Button>
           </CardContent>
         </Card>
@@ -206,14 +206,14 @@ function diffLabel(d: number | null): string {
         <EmptyState
           v-else
           :icon="CalendarClock"
-          title="Belum ada sesi"
-          description="Buka kasir untuk mulai mencatat sesi penjualan."
+          title="لا توجد جلسة حالية"
+          description="افتح جلسة الكاشير لبدء تسجيل المبيعات."
         />
       </section>
     </div>
 
     <!-- Sheet tutup kasir -->
-    <BottomSheet :open="showClose" title="Tutup Kasir" @update:open="showClose = $event">
+    <BottomSheet :open="showClose" title="إغلاق الجلسة" @update:open="showClose = $event">
       <div v-if="summary" class="space-y-5 p-5">
         <!-- Rincian expected -->
         <div class="space-y-1.5 rounded-2xl bg-muted/50 p-4 text-sm">
@@ -222,15 +222,15 @@ function diffLabel(d: number | null): string {
             <span>{{ formatRupiah(summary.openingCash) }}</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-muted-foreground">+ Penjualan tunai</span>
+            <span class="text-muted-foreground">+ المبيعات النقدية</span>
             <span>{{ formatRupiah(summary.cashSales) }}</span>
           </div>
           <div v-if="summary.manualIn" class="flex justify-between">
-            <span class="text-muted-foreground">+ Kas masuk manual</span>
+            <span class="text-muted-foreground">+ نقدية واردة يدوياً</span>
             <span>{{ formatRupiah(summary.manualIn) }}</span>
           </div>
           <div v-if="summary.manualOut" class="flex justify-between">
-            <span class="text-muted-foreground">− Kas keluar manual</span>
+            <span class="text-muted-foreground">− نقدية منصرفة يدوياً</span>
             <span>{{ formatRupiah(summary.manualOut) }}</span>
           </div>
           <div class="flex justify-between border-t border-border pt-1.5 font-semibold">
@@ -257,7 +257,7 @@ function diffLabel(d: number | null): string {
 
         <div class="space-y-1.5">
           <Label for="close-note">Catatan (opsional)</Label>
-          <Input id="close-note" v-model="closeNote" placeholder="mis. selisih karena kembalian" />
+          <Input id="close-note" v-model="closeNote" placeholder="مثال: فرق بسبب الباقي" />
         </div>
 
         <Button class="h-12 w-full gap-2 text-base" variant="destructive" :disabled="closing" @click="closeSession">
