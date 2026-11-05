@@ -23,7 +23,7 @@ const sale = ref<Sale | null>(null)
 const items = ref<SaleItem[]>([])
 const loading = ref(true)
 
-const PAY_LABEL: Record<string, string> = { cash: 'Tunai', qris: 'QRIS', transfer: 'Transfer' }
+const PAY_LABEL: Record<string, string> = { cash: 'نقداً', qris: 'QRIS', transfer: 'Transfer' }
 
 function activityTime(value: Sale): number {
   if (value.status === 'open') return value.opened_at ?? value.created_at
@@ -53,13 +53,13 @@ async function printReceipt() {
 
 <template>
   <div>
-    <AppHeader title="Detail Transaksi" :subtitle="sale?.number" back />
+    <AppHeader title="تفاصيل الفاتورة" :subtitle="sale?.number" back />
 
     <div v-if="loading" class="p-8 text-center text-sm text-muted-foreground">Memuat…</div>
 
     <div v-else-if="!sale" class="flex flex-col items-center gap-2 p-12 text-center text-muted-foreground">
       <Receipt class="size-10" />
-      <p class="text-sm">Transaksi tidak ditemukan.</p>
+      <p class="text-sm">لم يتم العثور على الفاتورة.</p>
     </div>
 
     <div v-else class="space-y-4 p-4">
@@ -105,7 +105,7 @@ async function printReceipt() {
             <span>{{ formatRupiah(sale.subtotal) }}</span>
           </div>
           <div v-if="sale.discount > 0" class="flex justify-between text-sm">
-            <span class="text-muted-foreground">Diskon</span>
+            <span class="text-muted-foreground">الخصم</span>
             <span>-{{ formatRupiah(sale.discount) }}</span>
           </div>
           <div class="flex justify-between text-base font-bold">
@@ -113,18 +113,18 @@ async function printReceipt() {
             <span>{{ formatRupiah(sale.total) }}</span>
           </div>
           <div v-if="sale.status !== 'open'" class="flex justify-between text-sm">
-            <span class="text-muted-foreground">Bayar</span>
+            <span class="text-muted-foreground">المدفوع</span>
             <span>{{ formatRupiah(sale.paid) }}</span>
           </div>
           <div v-if="sale.status !== 'open' && sale.change_due > 0" class="flex justify-between text-sm">
-            <span class="text-muted-foreground">Kembalian</span>
+            <span class="text-muted-foreground">الباقي</span>
             <span class="font-semibold text-success">{{ formatRupiah(sale.change_due) }}</span>
           </div>
         </div>
       </div>
 
       <Button v-if="sale.status !== 'open'" variant="outline" class="w-full gap-2" @click="printReceipt">
-        <Printer class="size-4" /> Cetak Ulang Struk
+        <Printer class="size-4" /> إعادة طباعة الفاتورة
       </Button>
     </div>
   </div>
