@@ -65,6 +65,8 @@ const butcherProduct = ref<Product | null>(null)
 const weightKg = ref('0')
 const weightG = ref('0')
 const mealPortion = ref<MealPortion>(4)
+const mealPersons = ref(3)
+const effectiveMealPortion = computed(() => mealPortion.value === 12 ? mealPersons.value * 4 : mealPortion.value)
 const butcherError = ref('')
 const butcherCategory = computed(() => categories.items.find((c) => c.id === butcherProduct.value?.category_id)?.name ?? '')
 const isWeightProduct = computed(() => ['اللحوم', 'الكبد'].includes(butcherCategory.value))
@@ -73,7 +75,7 @@ const butcherPrice = computed(() => {
   try {
     return isWeightProduct.value
       ? weighedItemPrice(butcherProduct.value.price, weightInGrams(Number(weightKg.value), Number(weightG.value)))
-      : mealPortionPrice(butcherProduct.value.price, mealPortion.value)
+      : mealPortionPrice(butcherProduct.value.price, effectiveMealPortion.value)
   } catch { return 0 }
 })
 
@@ -108,6 +110,7 @@ function selectProduct(product: Product) {
     weightKg.value = '0'
     weightG.value = '0'
     mealPortion.value = 4
+    mealPersons.value = 3
     butcherError.value = ''
     butcherDialogOpen.value = true
   } else cart.add(product)
@@ -123,8 +126,8 @@ function addButcherProduct() {
     cart.addButcher(butcherProduct.value, butcherPrice.value, {
       quantityKind: isWeightProduct.value ? 'weight' : 'meal',
       weightGrams: isWeightProduct.value ? grams : undefined,
-      portionQuarters: isWeightProduct.value ? undefined : mealPortion.value,
-      unitLabel: isWeightProduct.value ? `${(grams / 1000).toFixed(3)} كجم` : portion?.label ?? 'نفر',
+      portionQuarters: isWeightProduct.value ? undefined : effectiveMealPortion.value,
+      unitLabel: isWeightProduct.value ? `${(grams / 1000).toFixed(3)} كجم` : mealPortion.value === 12 ? `${mealPersons.value} أنفار` : portion?.label ?? 'نفر',
     })
     butcherDialogOpen.value = false
     butcherProduct.value = null
@@ -298,7 +301,7 @@ async function discardOpenBill() {
   }
 }
 
-async function pay({ paid, paymentMethod }: { paid: number; paymentMethod: string }) {
+async function pay({ paid, paymentMethod, paymentBank, paymentProofPath }: { paid: number; paymentMethod: string; paymentBank?: string; paymentProofPath?: string }) {
   paying.value = true
   operationError.value = null
   try {
@@ -307,6 +310,8 @@ async function pay({ paid, paymentMethod }: { paid: number; paymentMethod: strin
       lines: checkoutLines(),
       paid,
       paymentMethod,
+      paymentBank: paymentBank ?? null,
+      paymentProofPath: paymentProofPath ?? null,
       discount: cart.discount,
       sessionId: cashier.current?.id ?? null,
     }
@@ -526,6 +531,9 @@ function newTransaction() {
           <div class="grid grid-cols-2 gap-2">
             <button v-for="portion in MEAL_PORTIONS" :key="portion.units" type="button" class="rounded-xl border p-3 text-sm" :class="mealPortion === portion.units ? 'border-primary bg-primary/10' : 'border-border'" @click="mealPortion = portion.units">{{ portion.label }}</button>
           </div>
+          <label v-if="mealPortion === 12" class="block space-y-1.5 text-sm font-medium">عدد الأنفار (أكثر من نفرين)
+            <Input v-model.number="mealPersons" type="number" min="3" max="10" step="1" />
+          </label>
         </template>
         <p class="text-lg font-bold">الإجمالي: {{ formatRupiah(butcherPrice) }}</p>
         <p v-if="butcherError" class="text-sm text-destructive">{{ butcherError }}</p>
