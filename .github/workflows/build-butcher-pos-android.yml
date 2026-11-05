@@ -40,6 +40,23 @@ jobs:
           chmod +x android/gradlew
           cd android
           ./gradlew assembleDebug
+      - name: Package full project source
+        working-directory: .
+        run: |
+          zip -r butcher-pos-source.zip . \\
+            -x ".git/*" \\
+               "*/node_modules/*" \\
+               "*/dist/*" \\
+               "*/.gradle/*" \\
+               "*/build/*" \\
+               "*/.idea/*" \\
+               "*/.DS_Store"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: butcher-pos-full-project-source
+          path: butcher-pos-source.zip
+          if-no-files-found: error
+          retention-days: 14
       - uses: actions/upload-artifact@v4
         with:
           name: butcher-pos-debug-apk
