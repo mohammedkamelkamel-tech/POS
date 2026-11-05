@@ -8,7 +8,7 @@ import MoneyInput from '@/components/common/MoneyInput.vue'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { التسمية } from '@/components/ui/label'
+import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { CalendarClock, DoorOpen, DoorClosed, History } from 'lucide-vue-next'
 import { useCashierStore } from '@/stores/cashier'
@@ -66,7 +66,7 @@ async function closeSession() {
   }
 }
 
-function diffالتسمية(d: number | null): string {
+function diffLabel(d: number | null): string {
   if (d == null) return '—'
   if (d === 0) return 'مطابق'
   return d > 0 ? `زيادة ${formatRupiah(d)}` : `عجز ${formatRupiah(-d)}`
@@ -109,7 +109,7 @@ function diffالتسمية(d: number | null): string {
                 <p class="mt-0.5 text-sm font-bold">
                   {{ summary.salesCount }}
                   <span class="text-xs font-normal text-muted-foreground">
-                    · {{ formatRupiah(summary.salesالإجمالي) }}
+                    · {{ formatRupiah(summary.salesTotal) }}
                   </span>
                 </p>
               </div>
@@ -145,11 +145,11 @@ function diffالتسمية(d: number | null): string {
             </div>
 
             <div class="space-y-1.5">
-              <التسمية for="opening-cash">الرصيد الافتتاحي (النقدية في الدرج)</التسمية>
+              <Label for="opening-cash">الرصيد الافتتاحي (النقدية في الدرج)</Label>
               <MoneyInput id="opening-cash" v-model="openingCash" class="h-11 text-base font-semibold" />
             </div>
             <div class="space-y-1.5">
-              <التسمية for="open-note">Catatan (اختياري)</التسمية>
+              <Label for="open-note">Catatan (اختياري)</Label>
               <Input id="open-note" v-model="openNote" placeholder="مثال: الوردية الصباحية" />
             </div>
 
@@ -196,7 +196,7 @@ function diffالتسمية(d: number | null): string {
                   class="text-xs font-medium"
                   :class="(s.difference ?? 0) === 0 ? 'text-muted-foreground' : (s.difference ?? 0) > 0 ? 'text-success' : 'text-destructive'"
                 >
-                  {{ diffالتسمية(s.difference) }}
+                  {{ diffLabel(s.difference) }}
                 </p>
               </template>
             </div>
@@ -240,7 +240,7 @@ function diffالتسمية(d: number | null): string {
         </div>
 
         <div class="space-y-1.5">
-          <التسمية for="counted-cash">النقدية الفعلية بعد العد</التسمية>
+          <Label for="counted-cash">النقدية الفعلية بعد العد</Label>
           <MoneyInput id="counted-cash" v-model="countedCash" class="h-12 text-lg font-semibold" />
         </div>
 
@@ -256,7 +256,7 @@ function diffالتسمية(d: number | null): string {
         </div>
 
         <div class="space-y-1.5">
-          <التسمية for="close-note">Catatan (اختياري)</التسمية>
+          <Label for="close-note">Catatan (اختياري)</Label>
           <Input id="close-note" v-model="closeNote" placeholder="مثال: فرق بسبب الباقي" />
         </div>
 
