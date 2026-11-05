@@ -114,8 +114,8 @@ async function prepareالفرعTransition(): Promise<boolean> {
 
   outletTransitionError.value =
     failedCount.value > 0
-      ? 'Perubahan belum aman disinkronkan. Ada perubahan gagal; gunakan Coba lagi terlebih dahulu sebelum pindah outlet.'
-      : 'Perubahan belum aman disinkronkan. Periksa koneksi lalu sinkronkan kembali sebelum pindah outlet.'
+      ? 'تعذرت مزامنة بعض التغييرات. أعد المحاولة قبل الانتقال إلى فرع آخر.'
+      : 'لم تكتمل المزامنة. تحقق من الاتصال ثم أعد المزامنة قبل الانتقال إلى فرع آخر.'
   return false
 }
 
@@ -233,12 +233,12 @@ const syncLabel = computed(() => {
                   <Badge v-if="String(s.id) === currentStoreId" class="bg-primary/15 text-primary hover:bg-primary/15">نشط</Badge>
                 </div>
                 <Button v-if="String(s.id) !== currentStoreId" size="sm" variant="outline" class="h-8" @click="askSwitch(s)">تبديل</Button>
-                <button v-if="s.role === 'owner'" class="text-muted-foreground transition active:text-foreground" aria-label="تبديل nama outlet" @click="startRename(s)"><Pencil class="size-4" /></button>
+                <button v-if="s.role === 'owner'" class="text-muted-foreground transition active:text-foreground" aria-label="تغيير اسم الفرع" @click="startRename(s)"><Pencil class="size-4" /></button>
               </template>
             </div>
           </div>
         </section>
-        <BottomSheet :open="!!pendingSwitch" title="تبديل outlet?" @update:open="(v: boolean) => { if (!v && !switching) pendingSwitch = null }">
+        <BottomSheet :open="!!pendingSwitch" title="تبديل الفرع؟" @update:open="(v: boolean) => { if (!v && !switching) pendingSwitch = null }">
           <div class="space-y-4 p-5">
             <p class="text-sm text-muted-foreground">الانتقال إلى <span class="font-semibold text-foreground">{{ pendingSwitch?.name }}</span>? سيتم استبدال بيانات الفرع الحالي ببيانات الفرع المحدد على هذا الجهاز. ستتم مزامنة التغييرات غير المرسلة أولاً، وستبقى بيانات الخادم آمنة.</p>
             <p v-if="outletTransitionError" class="flex items-start gap-1.5 text-xs text-destructive" role="alert"><AlertCircle class="mt-0.5 size-3.5 shrink-0" /> {{ outletTransitionError }}</p>
