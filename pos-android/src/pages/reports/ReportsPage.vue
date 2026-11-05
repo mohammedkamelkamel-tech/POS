@@ -28,7 +28,7 @@ const trendLabel = computed(() => rangeLabel(range.value))
 
 const SOURCES: { key: ReportSource; label: string }[] = [
   { key: 'sales', label: 'المبيعات' },
-  { key: 'الحركة المالية', label: 'الحركة المالية' },
+  { key: 'cashflow', label: 'cashflow' },
 ]
 
 // Format ringkas untuk label sumbu-Y (mis. 1,2jt / 300rb).
@@ -62,7 +62,7 @@ const chartOptions = computed<ApexOptions>(() => {
       labels: { formatter: (v: number) => compact(v), style: { fontSize: '10px' } },
     },
     legend: {
-      show: source.value === 'الحركة المالية',
+      show: source.value === 'cashflow',
       position: 'top',
       horizontalAlign: 'right',
       fontSize: '12px',
@@ -78,7 +78,7 @@ const chartOptions = computed<ApexOptions>(() => {
 const exportConfig = computed(() =>
   source.value === 'sales'
     ? { title: 'تصدير الفواتير', filenameBase: 'عملية بيع', buildSheets: sales.buildExport }
-    : { title: 'Export الحركة المالية', filenameBase: 'الحركة المالية', buildSheets: cashflow.buildExport },
+    : { title: 'Export الحركة المالية', filenameBase: 'cashflow', buildSheets: cashflow.buildExport },
 )
 
 const exportOpen = ref(false)
