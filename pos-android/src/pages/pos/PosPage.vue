@@ -51,6 +51,7 @@ const showOpenBills = ref(false)
 const showHoldForm = ref(false)
 const showDiscardConfirm = ref(false)
 const paying = ref(false)
+const printing = ref(false)
 const holding = ref(false)
 const success = ref(false)
 const scannerReady = ref(false)
@@ -249,7 +250,7 @@ async function resumeOpenBill(bill: Sale) {
   try {
     const result = await sales.resume({ saleId: bill.id, deviceId: settings.deviceId })
     if (!restoreOpenBill(result)) {
-      operationError.value = 'فاتورة معلقة tidak dapat dilanjutkan karena ada item tanpa produk.'
+      operationError.value = 'فاتورة معلقة لا يمكن استكمالها لوجود صنف غير مرتبط بمنتج.'
       return
     }
     showOpenBills.value = false
@@ -267,7 +268,7 @@ async function resumeOpenBill(bill: Sale) {
 
 function requestDiscardOpenBill(bill: Sale) {
   if (settings.deviceId === '' || bill.origin_device_id !== settings.deviceId) {
-    operationError.value = 'فاتورة معلقة dari perangkat lain hanya dapat dilihat.'
+    operationError.value = 'فاتورة معلقة من جهاز آخر؛ يمكن عرضها فقط.'
     return
   }
   operationError.value = null
@@ -337,21 +338,36 @@ async function pay({ paid, paymentMethod }: { paid: number; paymentMethod: strin
 }
 
 async function printReceipt() {
-  if (!lastResult.value) return
+  if (!lastResult.value || printing.value) return
   const printer = capabilities.get<PrinterCapability>('printer')
-  if (!printer) return
-  await printer.print(
-    buildReceipt(lastResult.value.sale, lastResult.value.items, {
-      storeName: settings.storeName,
-      storeOwner: settings.storeOwner,
-      width: usePrinterStore().paperWidth,
-    }),
-  )
+  if (!printer) {
+    operationError.value = 'الطابعة غير متصلة أو غير مهيأة. افتح إعدادات الطابعة ثم أعد المحاولة.'
+    return
+  }
+  printing.value = true
+  operationError.value = null
+  try {
+    await printer.print(
+      buildReceipt(lastResult.value.sale, lastResult.value.items, {
+        storeName: settings.storeName,
+        storeOwner: settings.storeOwner,
+        width: usePrinterStore().paperWidth,
+      }),
+    )
+  } catch (error) {
+    operationError.value = error instanceof Error ? `تعذرت طباعة الإيصال: ${error.message}` : 'تعذرت طباعة الإيصال. تحقق من اتصال الطابعة.'
+  } finally {
+    printing.value = false
+  }
 }
 
 function newTransaction() {
   success.value = false
   lastResult.value = null
+  operationError.value = null
+  showPayment.value = false
+  showCart.value = false
+  cart.clear()
 }
 </script>
 
@@ -388,7 +404,7 @@ function newTransaction() {
           :class="cn(!categoryFilter ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-muted-foreground')"
           @click="setFilter(null)"
         >
-          Semua
+          الكل
         </button>
         <button
           v-for="c in categories.items"
@@ -454,13 +470,13 @@ function newTransaction() {
               v-if="soldOut(p.stock, p.track_stock)"
               class="absolute inset-x-0 bottom-0 bg-black/60 py-0.5 text-center text-[10px] font-semibold text-white"
             >
-              Habis
+              نفد المخزون
             </span>
           </div>
           <div class="flex flex-1 flex-col p-2.5">
             <p class="line-clamp-2 text-xs font-medium leading-snug">{{ p.name }}</p>
             <p class="mt-1 text-sm font-bold text-info">{{ formatRupiah(p.price) }}</p>
-            <p v-if="p.track_stock" class="text-[11px] text-muted-foreground">Stok {{ p.stock }}</p>
+            <p v-if="p.track_stock" class="text-[11px] text-muted-foreground">المخزون: {{ p.stock }}</p>
           </div>
         </button>
       </div>
@@ -468,10 +484,10 @@ function newTransaction() {
       <EmptyState
         v-else
         :icon="Package"
-        :title="query || categoryFilter ? 'Produk tidak ditemukan' : 'Belum ada produk'"
-        description="Tambahkan produk dulu di menu Produk untuk mulai berjualan."
+        :title="query || categoryFilter ? 'لم يتم العثور على صنف' : 'لا توجد أصناف بعد'"
+        description="أضف الأصناف أولاً من قائمة الأصناف لبدء البيع."
       >
-        <Button variant="outline" @click="router.push('/products')">Ke Produk</Button>
+        <Button variant="outline" @click="router.push('/products')">إدارة الأصناف</Button>
       </EmptyState>
     </div>
 
@@ -489,7 +505,7 @@ function newTransaction() {
             </span>
           </div>
           <span class="flex-1 truncate text-left text-sm font-semibold">
-            {{ cart.activeOpenBillId ? `فاتورة معلقة: ${cart.activeOpenBillLabel ?? cart.activeOpenBillId}` : 'Lihat Keranjang' }}
+            {{ cart.activeOpenBillId ? `فاتورة معلقة: ${cart.activeOpenBillLabel ?? cart.activeOpenBillId}` : 'عرض السلة' }}
           </span>
           <span class="text-base font-bold">{{ formatRupiah(cart.total) }}</span>
         </button>
@@ -534,32 +550,32 @@ function newTransaction() {
       @discard="requestDiscardOpenBill"
     />
 
-    <BottomSheet v-model:open="showHoldForm" :title="cart.activeOpenBillId ? 'Simpan Perubahan فاتورة معلقة' : 'Tahan Pesanan'">
+    <BottomSheet v-model:open="showHoldForm" :title="cart.activeOpenBillId ? 'حفظ تعديل الفاتورة المعلقة' : 'تعليق الطلب'">
       <form class="space-y-5 p-5" @submit.prevent="submitHold">
         <div class="space-y-2">
-          <Label for="open-bill-label">Label pesanan</Label>
+          <Label for="open-bill-label">اسم الطلب المعلق</Label>
           <Input
             id="open-bill-label"
             v-model="holdLabel"
             autocomplete="off"
-            placeholder="Contoh: Meja 4 / Nama pelanggan"
+            placeholder="مثال: طاولة 4 / اسم العميل"
           />
           <p class="text-xs leading-relaxed text-muted-foreground">
-            Gunakan label agar pesanan mudah ditemukan saat dilanjutkan.
+            أدخل اسماً ليسهل العثور على الطلب عند استكماله.
           </p>
         </div>
         <div class="grid grid-cols-2 gap-2">
           <Button type="button" variant="outline" :disabled="holding" @click="showHoldForm = false">
-            Batal
+            إلغاء
           </Button>
           <Button type="submit" :disabled="holding || cart.isEmpty">
-            {{ holding ? 'Menyimpan…' : cart.activeOpenBillId ? 'Simpan Perubahan' : 'Tahan Pesanan' }}
+            {{ holding ? 'جارٍ الحفظ…' : cart.activeOpenBillId ? 'حفظ التعديلات' : 'تعليق الطلب' }}
           </Button>
         </div>
       </form>
     </BottomSheet>
 
-    <BottomSheet v-model:open="showDiscardConfirm" title="Buang فاتورة معلقة?">
+    <BottomSheet v-model:open="showDiscardConfirm" title="حذف الفاتورة المعلقة؟">
       <div class="space-y-5 p-5">
         <div class="flex gap-3">
           <div class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-destructive/10 text-destructive">
@@ -567,15 +583,15 @@ function newTransaction() {
           </div>
           <p class="text-sm leading-relaxed text-muted-foreground">
             فاتورة معلقة <span class="font-semibold text-foreground">{{ selectedDiscardBill?.open_bill_label ?? selectedDiscardBill?.number }}</span>
-            beserta itemnya akan dibuang dan tidak dapat dilanjutkan lagi.
+            سيتم حذف الفاتورة وأصنافها ولن يمكن استكمالها بعد ذلك.
           </p>
         </div>
         <div class="grid grid-cols-2 gap-2">
           <Button type="button" variant="outline" :disabled="openBillBusyId !== null" @click="showDiscardConfirm = false">
-            Batal
+            إلغاء
           </Button>
           <Button type="button" variant="destructive" :disabled="openBillBusyId !== null" @click="discardOpenBill">
-            {{ openBillBusyId ? 'Membuang…' : 'Buang فاتورة معلقة' }}
+            {{ openBillBusyId ? 'جارٍ الحذف…' : 'حذف الفاتورة المعلقة' }}
           </Button>
         </div>
       </div>
@@ -589,7 +605,7 @@ function newTransaction() {
           role="alert"
         >
           <p class="min-w-0 flex-1 text-sm leading-relaxed text-destructive">{{ operationError }}</p>
-          <Button size="icon" variant="ghost" class="size-8 shrink-0" aria-label="Tutup pesan" @click="operationError = null">
+          <Button size="icon" variant="ghost" class="size-8 shrink-0" aria-label="إغلاق التنبيه" @click="operationError = null">
             <X class="size-4" />
           </Button>
         </div>
@@ -611,34 +627,34 @@ function newTransaction() {
             <div class="flex size-20 items-center justify-center rounded-full bg-success/15 text-success">
               <Check class="size-10" />
             </div>
-            <p class="mt-4 text-lg font-bold">Transaksi Berhasil</p>
+            <p class="mt-4 text-lg font-bold">تمت العملية بنجاح</p>
             <p class="text-sm text-muted-foreground">No. {{ lastResult.sale.number }}</p>
 
             <div class="mt-6 w-full space-y-2 rounded-2xl bg-muted/50 p-4">
               <div class="flex justify-between text-sm">
-                <span class="text-muted-foreground">Total</span>
+                <span class="text-muted-foreground">الإجمالي</span>
                 <span class="font-semibold">{{ formatRupiah(lastResult.sale.total) }}</span>
               </div>
               <div class="flex justify-between text-sm">
-                <span class="text-muted-foreground">Bayar</span>
+                <span class="text-muted-foreground">المدفوع</span>
                 <span>{{ formatRupiah(lastResult.sale.paid) }}</span>
               </div>
               <div v-if="lastResult.sale.change_due > 0" class="flex justify-between text-sm">
-                <span class="text-muted-foreground">Kembalian</span>
+                <span class="text-muted-foreground">الباقي</span>
                 <span class="font-semibold text-success">{{ formatRupiah(lastResult.sale.change_due) }}</span>
               </div>
             </div>
 
             <div class="mt-6 grid w-full grid-cols-2 gap-3">
-              <Button variant="outline" class="gap-2" @click="printReceipt">
-                <Printer class="size-4" /> Cetak Struk
+              <Button type="button" variant="outline" class="gap-2" :disabled="printing" @click="printReceipt">
+                <Printer class="size-4" /> {{ printing ? 'جارٍ الطباعة…' : 'طباعة الإيصال' }}
               </Button>
-              <Button class="gap-2" @click="newTransaction">
-                <PlusCircle class="size-4" /> Transaksi Baru
+              <Button type="button" class="gap-2" @click="newTransaction">
+                <PlusCircle class="size-4" /> عملية بيع جديدة
               </Button>
             </div>
-            <button class="mt-3 text-xs text-muted-foreground underline" @click="router.push('/transactions')">
-              Lihat semua transaksi
+            <button type="button" class="mt-3 text-xs text-muted-foreground underline" @click="router.push('/transactions')">
+              عرض جميع العمليات
             </button>
           </div>
         </div>
