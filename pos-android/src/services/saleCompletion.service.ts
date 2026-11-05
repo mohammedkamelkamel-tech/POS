@@ -15,7 +15,25 @@ export async function validateSaleStock(
 ): Promise<readonly StockAdjustment[]> {
   const quantities = new Map<string, number>()
   for (const line of lines) {
-    quantities.set(line.productId, (quantities.get(line.productId) ?? 0) + line.qty)
+    // المخزون يُخزّن بوحدة الصنف: القطعة، الكيلو، أو النفر.
+    // الوزن محفوظ بالجرام والحصة بوحدات الربع، لذلك نحوّلها قبل الخصم.
+    let stockQty = line.qty
+    if (line.quantityKind === 'weight') {
+      if (!Number.isSafeInteger(line.weightGrams) || (line.weightGrams ?? 0) <= 0 || line.qty !== 1) {
+        throw new CheckoutError({ kind: 'invalid-input', reason: 'وزن الصنف غير صحيح' })
+      }
+      stockQty = (line.weightGrams as number) / 1000
+    } else if (line.quantityKind === 'meal') {
+      if (![1, 2, 4, 6, 8].includes(line.portionQuarters ?? 0) || line.qty !== 1) {
+        throw new CheckoutError({ kind: 'invalid-input', reason: 'حصة الوجبة غير صحيحة' })
+      }
+      stockQty = (line.portionQuarters as number) / 4
+    }
+    const next = (quantities.get(line.productId) ?? 0) + stockQty
+    if (!Number.isFinite(next) || next > Number.MAX_SAFE_INTEGER) {
+      throw new CheckoutError({ kind: 'invalid-input', reason: 'كمية المخزون أكبر من المسموح' })
+    }
+    quantities.set(line.productId, next)
   }
   const productIds = Array.from(quantities.keys())
   const products = await db.query<Product>(
@@ -30,7 +48,7 @@ export async function validateSaleStock(
     if (product.deleted_at !== null) throw new CheckoutError({ kind: 'product-deleted', productId })
     if (product.active === 0) throw new CheckoutError({ kind: 'product-inactive', productId })
     if (product.track_stock !== 0) {
-      if (product.stock < qty) {
+      if (!Number.isFinite(product.stock) || product.stock < 0 || product.stock + Number.EPSILON < qty) {
         throw new CheckoutError({
           kind: 'insufficient-stock',
           productId,
@@ -50,8 +68,9 @@ export async function applySaleStock(
 ): Promise<void> {
   const repository = new ProductRepository(db)
   for (const adjustment of adjustments) {
+    const remaining = Math.max(0, Number((adjustment.product.stock - adjustment.qty).toFixed(6)))
     const updated = await repository.update(adjustment.product.id, {
-      stock: adjustment.product.stock - adjustment.qty,
+      stock: remaining,
     })
     if (updated === null) {
       throw new CheckoutError({ kind: 'product-missing', productId: adjustment.product.id })
