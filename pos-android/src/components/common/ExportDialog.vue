@@ -49,14 +49,14 @@ async function run() {
     const sheets = await props.buildSheets(range.value)
     const rowCount = sheets.reduce((n, s) => n + s.rows.length, 0)
     if (rowCount === 0) {
-      error.value = 'Tidak ada data pada rentang ini.'
+      error.value = 'لا توجد بيانات خلال هذه الفترة.'
       return
     }
     const name = `${props.filenameBase}-${dayKey(range.value.from)}_${dayKey(range.value.to)}.xlsx`
     await exportXlsx(name, sheets)
     emit('update:open', false)
   } catch (e) {
-    error.value = e instanceof Error ? e.message : 'Gagal mengekspor.'
+    error.value = e instanceof Error ? e.message : 'فشل التصدير.'
   } finally {
     busy.value = false
   }
@@ -74,18 +74,18 @@ async function run() {
       <DateRangeFilter :model-value="range" @update:model-value="range = $event" />
 
       <div class="px-4 text-sm">
-        <span class="text-muted-foreground">Rentang: </span>
+        <span class="text-muted-foreground">الفترة: </span>
         <span class="font-medium">{{ rangeLabel(range) }}</span>
       </div>
 
       <p v-if="error" class="px-4 text-sm text-destructive">{{ error }}</p>
 
       <div class="flex gap-2 px-4">
-        <Button variant="outline" class="flex-1" :disabled="busy" @click="close">Batal</Button>
+        <Button variant="outline" class="flex-1" :disabled="busy" @click="close">إلغاء</Button>
         <Button class="flex-1" :disabled="busy" @click="run">
           <Loader2 v-if="busy" class="mr-1.5 size-4 animate-spin" />
           <FileSpreadsheet v-else class="mr-1.5 size-4" />
-          {{ busy ? 'Menyiapkan…' : 'Export Excel' }}
+          {{ busy ? 'جارٍ التجهيز…' : 'تصدير Excel' }}
         </Button>
       </div>
     </div>
