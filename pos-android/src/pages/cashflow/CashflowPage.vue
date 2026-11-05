@@ -10,14 +10,14 @@ import { Button } from '@/components/ui/button'
 import {
   Wallet, Plus, Tag, ArrowDownLeft, ArrowUpRight, Lock, Download,
 } from 'lucide-vue-next'
-import { useCashflowStore } from '@/stores/cashflow'
+import { useالحركة الماليةStore } from '@/stores/cashflow'
 import { formatRupiah } from '@/lib/money'
 import { formatTime, formatDate, dayKey } from '@/lib/datetime'
 import { rangeLabel } from '@/lib/dateRange'
-import type { CashflowEntry } from '@/db/types'
+import type { الحركة الماليةEntry } from '@/db/types'
 
 const router = useRouter()
-const cashflow = useCashflowStore()
+const cashflow = useالحركة الماليةStore()
 const { entries, summary, byCategory, range } = storeToRefs(cashflow)
 
 const label = computed(() => rangeLabel(range.value))
@@ -26,7 +26,7 @@ const exportOpen = ref(false)
 
 // Kelompokkan entri per hari.
 const groups = computed(() => {
-  const map = new Map<string, CashflowEntry[]>()
+  const map = new Map<string, الحركة الماليةEntry[]>()
   for (const e of entries.value) {
     const k = dayKey(e.occurred_at)
     if (!map.has(k)) map.set(k, [])
@@ -42,7 +42,7 @@ const groups = computed(() => {
 
 onMounted(() => cashflow.load())
 
-function openEntry(e: CashflowEntry) {
+function openEntry(e: الحركة الماليةEntry) {
   if (e.source !== 'manual') return // entri dari penjualan terkunci
   router.push(`/cashflow/${e.id}/edit`)
 }
@@ -50,7 +50,7 @@ function openEntry(e: CashflowEntry) {
 
 <template>
   <div>
-    <AppHeader title="Cashflow" :subtitle="label">
+    <AppHeader title="الحركة المالية" :subtitle="label">
       <template #actions>
         <button
           class="flex size-9 items-center justify-center rounded-full text-foreground hover:bg-accent"
@@ -60,7 +60,7 @@ function openEntry(e: CashflowEntry) {
           <Download class="size-5" />
         </button>
         <RouterLink to="/cashflow/categories">
-          <Button variant="outline" size="sm" class="gap-1.5" title="Kelola kategori">
+          <Button variant="outline" size="sm" class="gap-1.5" title="إدارة التصنيفات">
             <Tag class="size-4" />
             <span>Kategori</span>
           </Button>
@@ -81,13 +81,13 @@ function openEntry(e: CashflowEntry) {
       <div class="mt-3 grid grid-cols-2 gap-3">
         <div class="rounded-xl bg-white/12 p-3 backdrop-blur">
           <div class="flex items-center gap-1 text-xs opacity-90">
-            <ArrowDownLeft class="size-3.5" /> Pemasukan
+            <ArrowDownLeft class="size-3.5" /> الإيرادات
           </div>
           <p class="mt-0.5 text-sm font-bold">{{ formatRupiah(summary.income) }}</p>
         </div>
         <div class="rounded-xl bg-white/12 p-3 backdrop-blur">
           <div class="flex items-center gap-1 text-xs opacity-90">
-            <ArrowUpRight class="size-3.5" /> Pengeluaran
+            <ArrowUpRight class="size-3.5" /> المصروفات
           </div>
           <p class="mt-0.5 text-sm font-bold">{{ formatRupiah(summary.expense) }}</p>
         </div>
@@ -109,7 +109,7 @@ function openEntry(e: CashflowEntry) {
             class="size-2 shrink-0 rounded-full"
             :class="row.category?.type === 'income' ? 'bg-success' : 'bg-destructive'"
           />
-          <span class="flex-1 truncate">{{ row.category?.name ?? 'Tanpa kategori' }}</span>
+          <span class="flex-1 truncate">{{ row.category?.name ?? 'بدون تصنيف' }}</span>
           <span
             class="font-medium"
             :class="row.category?.type === 'income' ? 'text-success' : 'text-destructive'"
@@ -166,8 +166,8 @@ function openEntry(e: CashflowEntry) {
     <EmptyState
       v-else
       :icon="Wallet"
-      title="Belum ada catatan kas"
-      description="Penjualan otomatis tercatat di sini. Tambah pemasukan/pengeluaran manual dengan tombol +."
+      title="لا توجد حركات مالية"
+      description="تُسجّل المبيعات تلقائياً هنا. أضف الإيرادات أو المصروفات يدوياً من زر +."
     />
 
     <!-- FAB tambah -->
@@ -180,7 +180,7 @@ function openEntry(e: CashflowEntry) {
 
     <ExportDialog
       v-model:open="exportOpen"
-      title="Export Cashflow"
+      title="Export الحركة المالية"
       filename-base="cashflow"
       :initial-range="range"
       :build-sheets="cashflow.buildExport"
