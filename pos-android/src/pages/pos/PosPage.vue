@@ -27,7 +27,8 @@ import { capabilities } from '@/services/capabilities/registry'
 import type { PrinterCapability } from '@/services/capabilities/registry'
 import { CheckoutError, type CheckoutResult } from '@/services/checkout.service'
 import type { CartLine } from '@/stores/cart'
-import type { Sale } from '@/db/types'
+import type { Product, Sale } from '@/db/types'
+import { MEAL_PORTIONS, mealPortionPrice, weightInGrams, weighedItemPrice, type MealPortion } from '@/lib/butcher'
 import { buildReceipt } from '@/lib/receipt'
 import { formatRupiah } from '@/lib/money'
 import { cn } from '@/lib/utils'
@@ -58,6 +59,22 @@ const holdLabel = ref('')
 const selectedDiscardBill = ref<Sale | null>(null)
 const openBillBusyId = ref<string | null>(null)
 const operationError = ref<string | null>(null)
+const butcherDialogOpen = ref(false)
+const butcherProduct = ref<Product | null>(null)
+const weightKg = ref('0')
+const weightG = ref('0')
+const mealPortion = ref<MealPortion>(4)
+const butcherError = ref('')
+const butcherCategory = computed(() => categories.items.find((c) => c.id === butcherProduct.value?.category_id)?.name ?? '')
+const isWeightProduct = computed(() => ['اللحوم', 'الكبد'].includes(butcherCategory.value))
+const butcherPrice = computed(() => {
+  if (!butcherProduct.value) return 0
+  try {
+    return isWeightProduct.value
+      ? weighedItemPrice(butcherProduct.value.price, weightInGrams(Number(weightKg.value), Number(weightG.value)))
+      : mealPortionPrice(butcherProduct.value.price, mealPortion.value)
+  } catch { return 0 }
+})
 
 const headerSubtitle = computed(() => {
   if (cart.activeOpenBillId) {
@@ -81,6 +98,38 @@ onMounted(async () => {
 
 function setFilter(id: string | null) {
   categoryFilter.value = categoryFilter.value === id ? null : id
+}
+
+function selectProduct(product: Product) {
+  const category = categories.items.find((c) => c.id === product.category_id)?.name ?? ''
+  if (['اللحوم', 'الكبد', 'الوجبات'].includes(category)) {
+    butcherProduct.value = product
+    weightKg.value = '0'
+    weightG.value = '0'
+    mealPortion.value = 4
+    butcherError.value = ''
+    butcherDialogOpen.value = true
+  } else cart.add(product)
+}
+
+function addButcherProduct() {
+  if (!butcherProduct.value) return
+  try {
+    const grams = isWeightProduct.value ? weightInGrams(Number(weightKg.value), Number(weightG.value)) : 0
+    if (isWeightProduct.value && grams <= 0) throw new Error('أدخل وزناً أكبر من صفر')
+    if (butcherPrice.value <= 0) throw new Error('تحقق من السعر والكمية')
+    const portion = MEAL_PORTIONS.find((p) => p.units === mealPortion.value)
+    cart.addButcher(butcherProduct.value, butcherPrice.value, {
+      quantityKind: isWeightProduct.value ? 'weight' : 'meal',
+      weightGrams: isWeightProduct.value ? grams : undefined,
+      portionQuarters: isWeightProduct.value ? undefined : mealPortion.value,
+      unitLabel: isWeightProduct.value ? `${(grams / 1000).toFixed(3)} كجم` : portion?.label ?? 'نفر',
+    })
+    butcherDialogOpen.value = false
+    butcherProduct.value = null
+  } catch (error) {
+    butcherError.value = error instanceof Error ? error.message : 'البيانات المدخلة غير صحيحة'
+  }
 }
 
 function soldOut(stock: number, track: number) {
@@ -383,7 +432,7 @@ function newTransaction() {
           type="button"
           :disabled="soldOut(p.stock, p.track_stock)"
           class="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card text-left shadow-sm transition active:scale-[.97] disabled:opacity-50"
-          @click="cart.add(p)"
+          @click="selectProduct(p)"
         >
           <div class="relative flex aspect-square items-center justify-center overflow-hidden bg-muted text-muted-foreground">
             <img
