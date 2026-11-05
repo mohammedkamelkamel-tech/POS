@@ -112,7 +112,7 @@ function discard(bill: Sale) {
         <div class="flex size-11 items-center justify-center rounded-xl bg-muted text-muted-foreground">
           <ReceiptText class="size-5" />
         </div>
-        <p class="text-sm font-semibold">Belum ada فاتورة معلقة</p>
+        <p class="text-sm font-semibold">لا يوجد بعد فاتورة معلقة</p>
         <p class="max-w-64 text-xs leading-relaxed text-muted-foreground">
           Tahan pesanan dari keranjang untuk melanjutkannya nanti.
         </p>
