@@ -250,6 +250,31 @@ const migrations: Migration[] = [
     },
   },
   protectLegacyCashflowDefaults,
+  {
+    version: 7,
+    name: 'butcher-default-categories',
+    up: async (db) => {
+      const defaults = [
+        { name: 'اللحوم', color: '#B91C1C', sort: 0 },
+        { name: 'الكبد', color: '#7C2D12', sort: 1 },
+        { name: 'الوجبات', color: '#D97706', sort: 2 },
+        { name: 'المخروج', color: '#0F766E', sort: 3 },
+      ];
+      for (const item of defaults) {
+        const found = await db.query<{ id: string }>(
+          'SELECT id FROM categories WHERE name = ? AND deleted_at IS NULL LIMIT 1', [item.name],
+        );
+        if (found.length) continue;
+        const id = crypto.randomUUID();
+        const t = nowMs();
+        await db.run(
+          `INSERT INTO categories (id, name, sort_order, color, created_at, updated_at, deleted_at, dirty, sync_version, remote_id)
+           VALUES (?, ?, ?, ?, ?, ?, NULL, 1, 0, NULL)`,
+          [id, item.name, item.sort, item.color, t, t],
+        );
+      }
+    },
+  },
 ]
 
 /** Jalanin migrasi yang belum di-apply, berurutan, tiap satu dalam transaksi. */
