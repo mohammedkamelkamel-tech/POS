@@ -34,7 +34,7 @@ async function saveEdit() {
 }
 
 async function remove(id: string) {
-  if (!confirm('حذف kategori ini? المنتجات terkait jadi tanpa kategori.')) return
+  if (!confirm('هل تريد حذف هذا التصنيف؟ ستصبح المنتجات المرتبطة به بلا تصنيف.')) return
   await categories.remove(id)
 }
 </script>
@@ -78,8 +78,8 @@ async function remove(id: string) {
     <EmptyState
       v-else
       :icon="Tag"
-      title="Belum ada kategori"
-      description="Kelompokkan produk agar mudah dicari."
+      title="لا توجد تصنيفات بعد"
+      description="صنّف المنتجات لتسهيل العثور عليها."
     />
   </div>
 </template>
