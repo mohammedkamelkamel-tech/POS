@@ -31,7 +31,7 @@ const SOURCES: { key: ReportSource; label: string }[] = [
   { key: 'cashflow', label: 'الحركة المالية' },
 ]
 
-// Format ringkas untuk label sumbu-Y (mis. 1,2jt / 300rb).
+// تنسيق مختصر لقيم المحور الرأسي.
 function compact(v: number): string {
   if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(v % 1_000_000 === 0 ? 0 : 1)} مليون`
   if (v >= 1_000) return `${Math.round(v / 1_000)} ألف`
@@ -47,7 +47,7 @@ const chartOptions = computed<ApexOptions>(() => {
       background: 'transparent',
     },
     theme: { mode: dark ? 'dark' : 'light' },
-    // Charcoal (brand) untuk penjualan; hijau/merah untuk pemasukan/pengeluaran.
+    // ألوان المبيعات والإيرادات والمصروفات.
     colors: source.value === 'sales' ? [dark ? '#a1a1aa' : '#3f4756'] : ['#3f9c5a', '#e5484d'],
     plotOptions: { bar: { borderRadius: 4, columnWidth: '58%' } },
     dataLabels: { enabled: false },
@@ -74,7 +74,7 @@ const chartOptions = computed<ApexOptions>(() => {
   }
 })
 
-// Konfigurasi export mengikuti sumber aktif — reuse buildExport yang sudah ada.
+// إعداد التصدير وفق نوع التقرير المحدد.
 const exportConfig = computed(() =>
   source.value === 'sales'
     ? { title: 'تصدير الفواتير', filenameBase: 'المبيعات', buildSheets: sales.buildExport }
@@ -100,14 +100,14 @@ onMounted(() => reports.load())
       </template>
     </AppHeader>
 
-    <!-- KPI Hari Ini (selalu hari ini, tak ikut filter) -->
+    <!-- ملخص اليوم، مستقل عن نطاق التصفية -->
     <section class="space-y-3 p-4">
       <p class="px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         اليوم · {{ todayLabel }}
       </p>
 
       <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <!-- المبيعات hari ini -->
+        <!-- مبيعات اليوم -->
         <div
           class="col-span-2 rounded-2xl bg-gradient-to-br from-hero to-hero/90 p-4 text-hero-foreground sm:col-span-1"
         >
@@ -118,7 +118,7 @@ onMounted(() => reports.load())
           <p class="text-xs opacity-85">{{ todaySalesSummary.count }} عملية بيع</p>
         </div>
 
-        <!-- الإيرادات vs المصروفات hari ini -->
+        <!-- إيرادات ومصروفات اليوم -->
         <div class="rounded-2xl border border-border bg-card p-4">
           <div class="flex items-center gap-1.5 text-xs text-muted-foreground">
             <ArrowDownLeft class="size-3.5 text-success" /> الإيرادات
@@ -138,13 +138,13 @@ onMounted(() => reports.load())
       </div>
     </section>
 
-    <!-- Tren -->
+    <!-- الاتجاهات -->
     <section class="border-t border-border">
       <div class="flex items-center justify-between px-4 pt-4">
         <p class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           الرسم البياني
         </p>
-        <!-- Toggle sumber data -->
+        <!-- اختيار مصدر البيانات -->
         <div class="flex gap-1 rounded-full border border-border p-0.5">
           <button
             v-for="opt in SOURCES"
@@ -181,7 +181,7 @@ onMounted(() => reports.load())
           v-else
           :icon="BarChart3"
           title="لا توجد بيانات"
-          :description="`Tidak ada ${source === 'sales' ? 'penjualan' : 'حركات مالية'} pada rentang ${trendLabel.toLowerCase()}.`"
+          :description="`لا توجد ${source === 'sales' ? 'مبيعات' : 'حركات مالية'} خلال الفترة ${trendLabel.toLowerCase()}.`"
         />
       </div>
     </section>
