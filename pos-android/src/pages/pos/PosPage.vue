@@ -93,6 +93,10 @@ function checkoutLines() {
     name: line.name,
     price: line.price,
     qty: line.qty,
+    quantityKind: line.quantityKind,
+    weightGrams: line.weightGrams,
+    portionQuarters: line.portionQuarters,
+    unitLabel: line.unitLabel,
   }))
 }
 
@@ -167,6 +171,10 @@ function restoreOpenBill(result: CheckoutResult): boolean {
       image_path: product?.image_path ?? null,
       track_stock: product?.track_stock ?? 0,
       stock: product?.stock ?? 0,
+      quantityKind: item.quantity_kind,
+      weightGrams: item.weight_grams,
+      portionQuarters: item.portion_quarters,
+      unitLabel: item.unit_label,
     })
   }
 
