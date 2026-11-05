@@ -123,7 +123,7 @@ onMounted(() => sales.load())
       v-else
       :icon="Receipt"
       title="لا توجد فواتير"
-      :description="`لا توجد فواتير pada rentang ${label.toLowerCase()}. جرّب تغيير نطاق التاريخ.`"
+      :description="`لا توجد فواتير خلال الفترة ${label}. جرّب تغيير نطاق التاريخ.`"
     />
 
     <ExportDialog
