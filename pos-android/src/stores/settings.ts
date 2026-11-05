@@ -11,6 +11,7 @@ const KEYS = {
   storeOwner: 'store_owner',
   storeLogo: 'store_logo',
   loginEnabled: 'login_enabled',
+  biometricEnabled: 'biometric_enabled',
   pinHash: 'pin_hash',
   deviceId: 'device_id',
   theme: 'theme',
@@ -26,6 +27,7 @@ export const useSettingsStore = defineStore('settings', () => {
   const storeOwner = ref('')
   const storeLogo = ref<string | null>(null) // ref media://<id>
   const loginEnabled = ref(false) // DEFAULT: tanpa login
+  const biometricEnabled = ref(false)
   const pinHash = ref<string | null>(null)
   const deviceId = ref('')
   const theme = ref<'light' | 'dark'>('light')
@@ -55,6 +57,7 @@ export const useSettingsStore = defineStore('settings', () => {
     storeOwner.value = all[KEYS.storeOwner] || ''
     storeLogo.value = all[KEYS.storeLogo] || null
     loginEnabled.value = all[KEYS.loginEnabled] === '1'
+    biometricEnabled.value = all[KEYS.biometricEnabled] === '1'
     pinHash.value = all[KEYS.pinHash] || null
     theme.value = all[KEYS.theme] === 'dark' ? 'dark' : 'light'
     // Splash: default mati; aktif hanya bila di-set '1'. bg default 'brand'.
@@ -120,6 +123,11 @@ export const useSettingsStore = defineStore('settings', () => {
     await repo().set(KEYS.loginEnabled, enabled ? '1' : '0')
   }
 
+  async function setBiometricEnabled(enabled: boolean) {
+    biometricEnabled.value = enabled
+    await repo().set(KEYS.biometricEnabled, enabled ? '1' : '0')
+  }
+
   async function setPinHash(hash: string | null) {
     pinHash.value = hash
     await repo().set(KEYS.pinHash, hash ?? '')
@@ -137,6 +145,7 @@ export const useSettingsStore = defineStore('settings', () => {
     storeOwner,
     storeLogo,
     loginEnabled,
+    biometricEnabled,
     pinHash,
     deviceId,
     theme,
@@ -153,6 +162,7 @@ export const useSettingsStore = defineStore('settings', () => {
     setQris,
     setQrisDynamic,
     setLoginEnabled,
+    setBiometricEnabled,
     setPinHash,
     toggleTheme,
   }
