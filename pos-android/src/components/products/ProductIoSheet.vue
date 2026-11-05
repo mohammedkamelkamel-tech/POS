@@ -68,14 +68,14 @@ async function runExport(format: 'xlsx' | 'csv') {
   try {
     const sheet = buildProductSheet(products.items, categories.items)
     if (!sheet.rows.length) {
-      error.value = 'لا يوجد بعد produk untuk diekspor.'
+      error.value = 'لا يوجد بعد من المنتجات لتصديرها.'
       return
     }
-    const name = `produk-${dayKey(Date.now())}.${format}`
+    const name = `المنتجات-${dayKey(Date.now())}.${format}`
     if (format === 'csv') await exportCsv(name, sheet)
     else await exportXlsx(name, [sheet])
   } catch (e) {
-    error.value = e instanceof Error ? e.message : 'فشل mengekspor.'
+    error.value = e instanceof Error ? e.message : 'فشل التصدير.'
   } finally {
     busyExport.value = false
   }
@@ -86,9 +86,9 @@ async function downloadTemplate() {
   busyExport.value = true
   error.value = ''
   try {
-    await exportXlsx('template-produk.xlsx', [buildTemplateSheet()])
+    await exportXlsx('قالب-المنتجات.xlsx', [buildTemplateSheet()])
   } catch (e) {
-    error.value = e instanceof Error ? e.message : 'فشل membuat template.'
+    error.value = e instanceof Error ? e.message : 'فشل إنشاء القالب.'
   } finally {
     busyExport.value = false
   }
@@ -104,7 +104,7 @@ async function chooseFile() {
   if (!file) return
   const name = file.name.toLowerCase()
   if (!ACCEPTED_EXTS.some((ext) => name.endsWith(ext))) {
-    error.value = 'File harus berformat .csv atau .xlsx.'
+    error.value = 'يجب أن يكون الملف بصيغة .csv أو .xlsx.'
     return
   }
   fileName.value = file.name
@@ -112,22 +112,22 @@ async function chooseFile() {
   try {
     const raw = await readTabular(file, isCsvFile(file.name))
     if (!raw.length) {
-      error.value = 'File-nya kosong atau tidak punya baris header.'
+      error.value = 'الملف فارغ أو لا يحتوي على صف عناوين للأعمدة.'
       stage.value = 'idle'
       return
     }
     parsed.value = await parseProductRows(raw)
     if (!parsed.value.rows.length) {
-      error.value = 'Tidak ada baris yang bisa diimpor. Cek kolom "nama".'
+      error.value = 'لا توجد صفوف قابلة للاستيراد. تحقق من عمود «الاسم».'
     }
     stage.value = 'preview'
   } catch (e) {
-    error.value = e instanceof Error ? e.message : 'فشل membaca file.'
+    error.value = e instanceof Error ? e.message : 'تعذرت قراءة الملف.'
     stage.value = 'idle'
   }
 }
 
-async function runاستيرادt() {
+async function runImport() {
   const p = parsed.value
   if (!p || !p.rows.length) return
   stage.value = 'importing'
@@ -141,7 +141,7 @@ async function runاستيرادt() {
     await categories.load()
     stage.value = 'done'
   } catch (e) {
-    error.value = e instanceof Error ? e.message : 'فشل mengimpor.'
+    error.value = e instanceof Error ? e.message : 'فشل الاستيراد.'
     stage.value = 'preview'
   }
 }
@@ -202,18 +202,18 @@ async function runاستيرادt() {
           <div class="rounded-xl border border-border p-3 text-sm">
             <p><b>{{ parsed.rows.length }}</b> baris siap diimpor</p>
             <p v-if="parsed.errors.length" class="mt-1 text-destructive">
-              {{ parsed.errors.length }} baris bermasalah (dilewati)
+              {{ parsed.errors.length }} صفاً به أخطاء (تم تخطيه)
             </p>
             <ul v-if="parsed.errors.length" class="mt-2 max-h-32 space-y-1 overflow-y-auto text-xs text-muted-foreground">
               <li v-for="e in parsed.errors.slice(0, 20)" :key="e.line">
-                Baris {{ e.line }}: {{ e.message }}
+                الصف {{ e.line }}: {{ e.message }}
               </li>
-              <li v-if="parsed.errors.length > 20">…dan {{ parsed.errors.length - 20 }} lainnya</li>
+              <li v-if="parsed.errors.length > 20">…و{{ parsed.errors.length - 20 }} أخطاء أخرى</li>
             </ul>
           </div>
           <div class="flex gap-2">
             <Button variant="outline" class="flex-1" @click="reset">إلغاء</Button>
-            <Button class="flex-1" :disabled="!parsed.rows.length" @click="runاستيرادt">
+            <Button class="flex-1" :disabled="!parsed.rows.length" @click="runImport">
               استيراد {{ parsed.rows.length }} Baris
             </Button>
           </div>
@@ -223,7 +223,7 @@ async function runاستيرادt() {
           <div class="flex items-center gap-3 py-2">
             <Loader2 class="size-5 animate-spin text-muted-foreground" />
             <div class="flex-1">
-              <p class="text-sm">Mengimpor… {{ progress }}%</p>
+              <p class="text-sm">جارٍ الاستيراد… {{ progress }}%</p>
               <div class="mt-1.5 h-1.5 overflow-hidden rounded-full bg-muted">
                 <div class="h-full bg-primary transition-all" :style="{ width: progress + '%' }" />
               </div>
@@ -243,7 +243,7 @@ async function runاستيرادt() {
                 {{ result.createdCategories }} kategori baru dibuat
               </p>
               <p v-if="result.errors.length" class="text-destructive">
-                {{ result.errors.length }} baris gagal disimpan
+                {{ result.errors.length }} صفاً تعذر حفظها
               </p>
             </div>
           </div>
