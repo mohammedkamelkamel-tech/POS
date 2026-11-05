@@ -181,7 +181,7 @@ function lockNow() {
           <CardContent class="space-y-3 p-4">
             <div class="flex items-center gap-3">
               <div class="flex size-11 items-center justify-center rounded-xl bg-primary/15 text-primary">
-                <الخدمات السحابية class="size-5" />
+                <Cloud class="size-5" />
               </div>
               <div class="flex-1">
                 <p class="text-sm font-semibold">الكامل برو</p>
@@ -233,11 +233,11 @@ function lockNow() {
               </div>
             </div>
             <div class="space-y-1.5">
-              <التسمية for="store-name">اسم المتجر</التسمية>
+              <Label for="store-name">اسم المتجر</Label>
               <Input id="store-name" v-model="name" placeholder="الكامل-كاشير" />
             </div>
             <div class="space-y-1.5">
-              <التسمية for="store-owner">المالك</التسمية>
+              <Label for="store-owner">المالك</Label>
               <Input id="store-owner" v-model="owner" placeholder="اسم المالك" />
             </div>
             <Button class="w-full gap-2" :disabled="savingProfile" @click="saveProfile">
