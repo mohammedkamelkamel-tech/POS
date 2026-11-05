@@ -95,7 +95,8 @@ export const useCartStore = defineStore('cart', () => {
   }
 
   function remove(key: string) {
-    lines.value = lines.value.filter((line) => line.cartKey !== key && line.productId !== key)
+    // احذف سطر السلة المحدد فقط؛ قد توجد عدة أوزان/حصص للصنف نفسه.
+    lines.value = lines.value.filter((line) => line.cartKey !== key)
   }
 
   function clear() {
