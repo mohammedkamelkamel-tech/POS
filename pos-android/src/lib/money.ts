@@ -1,34 +1,21 @@
-/**
- * Money is stored as INTEGER minor units (rupiah bulat — no sen).
- * Untuk IDR, 1 unit = Rp 1. Kita tetap simpan sebagai integer supaya
- * konsisten & bebas floating point error di seluruh app.
- */
+/** Money is stored as integer Yemeni rials (no fractional subunit). */
 
-const idr = new Intl.NumberFormat('id-ID', {
-  style: 'currency',
-  currency: 'IDR',
-  minimumFractionDigits: 0,
-  maximumFractionDigits: 0,
-})
+const yer = new Intl.NumberFormat('ar-YE', { style: 'currency', currency: 'YER', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+const plain = new Intl.NumberFormat('ar-YE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
-const plain = new Intl.NumberFormat('id-ID', {
-  minimumFractionDigits: 0,
-  maximumFractionDigits: 0,
-})
-
-/** 26000 -> "Rp 26.000" */
+/** Format an integer amount in Yemeni rials. */
 export function formatRupiah(amount: number): string {
-  return idr.format(Math.round(amount || 0))
+  return yer.format(Math.round(amount || 0));
 }
 
-/** 26000 -> "26.000" (tanpa prefix Rp) */
+/** Amount without currency symbol. */
 export function formatNumber(amount: number): string {
-  return plain.format(Math.round(amount || 0))
+  return plain.format(Math.round(amount || 0));
 }
 
-/** "Rp 26.000" / "26.000" / "26000" -> 26000 */
+/** Accept localized or plain numeric input and return integer rials. */
 export function parseRupiah(input: string): number {
-  if (!input) return 0
-  const digits = input.replace(/[^\d]/g, '')
-  return digits ? parseInt(digits, 10) : 0
+  if (!input) return 0;
+  const digits = input.replace(/[^\\d]/g, '');
+  return digits ? parseInt(digits, 10) : 0;
 }
