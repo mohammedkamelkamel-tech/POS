@@ -217,7 +217,7 @@ async function save() {
 
 async function remove() {
   if (!id.value) return
-  if (!confirm('Hapus produk ini?')) return
+  if (!confirm('هل تريد حذف هذا المنتج؟')) return
   await products.remove(id.value)
   router.push('/products')
 }
@@ -225,7 +225,7 @@ async function remove() {
 
 <template>
   <div>
-    <AppHeader :title="isEdit ? 'Edit Produk' : 'Produk Baru'" back>
+    <AppHeader :title="isEdit ? 'تعديل المنتج' : 'منتج جديد'" back>
       <template #actions>
         <Button v-if="isEdit" variant="ghost" size="icon" @click="remove">
           <Trash2 class="size-5 text-destructive" />
@@ -234,10 +234,10 @@ async function remove() {
     </AppHeader>
 
     <div v-if="!loading" class="space-y-5 p-4 pb-28">
-      <!-- Foto produk -->
+      <!-- صورة المنتج -->
       <div class="flex items-center gap-4">
         <div class="relative flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-border bg-muted">
-          <img v-if="preview" :src="preview" alt="Foto produk" class="size-full object-cover" />
+          <img v-if="preview" :src="preview" alt="صورة المنتج" class="size-full object-cover" />
           <ImageIcon v-else class="size-8 text-muted-foreground" />
           <div v-if="picking" class="absolute inset-0 flex items-center justify-center bg-background/70">
             <Loader2 class="size-6 animate-spin text-muted-foreground" />
@@ -246,7 +246,7 @@ async function remove() {
         <div class="space-y-2">
           <Button type="button" variant="outline" size="sm" class="gap-2" :disabled="picking" @click="choosePhoto">
             <ImagePlus class="size-4" />
-            {{ preview ? 'Ganti Foto' : 'Tambah Foto' }}
+            {{ preview ? 'تغيير الصورة' : 'إضافة صورة' }}
           </Button>
           <button
             v-if="preview"
@@ -261,7 +261,7 @@ async function remove() {
       </div>
 
       <div class="space-y-1.5">
-        <Label for="name">Nama Produk <span class="text-destructive">*</span></Label>
+        <Label for="name">اسم المنتج <span class="text-destructive">*</span></Label>
         <Input id="name" v-model="form.name" placeholder="مثال: لحم بلدي" />
       </div>
 
@@ -272,7 +272,7 @@ async function remove() {
           v-model="form.category_id"
           class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <option :value="null">Tanpa kategori</option>
+          <option :value="null">بدون تصنيف</option>
           <option v-for="c in categories.items" :key="c.id" :value="c.id">
             {{ c.name }}
           </option>
@@ -355,32 +355,32 @@ async function remove() {
       <div class="space-y-3 rounded-xl border border-border p-4">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium">Lacak Stok</p>
-            <p class="text-xs text-muted-foreground">Kurangi stok tiap penjualan</p>
+            <p class="text-sm font-medium">تتبّع المخزون</p>
+            <p class="text-xs text-muted-foreground">خصم الكمية من المخزون عند كل عملية بيع</p>
           </div>
           <Switch v-model="trackStock" />
         </div>
         <div v-if="trackStock" class="space-y-1.5">
-          <Label for="stock">Jumlah Stok</Label>
+          <Label for="stock">كمية المخزون</Label>
           <Input id="stock" v-model.number="form.stock" type="number" inputmode="numeric" />
         </div>
       </div>
 
       <div class="flex items-center justify-between rounded-xl border border-border p-4">
         <div>
-          <p class="text-sm font-medium">Produk Aktif</p>
-          <p class="text-xs text-muted-foreground">Tampil di layar kasir</p>
+          <p class="text-sm font-medium">المنتج نشط</p>
+          <p class="text-xs text-muted-foreground">إظهار المنتج في شاشة الكاشير</p>
         </div>
         <Switch v-model="isActive" />
       </div>
     </div>
 
-    <ScannerSheet v-model:open="scanOpen" title="Scan Barcode Produk" @scan="onScanned" />
+    <ScannerSheet v-model:open="scanOpen" title="مسح باركود المنتج" @scan="onScanned" />
 
     <!-- Save bar -->
     <div class="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-md border-t border-border bg-card p-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:left-64 md:right-0 md:mx-0 md:max-w-none">
       <Button class="w-full" size="lg" :disabled="!canSave || saving" @click="save">
-        {{ saving ? 'Menyimpan…' : isEdit ? 'Simpan Perubahan' : 'Simpan Produk' }}
+        {{ saving ? 'جارٍ الحفظ…' : isEdit ? 'حفظ التعديلات' : 'حفظ المنتج' }}
       </Button>
     </div>
   </div>
