@@ -19,16 +19,16 @@ const emit = defineEmits<{
 type Method = 'cash' | 'qris' | 'transfer'
 const METHODS: Array<{ id: Method; label: string; icon: typeof Banknote }> = [
   { id: 'cash', label: 'نقداً', icon: Banknote },
-  { id: 'qris', label: 'QRIS', icon: QrCode },
+  { id: 'qris', label: 'رمز QR', icon: QrCode },
   { id: 'transfer', label: 'تحويل بنكي', icon: ArrowLeftRight },
 ]
 
 const method = ref<Method>('cash')
 const paid = ref(0)
 
-// QRIS: QR di-generate saat metode QRIS dipilih & QRIS statis sudah di-upload.
+// رمز QR: QR di-generate saat metode رمز QR dipilih & رمز QR statis sudah di-upload.
 // - dinamis aktif → payload di-inject nominal tagihan (scan langsung jumlah pas)
-// - dinamis mati  → tampilkan QRIS statis apa adanya (pembeli ketik nominal)
+// - dinamis mati  → tampilkan رمز QR statis apa adanya (pembeli ketik nominal)
 const qrDataUrl = ref<string | null>(null)
 const qrLoading = ref(false)
 const hasQris = computed(() => !!settings.qrisPayload)
@@ -46,7 +46,7 @@ watch(
   },
 )
 
-// Generate QR dinamis tiap metode QRIS aktif / total berubah / dialog dibuka.
+// Generate QR dinamis tiap metode رمز QR aktif / total berubah / dialog dibuka.
 watch([method, () => props.total, () => props.open], () => {
   if (props.open) void genQr()
 })
@@ -101,13 +101,13 @@ function confirm() {
 <template>
   <BottomSheet :open="open" title="الدفع" @update:open="emit('update:open', $event)">
     <div class="space-y-5 p-5">
-      <!-- Total tagihan -->
+      <!-- إجمالي الفاتورة -->
       <div class="rounded-2xl bg-primary/10 p-4 text-center">
         <p class="text-xs font-medium text-muted-foreground">إجمالي الفاتورة</p>
         <p class="mt-1 text-3xl font-bold text-primary">{{ formatRupiah(total) }}</p>
       </div>
 
-      <!-- Metode -->
+      <!-- طريقة الدفع -->
       <div class="grid grid-cols-3 gap-2">
         <button
           v-for="m in METHODS"
@@ -122,7 +122,7 @@ function confirm() {
         </button>
       </div>
 
-      <!-- Input tunai -->
+      <!-- إدخال المبلغ النقدي -->
       <template v-if="method === 'cash'">
         <div class="space-y-2">
           <p class="text-xs font-medium text-muted-foreground">المبلغ المستلم</p>
@@ -141,11 +141,11 @@ function confirm() {
           </div>
         </div>
       </template>
-      <!-- QRIS: tampilkan QR untuk di-scan (statis apa adanya / dinamis nominal pas) -->
+      <!-- رمز QR: tampilkan QR untuk di-scan (statis apa adanya / dinamis nominal pas) -->
       <div v-else-if="showQris" class="space-y-3 text-center">
         <div class="mx-auto flex size-56 items-center justify-center rounded-2xl border border-border bg-white p-2">
           <Loader2 v-if="qrLoading" class="size-6 animate-spin text-muted-foreground" />
-          <img v-else-if="qrDataUrl" :src="qrDataUrl" alt="QRIS" class="size-full object-contain" />
+          <img v-else-if="qrDataUrl" :src="qrDataUrl" alt="رمز QR" class="size-full object-contain" />
           <span v-else class="px-4 text-xs text-destructive">تعذر إنشاء رمز QR. تحقق من إعدادات رمز QR.</span>
         </div>
         <p v-if="qrisDynamicReady" class="text-xs text-muted-foreground">
@@ -169,7 +169,7 @@ function confirm() {
         </span>
       </div>
 
-      <!-- QRIS: pembeli scan dulu, kasir konfirmasi "تم الدفع" / batal -->
+      <!-- رمز QR: pembeli scan dulu, kasir konfirmasi "تم الدفع" / batal -->
       <div v-if="showQris" class="grid grid-cols-2 gap-2">
         <Button variant="outline" class="h-12 text-base" :disabled="busy" @click="cancel">
           إلغاء
