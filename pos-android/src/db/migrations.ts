@@ -274,7 +274,19 @@ const migrations: Migration[] = [
         );
       }
     },
-  },
+  },,
+  {
+    version: 8,
+    name: 'butcher-sale-quantities',
+    up: async (db) => {
+      await db.execute(`
+        ALTER TABLE sale_items ADD COLUMN quantity_kind TEXT NOT NULL DEFAULT 'unit';
+        ALTER TABLE sale_items ADD COLUMN weight_grams INTEGER;
+        ALTER TABLE sale_items ADD COLUMN portion_quarters INTEGER;
+        ALTER TABLE sale_items ADD COLUMN unit_label TEXT;
+      `)
+    },
+  }
 ]
 
 /** Jalanin migrasi yang belum di-apply, berurutan, tiap satu dalam transaksi. */
