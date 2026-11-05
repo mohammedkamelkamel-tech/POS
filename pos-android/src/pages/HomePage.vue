@@ -6,7 +6,7 @@ import {
   Package,
   Receipt,
   Wallet,
-  Printer,
+  الطابعة,
   UserCog,
   Store,
   CalendarClock,
@@ -28,12 +28,12 @@ onMounted(() => {
 
 const menu = [
   { to: '/pos', label: 'الكاشير', desc: 'بدء عملية بيع', icon: ShoppingCart },
-  { to: '/products', label: 'Produk', desc: 'إدارة المنتجات', icon: Package },
-  { to: '/transactions', label: 'Transaksi', desc: 'سجل المبيعات', icon: Receipt },
-  { to: '/cashflow', label: 'الحركة المالية', desc: 'الإيرادات والمصروفات', icon: Wallet },
-  { to: '/reports', label: 'Laporan', desc: 'ملخص المبيعات والرسوم البيانية', icon: BarChart3 },
-  { to: '/cashier', label: 'Sesi Kasir', desc: 'فتح وإغلاق جلسة الكاشير', icon: CalendarClock },
-  { to: '/printer', label: 'Printer', desc: 'طباعة الفاتورة', icon: Printer },
+  { to: '/products', label: 'المنتجات', desc: 'إدارة المنتجات', icon: Package },
+  { to: '/transactions', label: 'المبيعات', desc: 'سجل المبيعات', icon: Receipt },
+  { to: '/الحركة المالية', label: 'الحركة المالية', desc: 'الإيرادات والمصروفات', icon: Wallet },
+  { to: '/reports', label: 'التقارير', desc: 'ملخص المبيعات والرسوم البيانية', icon: BarChart3 },
+  { to: '/cashier', label: 'جلسة الكاشير', desc: 'فتح وإغلاق جلسة الكاشير', icon: CalendarClock },
+  { to: '/printer', label: 'الطابعة', desc: 'طباعة الفاتورة', icon: الطابعة },
   { to: '/settings', label: 'الحساب والإعدادات', desc: 'تسجيل الدخول والرقم السري وبيانات المتجر', icon: UserCog },
 ]
 </script>
