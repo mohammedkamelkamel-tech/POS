@@ -27,14 +27,14 @@ onMounted(() => {
 })
 
 const menu = [
-  { to: '/pos', label: 'Point of Sale', desc: 'Mulai transaksi', icon: ShoppingCart },
-  { to: '/products', label: 'Produk', desc: 'Kelola barang', icon: Package },
-  { to: '/transactions', label: 'Transaksi', desc: 'Riwayat penjualan', icon: Receipt },
-  { to: '/cashflow', label: 'Cashflow', desc: 'Pemasukan & pengeluaran', icon: Wallet },
-  { to: '/reports', label: 'Laporan', desc: 'Ringkasan & grafik', icon: BarChart3 },
-  { to: '/cashier', label: 'Sesi Kasir', desc: 'Buka/tutup kasir', icon: CalendarClock },
-  { to: '/printer', label: 'Printer', desc: 'Cetak struk', icon: Printer },
-  { to: '/settings', label: 'Akun & Setelan', desc: 'Login, PIN, toko', icon: UserCog },
+  { to: '/pos', label: 'الكاشير', desc: 'بدء عملية بيع', icon: ShoppingCart },
+  { to: '/products', label: 'Produk', desc: 'إدارة المنتجات', icon: Package },
+  { to: '/transactions', label: 'Transaksi', desc: 'سجل المبيعات', icon: Receipt },
+  { to: '/cashflow', label: 'الحركة المالية', desc: 'الإيرادات والمصروفات', icon: Wallet },
+  { to: '/reports', label: 'Laporan', desc: 'ملخص المبيعات والرسوم البيانية', icon: BarChart3 },
+  { to: '/cashier', label: 'Sesi Kasir', desc: 'فتح وإغلاق جلسة الكاشير', icon: CalendarClock },
+  { to: '/printer', label: 'Printer', desc: 'طباعة الفاتورة', icon: Printer },
+  { to: '/settings', label: 'الحساب والإعدادات', desc: 'تسجيل الدخول والرقم السري وبيانات المتجر', icon: UserCog },
 ]
 </script>
 
@@ -51,7 +51,7 @@ const menu = [
           <img
             v-if="media.url(storeLogo)"
             :src="media.url(storeLogo)!"
-            alt="Logo toko"
+            alt="شعار المتجر"
             class="size-full object-contain p-1"
           />
           <Store v-else class="size-6" />
@@ -59,7 +59,7 @@ const menu = [
         <div class="min-w-0">
           <p class="truncate text-lg font-bold leading-tight">{{ storeName }}</p>
           <p class="truncate text-sm text-hero-foreground/70">
-            {{ storeOwner || 'Belum ada nama pemilik' }}
+            {{ storeOwner || 'لم يُحدد اسم المالك' }}
           </p>
         </div>
       </div>
@@ -75,9 +75,9 @@ const menu = [
           <Cloud class="size-5" />
         </div>
         <div class="min-w-0 flex-1">
-          <p class="text-sm font-semibold">Sambungkan ke POS Pro</p>
+          <p class="text-sm font-semibold">ربط مع الكامل برو</p>
           <p class="truncate text-xs text-hero-foreground/70">
-            Login online & sinkronkan data ke cloud
+            تسجيل الدخول ومزامنة البيانات سحابياً
           </p>
         </div>
         <ChevronRight
@@ -91,7 +91,7 @@ const menu = [
       <p
         class="mb-3 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground"
       >
-        Menu Utama
+        القائمة الرئيسية
       </p>
       <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         <RouterLink
