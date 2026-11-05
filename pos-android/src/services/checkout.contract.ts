@@ -15,6 +15,8 @@ export interface PaymentInput {
   readonly lines: readonly CheckoutLine[]
   readonly paid: number
   readonly paymentMethod: string
+  readonly paymentBank?: string | null
+  readonly paymentProofPath?: string | null
   readonly discount?: number
   readonly sessionId?: string | null
 }
@@ -130,7 +132,7 @@ export function saleAmounts(
       line.productId.trim().length === 0 ||
       !Number.isSafeInteger(line.price * line.qty) ||
       (line.quantityKind === 'weight' && (!Number.isSafeInteger(line.weightGrams) || (line.weightGrams ?? 0) <= 0)) ||
-      (line.quantityKind === 'meal' && ![1, 2, 4, 6, 8].includes(line.portionQuarters ?? 0))
+      (line.quantityKind === 'meal' && (!Number.isSafeInteger(line.portionQuarters) || (line.portionQuarters ?? 0) < 1 || (line.portionQuarters ?? 0) > 40))
     ) {
       throw new CheckoutError({ kind: 'invalid-input', reason: 'Baris keranjang tidak valid' })
     }
@@ -154,7 +156,7 @@ export function assertPayment(input: PaymentInput): void {
   if (!Number.isSafeInteger(input.paid) || input.paid < 0) {
     throw new CheckoutError({ kind: 'invalid-input', reason: 'Nominal pembayaran tidak valid' })
   }
-  if (input.paymentMethod.trim().length === 0) {
+  if (input.paymentMethod === 'transfer' && (!input.paymentBank?.trim() || !input.paymentProofPath?.startsWith('media://'))) {\n    throw new CheckoutError({ kind: 'invalid-input', reason: 'حدد البنك وأرفق صورة إشعار التحويل' })\n  }\n  if (input.paymentMethod.trim().length === 0) {
     throw new CheckoutError({ kind: 'invalid-input', reason: 'Metode pembayaran wajib diisi' })
   }
 }
