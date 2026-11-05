@@ -148,7 +148,7 @@ watch(
 )
 
 /**
- * Pasang tipe yang disarankan — HARUS lewat tap user.
+ * مطابقang tipe yang disarankan — HARUS lewat tap user.
  *
  * Sengaja gak otomatis: menebak sendiri saat barcode diketik manual bakal
  * (a) menimpa tipe yang user pilih sadar-sadar, dan (b) menyembunyikan typo —
@@ -253,7 +253,7 @@ async function remove() {
             class="block text-xs text-destructive"
             @click="removePhoto"
           >
-            Hapus foto
+            حذف الصورة
           </button>
           <p v-else class="text-xs text-muted-foreground">صور JPG أو PNG — يتم تصغيرها تلقائياً.</p>
         </div>
@@ -302,7 +302,7 @@ async function remove() {
             v-model="form.barcode as string"
             class="flex-1"
             inputmode="numeric"
-            placeholder="opsional"
+            placeholder="اختياري"
           />
           <Button
             v-if="scannerReady"
@@ -346,7 +346,7 @@ async function remove() {
         </p>
         <!-- Check digit ditambah otomatis → angka di gambar beda dari yang diketik. -->
         <p v-if="barcodeAutoCheckDigit" class="text-xs text-warning">
-          Tergambar sebagai <strong>{{ barcodeRendered }}</strong> — check digit ditambah
+          سيظهر الرمز بالشكل <strong>{{ barcodeRendered }}</strong> — تمت إضافة رقم التحقق
           otomatis.
         </p>
       </div>
