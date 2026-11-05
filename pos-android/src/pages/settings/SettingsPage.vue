@@ -222,12 +222,12 @@ function lockNow() {
           <CardContent class="space-y-4 p-4">
             <!-- شعار المتجر -->
             <div class="flex items-center gap-4">
-              <div class="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-primary/10 text-primary">
+              <div class="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-border bg-white p-2 text-primary">
                 <img
                   v-if="media.url(storeLogo)"
                   :src="media.url(storeLogo)!"
                   alt="شعار المتجر"
-                  class="size-full object-contain p-1"
+                  class="max-h-full max-w-full object-contain"
                 />
                 <Store v-else class="size-6" />
               </div>
