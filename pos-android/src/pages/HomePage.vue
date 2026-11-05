@@ -14,9 +14,13 @@ import {
   MessageCircle,
 } from 'lucide-vue-next'
 import { storeToRefs } from 'pinia'
+import { computed } from 'vue'
+import { useAuthStore } from '@/stores/auth'
 import { useSettingsStore } from '@/stores/settings'
 
 const settings = useSettingsStore()
+const auth = useAuthStore()
+const visibleMenu = computed(() => auth.isOwner ? menu : menu.filter(item => item.to === '/pos'))
 const { storeName, storeOwner } = storeToRefs(settings)
 
 const menu = [
@@ -57,6 +61,7 @@ const menu = [
 
       <!-- لافتة الربط مع الكامل برو -->
       <RouterLink
+        v-if="auth.isOwner"
         to="/settings"
         class="group mt-5 flex items-center gap-3 rounded-2xl bg-white/12 p-3.5 backdrop-blur transition hover:bg-white/[.18]"
       >
@@ -86,7 +91,7 @@ const menu = [
       </p>
       <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         <RouterLink
-          v-for="item in menu"
+          v-for="item in visibleMenu"
           :key="item.to"
           :to="item.to"
           class="group flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-sm transition hover:border-primary/40 hover:shadow-md active:scale-[.98]"
