@@ -495,6 +495,27 @@ function newTransaction() {
       </div>
     </Transition>
 
+    <BottomSheet v-model:open="butcherDialogOpen" :title="butcherProduct?.name ?? 'تفاصيل الصنف'">
+      <div v-if="butcherProduct" class="space-y-4 p-5">
+        <template v-if="isWeightProduct">
+          <p class="text-sm text-muted-foreground">سعر الكيلو: {{ formatRupiah(butcherProduct.price) }}</p>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="space-y-1 text-sm">كيلو<Input v-model="weightKg" type="number" min="0" /></label>
+            <label class="space-y-1 text-sm">جرام<Input v-model="weightG" type="number" min="0" max="999" /></label>
+          </div>
+        </template>
+        <template v-else>
+          <p class="text-sm text-muted-foreground">سعر النفر الكامل: {{ formatRupiah(butcherProduct.price) }}</p>
+          <div class="grid grid-cols-2 gap-2">
+            <button v-for="portion in MEAL_PORTIONS" :key="portion.units" type="button" class="rounded-xl border p-3 text-sm" :class="mealPortion === portion.units ? 'border-primary bg-primary/10' : 'border-border'" @click="mealPortion = portion.units">{{ portion.label }}</button>
+          </div>
+        </template>
+        <p class="text-lg font-bold">الإجمالي: {{ formatRupiah(butcherPrice) }}</p>
+        <p v-if="butcherError" class="text-sm text-destructive">{{ butcherError }}</p>
+        <Button class="w-full" :disabled="butcherPrice <= 0" @click="addButcherProduct">إضافة إلى الفاتورة</Button>
+      </div>
+    </BottomSheet>
+
     <CartSheet
       v-model:open="showCart"
       @hold="openHoldForm"
