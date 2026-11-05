@@ -6,7 +6,7 @@ import PinPad from '@/components/common/PinPad.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useSettingsStore } from '@/stores/settings'
 import { useMediaStore } from '@/stores/media'
-import { ShieldCheck, Fingerprint } from 'lucide-vue-next'
+import { ShieldCheck } from 'lucide-vue-next'
 import { deviceBiometric } from '@/services/auth/deviceBiometric'
 
 const route = useRoute()
