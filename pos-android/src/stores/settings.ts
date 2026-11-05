@@ -22,7 +22,7 @@ const KEYS = {
 
 export const useSettingsStore = defineStore('settings', () => {
   const loaded = ref(false)
-  const storeName = ref('POS Kacaw')
+  const storeName = ref('الكامل-كاشير')
   const storeOwner = ref('')
   const storeLogo = ref<string | null>(null) // ref media://<id>
   const loginEnabled = ref(false) // DEFAULT: tanpa login
