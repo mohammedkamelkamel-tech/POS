@@ -10,14 +10,14 @@ import { Button } from '@/components/ui/button'
 import {
   Wallet, Plus, Tag, ArrowDownLeft, ArrowUpRight, Lock, Download,
 } from 'lucide-vue-next'
-import { useالحركة الماليةStore } from '@/stores/cashflow'
+import { useCashflowStore } from '@/stores/cashflow'
 import { formatRupiah } from '@/lib/money'
 import { formatTime, formatDate, dayKey } from '@/lib/datetime'
 import { rangeLabel } from '@/lib/dateRange'
-import type { الحركة الماليةEntry } from '@/db/types'
+import type { CashflowEntry } from '@/db/types'
 
 const router = useRouter()
-const cashflow = useالحركة الماليةStore()
+const cashflow = useCashflowStore()
 const { entries, summary, byCategory, range } = storeToRefs(cashflow)
 
 const label = computed(() => rangeLabel(range.value))
@@ -26,7 +26,7 @@ const exportOpen = ref(false)
 
 // Kelompokkan entri per hari.
 const groups = computed(() => {
-  const map = new Map<string, الحركة الماليةEntry[]>()
+  const map = new Map<string, CashflowEntry[]>()
   for (const e of entries.value) {
     const k = dayKey(e.occurred_at)
     if (!map.has(k)) map.set(k, [])
@@ -42,7 +42,7 @@ const groups = computed(() => {
 
 onMounted(() => cashflow.load())
 
-function openEntry(e: الحركة الماليةEntry) {
+function openEntry(e: CashflowEntry) {
   if (e.source !== 'manual') return // entri dari penjualan terkunci
   router.push(`/cashflow/${e.id}/edit`)
 }
