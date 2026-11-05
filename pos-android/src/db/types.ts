@@ -88,6 +88,8 @@ export interface Sale extends SyncEntity {
   paid: number
   change_due: number
   payment_method: string
+  payment_bank: string | null
+  payment_proof_path: string | null
   status: 'open' | 'completed' | 'void'
   open_bill_label: string | null
   opened_at: number | null
