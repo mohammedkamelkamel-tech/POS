@@ -1,4 +1,5 @@
 import type { ExportSheet } from './xlsx'
+export type { ExportSheet } from './xlsx'
 
 function escapeHtml(value: unknown): string {
   return String(value ?? '').replace(/[&<>"']/g, (char) => ({
