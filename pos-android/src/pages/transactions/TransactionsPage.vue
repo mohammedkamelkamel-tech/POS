@@ -56,11 +56,11 @@ onMounted(() => sales.load())
 
 <template>
   <div>
-    <AppHeader title="Transaksi" :subtitle="`${label}: ${summary.count} transaksi`">
+    <AppHeader title="الفواتير" :subtitle="`${label}: ${summary.count} فاتورة`">
       <template #actions>
         <button
           class="flex size-9 items-center justify-center rounded-full text-foreground hover:bg-accent"
-          aria-label="Export Excel"
+          aria-label="تصدير الفواتير"
           @click="exportOpen = true"
         >
           <Download class="size-5" />
@@ -78,7 +78,7 @@ onMounted(() => sales.load())
     <div class="border-b border-border bg-gradient-to-br from-hero to-hero/90 px-5 py-5 text-hero-foreground">
       <p class="text-xs opacity-80">المبيعات · {{ label }}</p>
       <p class="mt-1 text-2xl font-bold">{{ formatRupiah(summary.total) }}</p>
-      <p class="mt-0.5 text-xs opacity-80">{{ summary.count }} transaksi</p>
+      <p class="mt-0.5 text-xs opacity-80">{{ summary.count }} فاتورة</p>
     </div>
 
     <template v-if="visibleSales.length">
@@ -123,13 +123,13 @@ onMounted(() => sales.load())
       v-else
       :icon="Receipt"
       title="لا توجد فواتير"
-      :description="`لا توجد فواتير pada rentang ${label.toLowerCase()}. جرّب تغيير نطاق التاريخ.`"
+      :description="`لا توجد فواتير خلال الفترة ${label.toLowerCase()}. جرّب تغيير نطاق التاريخ.`"
     />
 
     <ExportDialog
       v-model:open="exportOpen"
       title="تصدير الفواتير"
-      filename-base="transaksi"
+      filename-base="الفواتير"
       :initial-range="range"
       :build-sheets="sales.buildExport"
     />
