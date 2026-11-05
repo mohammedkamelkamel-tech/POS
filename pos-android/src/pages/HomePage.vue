@@ -53,9 +53,14 @@ const menu = [
             v-if="media.url(storeLogo)"
             :src="media.url(storeLogo)!"
             alt="شعار المتجر"
-            class="size-full object-contain p-1.5"
+            class="size-full object-contain p-1"
           />
-          <Store v-else class="size-6" />
+          <img
+            v-else
+            src="/alkamel-cashier-logo.jpg"
+            alt="شعار الكامل-كاشير"
+            class="size-full object-contain"
+          />
         </div>
         <div class="min-w-0">
           <p class="truncate text-lg font-bold leading-tight">{{ storeName }}</p>
