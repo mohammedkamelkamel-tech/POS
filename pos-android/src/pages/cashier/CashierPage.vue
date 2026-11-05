@@ -89,7 +89,7 @@ function diffLabel(d: number | null): string {
               <div class="flex-1">
                 <p class="text-sm font-semibold">جلسة الكاشير مفتوحة</p>
                 <p class="text-xs text-muted-foreground">
-                  Dibuka {{ formatDateTime(current.opened_at) }}
+                  فُتحت في {{ formatDateTime(current.opened_at) }}
                 </p>
               </div>
               <Badge class="bg-success">نشطة</Badge>
@@ -149,7 +149,7 @@ function diffLabel(d: number | null): string {
               <MoneyInput id="opening-cash" v-model="openingCash" class="h-11 text-base font-semibold" />
             </div>
             <div class="space-y-1.5">
-              <Label for="open-note">Catatan (اختياري)</Label>
+              <Label for="open-note">ملاحظات (اختياري)</Label>
               <Input id="open-note" v-model="openNote" placeholder="مثال: الوردية الصباحية" />
             </div>
 
@@ -256,13 +256,13 @@ function diffLabel(d: number | null): string {
         </div>
 
         <div class="space-y-1.5">
-          <Label for="close-note">Catatan (اختياري)</Label>
+          <Label for="close-note">ملاحظات (اختياري)</Label>
           <Input id="close-note" v-model="closeNote" placeholder="مثال: فرق بسبب الباقي" />
         </div>
 
         <Button class="h-12 w-full gap-2 text-base" variant="destructive" :disabled="closing" @click="closeSession">
           <DoorClosed class="size-4" />
-          {{ closing ? 'جارٍ الإغلاق…' : 'أُغلقت الساعة Sesi' }}
+          {{ closing ? 'جارٍ الإغلاق…' : 'إغلاق الجلسة' }}
         </Button>
       </div>
     </BottomSheet>
