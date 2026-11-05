@@ -119,15 +119,15 @@ async function testPrint() {
           <CardContent class="space-y-1 p-4">
             <p class="text-sm font-semibold">لم يتم تفعيل خدمة الطباعة</p>
             <p class="text-xs text-muted-foreground">
-              Layer software (encoder ESC/POS + pemilihan device) sudah siap. Plugin
+              طبقة البرنامج (ومشفّر ESC/POS واختيار الجهاز) جاهزان. Plugin
               koneksi Bluetooth/USB akan diaktifkan pada update berikutnya — setelah
-              itu tombol pindai & cetak di sini langsung berfungsi tanpa ubah alur.
+              ستعمل أزرار البحث والطباعة مباشرة دون تغيير طريقة الاستخدام.
             </p>
           </CardContent>
         </Card>
 
         <template v-else>
-          <!-- Pilih koneksi + pindai -->
+          <!-- اختر نوع الاتصال ثم ابحث عن الطابعة -->
           <div class="flex gap-2">
             <Button
               v-for="c in supportedConnections"
@@ -149,7 +149,7 @@ async function testPrint() {
 
           <p v-if="error" class="px-1 text-xs text-destructive">{{ error }}</p>
 
-          <!-- Hasil pindai -->
+          <!-- الطابعات المتاحة -->
           <div v-if="devices.length" class="overflow-hidden rounded-xl border border-border">
             <button
               v-for="d in devices"
@@ -167,7 +167,7 @@ async function testPrint() {
             </button>
           </div>
 
-          <!-- Printer terpilih -->
+          <!-- الطابعة المحددة -->
           <Card v-if="selected">
             <CardContent class="flex items-center gap-3 p-4">
               <component :is="CONN_META[connection ?? 'bluetooth'].icon" class="size-5 text-primary" />
@@ -200,16 +200,16 @@ async function testPrint() {
         </template>
       </template>
 
-      <!-- Test print -->
+      <!-- اختبار الطباعة -->
       <Button class="w-full" size="lg" :disabled="!canPrint || printing" @click="testPrint">
         <Loader2 v-if="printing" class="mr-1.5 size-4 animate-spin" />
-        اختبار الطباعة Struk
+        اختبار الطباعة الإيصال
       </Button>
       <p v-if="message" class="px-1 text-center text-xs text-muted-foreground">{{ message }}</p>
 
       <p v-if="!isNative" class="px-1 text-xs text-muted-foreground">
-        Di Android, printer thermal (Bluetooth/USB) akan tampil di sini untuk
-        dipindai & dipilih. Di web, cetak memakai dialog browser sebagai preview.
+        على أجهزة أندرويد ستظهر الطابعات الحرارية (بلوتوث أو USB) هنا للبحث عنها واختيارها.
+        أما في نسخة الويب فتُعرض الفاتورة عبر نافذة الطباعة في المتصفح.
       </p>
     </div>
   </div>
