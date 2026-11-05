@@ -25,7 +25,7 @@ export const BARCODE_TYPES: BarcodeTypeDef[] = [
   { value: 'ITF14', label: 'ITF-14', hint: '14 digit angka' },
 ]
 
-export const DEFAULT_BARCODE_TYPE = 'EAN13'
+export const DEFAULT_BARCODE_TYPE = 'CODE128'
 
 const VALID_TYPES = new Set(BARCODE_TYPES.map((t) => t.value))
 
