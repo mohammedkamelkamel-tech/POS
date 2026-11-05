@@ -12,15 +12,15 @@ import {
 } from 'lucide-vue-next'
 import { useReportsStore, type ReportSource } from '@/stores/reports'
 import { useSalesStore } from '@/stores/sales'
-import { useالحركة الماليةStore } from '@/stores/cashflow'
+import { useCashflowStore } from '@/stores/cashflow'
 import { formatRupiah } from '@/lib/money'
 import { formatDate, nowMs } from '@/lib/datetime'
 import { rangeLabel } from '@/lib/dateRange'
 
 const reports = useReportsStore()
 const sales = useSalesStore()
-const cashflow = useالحركة الماليةStore()
-const { source, range, todaySalesSummary, todayالحركة المالية, chart, hasChartData } =
+const cashflow = useCashflowStore()
+const { source, range, todaySalesSummary, todayCashflow, chart, hasChartData } =
   storeToRefs(reports)
 
 const todayLabel = computed(() => formatDate(nowMs()))
@@ -124,7 +124,7 @@ onMounted(() => reports.load())
             <ArrowDownLeft class="size-3.5 text-success" /> الإيرادات
           </div>
           <p class="mt-1 text-lg font-bold text-success">
-            {{ formatRupiah(todayالحركة المالية.income) }}
+            {{ formatRupiah(todayCashflow.income) }}
           </p>
         </div>
         <div class="rounded-2xl border border-border bg-card p-4">
@@ -132,7 +132,7 @@ onMounted(() => reports.load())
             <ArrowUpRight class="size-3.5 text-destructive" /> المصروفات
           </div>
           <p class="mt-1 text-lg font-bold text-destructive">
-            {{ formatRupiah(todayالحركة المالية.expense) }}
+            {{ formatRupiah(todayCashflow.expense) }}
           </p>
         </div>
       </div>
