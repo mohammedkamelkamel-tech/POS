@@ -286,6 +286,16 @@ const migrations: Migration[] = [
         ALTER TABLE sale_items ADD COLUMN unit_label TEXT;
       `)
     },
+  },
+  {
+    version: 9,
+    name: 'sale-bank-transfer-details',
+    up: async (db) => {
+      await db.execute(`
+        ALTER TABLE sales ADD COLUMN payment_bank TEXT;
+        ALTER TABLE sales ADD COLUMN payment_proof_path TEXT;
+      `)
+    },
   }
 ]
 
