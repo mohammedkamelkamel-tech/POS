@@ -7,13 +7,16 @@ import { Banknote, QrCode, ArrowLeftRight, Loader2 } from 'lucide-vue-next'
 import { formatRupiah } from '@/lib/money'
 import { useSettingsStore } from '@/stores/settings'
 import { makeDynamicPayload, encodeQrToDataUrl } from '@/lib/qris'
+import { pickImage, downscale } from '@/lib/image'
+import { useMediaStore } from '@/stores/media'
 
 const settings = useSettingsStore()
+const media = useMediaStore()
 
 const props = defineProps<{ open: boolean; total: number; busy?: boolean }>()
 const emit = defineEmits<{
   'update:open': [value: boolean]
-  confirm: [payload: { paid: number; paymentMethod: string }]
+  confirm: [payload: { paid: number; paymentMethod: string; paymentBank?: string; paymentProofPath?: string }]
 }>()
 
 type Method = 'cash' | 'qris' | 'transfer'
@@ -25,6 +28,11 @@ const METHODS: Array<{ id: Method; label: string; icon: typeof Banknote }> = [
 
 const method = ref<Method>('cash')
 const paid = ref(0)
+const paymentBank = ref('')
+const paymentProofPath = ref('')
+const paymentProofPreview = ref<string | null>(null)
+const proofBusy = ref(false)
+const banks = ['بنك الكريمي', 'بنك التسليف التعاوني والزراعي (كاك بنك)', 'بنك التضامن', 'بنك اليمن والكويت', 'البنك اليمني للإنشاء والتعمير', 'بنك الأمل', 'بنك آخر']
 
 // رمز QR: QR di-generate saat metode رمز QR dipilih & رمز QR statis sudah di-upload.
 // - dinamis aktif → payload di-inject nominal tagihan (scan langsung jumlah pas)
@@ -42,6 +50,9 @@ watch(
     if (v) {
       method.value = 'cash'
       paid.value = 0
+      paymentBank.value = ''
+      paymentProofPath.value = ''
+      paymentProofPreview.value = null
     }
   },
 )
@@ -89,12 +100,23 @@ const quickAmounts = computed(() => {
 const effectivePaid = computed(() => (method.value === 'cash' ? paid.value : props.total))
 const change = computed(() => Math.max(0, effectivePaid.value - props.total))
 const canConfirm = computed(
-  () => !props.busy && (method.value !== 'cash' || paid.value >= props.total),
+  () => !props.busy && (method.value !== 'cash' || paid.value >= props.total) && (method.value !== 'transfer' || (!!paymentBank.value && !!paymentProofPath.value && !proofBusy.value)),
 )
+
+async function chooseTransferProof() {
+  const selected = await pickImage()
+  if (!selected) return
+  proofBusy.value = true
+  try {
+    const image = await downscale(selected, { maxDim: 1200, quality: 0.78 })
+    paymentProofPath.value = await media.save(image)
+    paymentProofPreview.value = media.url(paymentProofPath.value)
+  } finally { proofBusy.value = false }
+}
 
 function confirm() {
   if (!canConfirm.value) return
-  emit('confirm', { paid: effectivePaid.value, paymentMethod: method.value })
+  emit('confirm', { paid: effectivePaid.value, paymentMethod: method.value, ...(method.value === 'transfer' ? { paymentBank: paymentBank.value, paymentProofPath: paymentProofPath.value } : {}) })
 }
 </script>
 
@@ -139,6 +161,22 @@ function confirm() {
               {{ amt === total ? 'المبلغ بالكامل' : formatRupiah(amt) }}
             </button>
           </div>
+        </div>
+      </template>
+      <template v-else-if="method === 'transfer'">
+        <div class="space-y-3 rounded-xl border border-border p-3">
+          <label class="block space-y-1.5 text-sm font-medium">البنك الذي تم التحويل إليه
+            <select v-model="paymentBank" class="h-12 w-full rounded-xl border border-border bg-background px-3 text-sm">
+              <option value="" disabled>اختر البنك</option>
+              <option v-for="bank in banks" :key="bank" :value="bank">{{ bank }}</option>
+            </select>
+          </label>
+          <div class="space-y-2">
+            <p class="text-sm font-medium">صورة إشعار التحويل</p>
+            <img v-if="paymentProofPreview" :src="paymentProofPreview" alt="إشعار التحويل" class="max-h-44 w-full rounded-lg border border-border object-contain" />
+            <Button type="button" variant="outline" class="w-full gap-2" :disabled="proofBusy" @click="chooseTransferProof">{{ proofBusy ? 'جارٍ تجهيز الصورة…' : paymentProofPath ? 'تغيير صورة الإشعار' : 'تصوير أو اختيار إشعار التحويل' }}</Button>
+          </div>
+          <p class="text-xs text-muted-foreground">لن يكتمل تسجيل التحويل حتى تحدد البنك وترفق صورة الإشعار.</p>
         </div>
       </template>
       <!-- رمز QR: tampilkan QR untuk di-scan (statis apa adanya / dinamis nominal pas) -->
