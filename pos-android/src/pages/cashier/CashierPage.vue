@@ -92,12 +92,12 @@ function diffLabel(d: number | null): string {
                   Dibuka {{ formatDateTime(current.opened_at) }}
                 </p>
               </div>
-              <Badge class="bg-success">Aktif</Badge>
+              <Badge class="bg-success">نشطة</Badge>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
               <div class="rounded-xl bg-background p-3">
-                <p class="text-xs text-muted-foreground">Modal awal</p>
+                <p class="text-xs text-muted-foreground">الرصيد الافتتاحي</p>
                 <p class="mt-0.5 text-sm font-bold">{{ formatRupiah(summary.openingCash) }}</p>
               </div>
               <div class="rounded-xl bg-background p-3">
@@ -114,7 +114,7 @@ function diffLabel(d: number | null): string {
                 </p>
               </div>
               <div class="rounded-xl bg-success/10 p-3">
-                <p class="text-xs text-success">Perkiraan di laci</p>
+                <p class="text-xs text-success">الرصيد المتوقع في الدرج</p>
                 <p class="mt-0.5 text-sm font-bold text-success">
                   {{ formatRupiah(summary.expectedCash) }}
                 </p>
@@ -145,7 +145,7 @@ function diffLabel(d: number | null): string {
             </div>
 
             <div class="space-y-1.5">
-              <Label for="opening-cash">Modal awal (uang di laci)</Label>
+              <Label for="opening-cash">الرصيد الافتتاحي (uang di laci)</Label>
               <MoneyInput id="opening-cash" v-model="openingCash" class="h-11 text-base font-semibold" />
             </div>
             <div class="space-y-1.5">
@@ -189,7 +189,7 @@ function diffLabel(d: number | null): string {
               </p>
             </div>
             <div class="text-right">
-              <Badge v-if="s.status === 'open'" class="bg-success">Aktif</Badge>
+              <Badge v-if="s.status === 'open'" class="bg-success">نشطة</Badge>
               <template v-else>
                 <p class="text-sm font-semibold">{{ formatRupiah(s.counted_cash ?? 0) }}</p>
                 <p
@@ -218,7 +218,7 @@ function diffLabel(d: number | null): string {
         <!-- Rincian expected -->
         <div class="space-y-1.5 rounded-2xl bg-muted/50 p-4 text-sm">
           <div class="flex justify-between">
-            <span class="text-muted-foreground">Modal awal</span>
+            <span class="text-muted-foreground">الرصيد الافتتاحي</span>
             <span>{{ formatRupiah(summary.openingCash) }}</span>
           </div>
           <div class="flex justify-between">
@@ -234,7 +234,7 @@ function diffLabel(d: number | null): string {
             <span>{{ formatRupiah(summary.manualOut) }}</span>
           </div>
           <div class="flex justify-between border-t border-border pt-1.5 font-semibold">
-            <span>Perkiraan di laci</span>
+            <span>الرصيد المتوقع في الدرج</span>
             <span>{{ formatRupiah(summary.expectedCash) }}</span>
           </div>
         </div>
