@@ -20,7 +20,7 @@ import {
   buildProductSheet,
   buildTemplateSheet,
   parseProductRows,
-  type استيرادtResult,
+  type ImportResult,
   type ParseResult,
 } from '@/services/products/productIo'
 
@@ -36,7 +36,7 @@ const busyExport = ref(false)
 const error = ref('')
 const fileName = ref('')
 const parsed = ref<ParseResult | null>(null)
-const result = ref<استيرادtResult | null>(null)
+const result = ref<ImportResult | null>(null)
 const progress = ref(0)
 
 watch(
@@ -134,7 +134,7 @@ async function runImport() {
   progress.value = 0
   error.value = ''
   try {
-    result.value = await products.bulkاستيرادt(p.rows, (done, total) => {
+    result.value = await products.bulkImport(p.rows, (done, total) => {
       progress.value = total ? Math.round((done / total) * 100) : 100
     })
     // استيراد bisa bikin kategori baru → daftar kategori di halaman ikut segar.
