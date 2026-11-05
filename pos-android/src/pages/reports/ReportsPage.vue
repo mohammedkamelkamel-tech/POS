@@ -15,7 +15,7 @@ import { useSalesStore } from '@/stores/sales'
 import { useCashflowStore } from '@/stores/الحركة المالية'
 import { formatRupiah } from '@/lib/money'
 import { formatDate, nowMs } from '@/lib/datetime'
-import { rangeLabel } from '@/lib/dateRange'
+import { rangeالتسمية } from '@/lib/dateRange'
 
 const reports = useReportsStore()
 const sales = useSalesStore()
@@ -23,8 +23,8 @@ const الحركة المالية = useCashflowStore()
 const { source, range, todaySalesSummary, todayCashflow, chart, hasChartData } =
   storeToRefs(reports)
 
-const todayLabel = computed(() => formatDate(nowMs()))
-const trendLabel = computed(() => rangeLabel(range.value))
+const todayالتسمية = computed(() => formatDate(nowMs()))
+const trendالتسمية = computed(() => rangeالتسمية(range.value))
 
 const SOURCES: { key: ReportSource; label: string }[] = [
   { key: 'sales', label: 'المبيعات' },
@@ -50,11 +50,11 @@ const chartOptions = computed<ApexOptions>(() => {
     // Charcoal (brand) untuk المبيعات; hijau/merah untuk pemasukan/pengeluaran.
     colors: source.value === 'sales' ? [dark ? '#a1a1aa' : '#3f4756'] : ['#3f9c5a', '#e5484d'],
     plotOptions: { bar: { borderRadius: 4, columnWidth: '58%' } },
-    dataLabels: { enabled: false },
+    dataالتسميةs: { enabled: false },
     grid: { borderColor: dark ? '#27272a' : '#e5e7eb', strokeDashArray: 4 },
     xaxis: {
       categories: chart.value.categories,
-      labels: { style: { fontSize: '10px' }, rotate: 0, hideOverlappingLabels: true },
+      labels: { style: { fontSize: '10px' }, rotate: 0, hideOverlappingالتسميةs: true },
       axisBorder: { show: false },
       axisTicks: { show: false },
     },
@@ -88,7 +88,7 @@ onMounted(() => reports.load())
 
 <template>
   <div class="pb-6">
-    <AppHeader title="التقارير" :subtitle="`Tren · ${trendLabel}`" back>
+    <AppHeader title="التقارير" :subtitle="`Tren · ${trendالتسمية}`" back>
       <template #actions>
         <button
           class="flex size-9 items-center justify-center rounded-full text-foreground hover:bg-accent"
@@ -103,7 +103,7 @@ onMounted(() => reports.load())
     <!-- KPI Hari Ini (selalu hari ini, tak ikut filter) -->
     <section class="space-y-3 p-4">
       <p class="px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-        اليوم · {{ todayLabel }}
+        اليوم · {{ todayالتسمية }}
       </p>
 
       <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -181,7 +181,7 @@ onMounted(() => reports.load())
           v-else
           :icon="BarChart3"
           title="لا توجد بيانات"
-          :description="`لا توجد ${source === 'sales' ? 'المبيعات' : 'حركات مالية'} خلال الفترة ${trendLabel.toLowerCase()}.`"
+          :description="`لا توجد ${source === 'sales' ? 'المبيعات' : 'حركات مالية'} خلال الفترة ${trendالتسمية.toLowerCase()}.`"
         />
       </div>
     </section>
