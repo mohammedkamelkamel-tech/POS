@@ -19,23 +19,32 @@ const { storeName, storeLogo } = storeToRefs(settings)
 const pin = ref('')
 const error = ref(false)
 const logoUrl = ref<string | null>(null)
+const biometricBusy = ref(false)
+const biometricMessage = ref('')
 
 onMounted(async () => {
   if (storeLogo.value) {
     await media.ensure([storeLogo.value])
     logoUrl.value = media.url(storeLogo.value)
   }
-  if (settings.biometricEnabled) {
-    try {
-      await deviceBiometric.authenticate()
-      auth.unlocked = true
-      const r = route.query.redirect
-      await router.replace(typeof r === 'string' ? r : '/')
-    } catch {
-      // إلغاء البصمة أو فشلها يعيد المستخدم إلى إدخال الرقم السري.
-    }
-  }
+  if (settings.biometricEnabled) await unlockWithBiometric()
 })
+
+async function unlockWithBiometric() {
+  if (biometricBusy.value) return
+  biometricBusy.value = true
+  biometricMessage.value = ''
+  try {
+    await deviceBiometric.authenticate()
+    auth.unlocked = true
+    const r = route.query.redirect
+    await router.replace(typeof r === 'string' ? r : '/')
+  } catch {
+    biometricMessage.value = 'تعذر التحقق بالبصمة. يمكنك إدخال الرقم السري أو المحاولة مجدداً.'
+  } finally {
+    biometricBusy.value = false
+  }
+}
 
 async function onComplete(value: string) {
   if (await auth.verify(value)) {
