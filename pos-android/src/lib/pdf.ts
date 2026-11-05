@@ -37,7 +37,7 @@ function buildDocument(filename: string, title: string, sheets: ExportSheet[]): 
   body { font-family: "Noto Naskh Arabic", "Noto Sans Arabic", Tahoma, Arial, sans-serif; color: #172033; font-size: 10px; line-height: 1.65; }
   .report-head { border-bottom: 2px solid #24364f; padding: 0 0 10px; margin-bottom: 16px; }
   h1 { text-align: center; font-size: 20px; line-height: 1.4; margin: 0 0 5px; color: #172033; }
-  .date { text-align: center; color: #667085; margin: 0; font-size: 10px; }
+  .brand { text-align: center; font-weight: 700; color: #475467; margin: 0 0 4px; font-size: 12px; }\n  .date { text-align: center; color: #667085; margin: 0; font-size: 10px; }
   h2 { font-size: 14px; margin: 18px 0 7px; color: #26364f; page-break-after: avoid; break-after: avoid; }
   table { width: 100%; border-collapse: collapse; table-layout: auto; margin: 0 0 12px; }
   thead { display: table-header-group; }
@@ -54,6 +54,7 @@ function buildDocument(filename: string, title: string, sheets: ExportSheet[]): 
 <body>
 <header class="report-head">
   <h1>${escapeHtml(title)}</h1>
+  <p class="brand">الكامل-كاشير</p>
   <p class="date">تاريخ التصدير: ${escapeHtml(new Intl.DateTimeFormat('ar-YE', { dateStyle: 'full', timeStyle: 'short' }).format(new Date()))}</p>
 </header>
 ${sections}
