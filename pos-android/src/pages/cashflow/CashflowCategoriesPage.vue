@@ -31,6 +31,15 @@ async function add() {
   newName.value = ''
 }
 
+function displayCategory(name: string): string {
+  const labels: Record<string, string> = {
+    'Penjualan': 'المبيعات', 'Modal / Setoran': 'رأس المال / الإيداعات', 'Pendapatan Lain': 'إيرادات أخرى',
+    'Belanja Stok': 'مشتريات المخزون', 'Gaji Karyawan': 'رواتب الموظفين', 'Sewa Tempat': 'إيجار المحل',
+    'Listrik & Air': 'الكهرباء والماء', 'Operasional': 'مصروفات تشغيلية', 'Lain-lain': 'مصروفات أخرى',
+  }
+  return labels[name] ?? name
+}
+
 function startEdit(id: string, name: string) {
   editingId.value = id
   editName.value = name
@@ -102,7 +111,7 @@ async function remove(c: CashflowCategory) {
             </Button>
           </template>
           <template v-else>
-            <span class="flex-1 text-sm font-medium">{{ c.name }}</span>
+            <span class="flex-1 text-sm font-medium">{{ displayCategory(c.name) }}</span>
             <Lock v-if="c.is_system" class="size-4 text-muted-foreground" />
             <template v-else>
               <Button size="icon" variant="ghost" @click="startEdit(c.id, c.name)">
