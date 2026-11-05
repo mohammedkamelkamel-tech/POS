@@ -29,7 +29,7 @@ export async function saveOrShare(
       data: base64,
       directory: Directory.Cache,
     })
-    await Share.share({ title: filename, url: res.uri, dialogTitle: 'Bagikan / simpan file' })
+    await Share.share({ title: filename, url: res.uri, dialogTitle: 'مشاركة الملف أو حفظه' })
     return
   }
 
