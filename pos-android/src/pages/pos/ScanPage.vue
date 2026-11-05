@@ -20,7 +20,7 @@ const cart = useCartStore()
 
 const scanner = shallowRef<InstanceType<typeof CameraScanner> | null>(null)
 
-/** Notifikasi singkat di atas keranjang — cukup lokal, app ini belum punya toast. */
+/** إشعار قصير أعلى السلة. */
 const toast = ref<{ text: string; tone: 'ok' | 'warn' } | null>(null)
 let toastTimer: ReturnType<typeof setTimeout> | null = null
 
@@ -30,7 +30,7 @@ function say(text: string, tone: 'ok' | 'warn' = 'ok') {
   toastTimer = setTimeout(() => (toast.value = null), 2200)
 }
 
-/** الباركود yang gak ketemu di katalog — ditawarin bikin produk baru. */
+/** عند عدم العثور على الباركود، يُعرض خيار إنشاء منتج جديد. */
 const unknown = ref<string | null>(null)
 
 function handleCode(code: string) {
