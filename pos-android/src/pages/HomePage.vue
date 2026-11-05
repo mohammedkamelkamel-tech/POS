@@ -16,15 +16,9 @@ import {
 } from 'lucide-vue-next'
 import { storeToRefs } from 'pinia'
 import { useSettingsStore } from '@/stores/settings'
-import { useMediaStore } from '@/stores/media'
 
 const settings = useSettingsStore()
-const media = useMediaStore()
-const { storeName, storeOwner, storeLogo } = storeToRefs(settings)
-
-onMounted(() => {
-  if (storeLogo.value) media.ensure([storeLogo.value])
-})
+const { storeName, storeOwner } = storeToRefs(settings)
 
 const menu = [
   { to: '/pos', label: 'الكاشير', desc: 'بدء عملية بيع', icon: ShoppingCart },
@@ -46,19 +40,12 @@ const menu = [
     >
       <div class="flex items-center gap-3">
         <div
-          class="flex size-14 items-center justify-center overflow-hidden rounded-2xl bg-white/15 p-1 backdrop-blur"
+          class="flex size-[4.25rem] shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/25 bg-white p-1 shadow-md shadow-black/10"
         >
           <img
-            v-if="media.url(storeLogo)"
-            :src="media.url(storeLogo)!"
-            alt="شعار المتجر"
-            class="size-full object-contain p-1"
-          />
-          <img
-            v-else
             src="/alkamel-cashier-logo.jpg"
             alt="شعار الكامل-كاشير"
-            class="size-full object-contain"
+            class="size-full rounded-xl object-contain p-0.5"
           />
         </div>
         <div class="min-w-0">
