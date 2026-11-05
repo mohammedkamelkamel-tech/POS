@@ -156,7 +156,10 @@ export function assertPayment(input: PaymentInput): void {
   if (!Number.isSafeInteger(input.paid) || input.paid < 0) {
     throw new CheckoutError({ kind: 'invalid-input', reason: 'Nominal pembayaran tidak valid' })
   }
-  if (input.paymentMethod === 'transfer' && (!input.paymentBank?.trim() || !input.paymentProofPath?.startsWith('media://'))) {\n    throw new CheckoutError({ kind: 'invalid-input', reason: 'حدد البنك وأرفق صورة إشعار التحويل' })\n  }\n  if (input.paymentMethod.trim().length === 0) {
+  if (input.paymentMethod === 'transfer' && (!input.paymentBank?.trim() || !input.paymentProofPath?.startsWith('media://'))) {
+    throw new CheckoutError({ kind: 'invalid-input', reason: 'حدد البنك وأرفق صورة إشعار التحويل' })
+  }
+  if (input.paymentMethod.trim().length === 0) {
     throw new CheckoutError({ kind: 'invalid-input', reason: 'Metode pembayaran wajib diisi' })
   }
 }
