@@ -108,6 +108,63 @@ jobs:
               print("Patched ReceiptOpts with optional pixelWidth.")
           PY
 
+      - name: Configure narrow 15mm receipt width
+        working-directory: pos-android
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          def edit(path, pairs):
+              p=Path(path); s=p.read_text()
+              for old,new in pairs:
+                  if old not in s: raise SystemExit(f"Expected source text not found in {path}: {old[:90]!r}")
+                  s=s.replace(old,new,1)
+              p.write_text(s)
+          edit("src/services/capabilities/registry.ts", [
+            ("pixelWidth?: 384 | 576", "pixelWidth?: 120 | 384 | 576"),
+          ])
+          edit("src/lib/receipt.ts", [
+            ("pixelWidth: w >= 48 ? 576 : 384", "pixelWidth: w >= 48 ? 576 : w === 16 ? 120 : 384"),
+          ])
+          edit("src/lib/escpos.ts", [
+            ("pixelWidth?: 384 | 576", "pixelWidth?: 120 | 384 | 576"),
+            ("const pad = width === 384 ? 16 : 22", "const pad = width === 120 ? 4 : width === 384 ? 16 : 22"),
+            ("const contentWidth = width - pad * 2", "const contentWidth = width - pad * 2"),
+            ("const normalSize = width === 384 ? 22 : 26", "const normalSize = width === 120 ? 8 : width === 384 ? 22 : 26"),
+            ("const largeSize = width === 384 ? 30 : 36", "const largeSize = width === 120 ? 10 : width === 384 ? 30 : 36"),
+            ("const lineGap = width === 384 ? 10 : 12", "const lineGap = width === 120 ? 2 : width === 384 ? 10 : 12"),
+          ])
+          edit("src/stores/printer.ts", [
+            ("export type PaperWidth = 32 | 48", "export type PaperWidth = 16 | 32 | 48"),
+            ("const paperWidth = ref<PaperWidth>(32)", "const paperWidth = ref<PaperWidth>(16)"),
+            ("paperWidth.value = all[KEYS.width] === '48' ? 48 : 32", "paperWidth.value = all[KEYS.width] === '48' ? 48 : all[KEYS.width] === '32' ? 32 : 16"),
+          ])
+          edit("src/pages/printer/PrinterPage.vue", [
+            ("pixelWidth", "pixelWidth"), 
+          ])
+          p=Path("src/pages/printer/PrinterPage.vue"); s=p.read_text()
+          old='''        { text: 'Printer berfungsi', align: 'center' },
+      ],'''
+          new='''        { text: 'Printer berfungsi', align: 'center' },
+      ],
+      pixelWidth: w === 16 ? 120 : w === 48 ? 576 : 384,'''
+          if old not in s: raise SystemExit("Test print block not found")
+          s=s.replace(old,new,1)
+          old='''            <div class="ml-auto flex gap-1.5">
+              <Button
+                :variant="paperWidth === 32 ? 'default' : 'outline' '''
+          new='''            <div class="ml-auto flex gap-1.5">
+              <Button
+                :variant="paperWidth === 16 ? 'default' : 'outline'"
+                size="sm"
+                @click="printer.setWidth(16)"
+              >15mm</Button>
+              <Button
+                :variant="paperWidth === 32 ? 'default' : 'outline' '''
+          if old not in s: raise SystemExit("Paper width controls not found")
+          s=s.replace(old,new,1); p.write_text(s)
+          print("Configured 15mm (120-dot) raster width and selectable printer setting.")
+          PY
+
       - name: Install dependencies
         working-directory: pos-android
         run: npm ci
