@@ -105,7 +105,9 @@ jobs:
 
       - name: Build debug APK
         working-directory: pos-android/android
-        run: ./gradlew assembleDebug --stacktrace
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --stacktrace
 
       - name: Package exact source used for build
         run: |
