@@ -1,0 +1,76 @@
+name: Build POS Android from main source
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "pos-android/**"
+      - ".github/workflows/build-pos-android.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact main commit
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: pos-android/package-lock.json
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Install dependencies
+        working-directory: pos-android
+        run: npm ci
+
+      - name: Build web app
+        working-directory: pos-android
+        run: npm run build
+
+      - name: Sync Capacitor Android
+        working-directory: pos-android
+        run: npx cap sync android
+
+      - name: Build debug APK
+        working-directory: pos-android/android
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Package full project source
+        run: |
+          zip -qr POS-main-source-with-printer-fix.zip pos-android .github/workflows/build-pos-android.yml             -x "pos-android/node_modules/*" "pos-android/android/.gradle/*" "pos-android/android/app/build/*"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: POS-main-debug-apk
+          path: pos-android/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload full project source
+        uses: actions/upload-artifact@v4
+        with:
+          name: POS-main-full-project-source
+          path: POS-main-source-with-printer-fix.zip
+          if-no-files-found: error
+          retention-days: 30
