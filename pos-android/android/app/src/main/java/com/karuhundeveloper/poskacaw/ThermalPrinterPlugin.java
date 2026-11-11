@@ -106,7 +106,8 @@ public class ThermalPrinterPlugin extends Plugin {
         try {
             BluetoothDevice device = adapter.getRemoteDevice(id);
             socket = device.createRfcommSocketToServiceRecord(SPP_UUID);
-            adapter.cancelDiscovery(); // discovery bikin connect lambat/gagal
+            // Tidak memanggil cancelDiscovery(): pada Android 12+ tindakan ini
+            // dapat membutuhkan BLUETOOTH_SCAN, yang tidak diperlukan untuk printer paired.
             socket.connect();
             OutputStream out = socket.getOutputStream();
             out.write(bytes);
