@@ -1,11 +1,11 @@
-name: Build POS Android from main source
+name: Build POS Android from latest uploaded source ZIP
 
 on:
   workflow_dispatch:
   push:
     branches: [main]
     paths:
-      - "pos-android/**"
+      - "butcher-pos-full-project-source-fixed.zip"
       - ".github/workflows/build-pos-android.yml"
 
 permissions:
@@ -15,10 +15,24 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout exact main commit
+      - name: Checkout latest main commit
         uses: actions/checkout@v4
         with:
           ref: main
+
+      - name: Extract the exact uploaded source archive
+        run: |
+          test -f butcher-pos-full-project-source-fixed.zip
+          rm -rf pos-android /tmp/butcher-source
+          mkdir -p /tmp/butcher-source
+          unzip -q butcher-pos-full-project-source-fixed.zip -d /tmp/butcher-source
+          test -d /tmp/butcher-source/pos-android
+          cp -a /tmp/butcher-source/pos-android ./pos-android
+          rm -rf pos-android/node_modules pos-android/android/.gradle pos-android/android/app/build
+          echo "Building source archive SHA256:"
+          sha256sum butcher-pos-full-project-source-fixed.zip
+          echo "Source root:"
+          ls -la pos-android
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -33,7 +47,7 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Configure preinstalled Android SDK
+      - name: Configure Android SDK
         run: |
           echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
           echo "$ANDROID_HOME/platform-tools" >> "$GITHUB_PATH"
@@ -56,22 +70,22 @@ jobs:
         working-directory: pos-android/android
         run: ./gradlew assembleDebug --stacktrace
 
-      - name: Package full project source
+      - name: Package exact source used for build
         run: |
-          zip -qr POS-main-source-with-printer-fix.zip pos-android .github/workflows/build-pos-android.yml             -x "pos-android/node_modules/*" "pos-android/android/.gradle/*" "pos-android/android/app/build/*"
+          zip -qr POS-latest-source-built.zip pos-android .github/workflows/build-pos-android.yml -x "pos-android/node_modules/*" "pos-android/android/.gradle/*" "pos-android/android/app/build/*"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: POS-main-debug-apk
+          name: POS-latest-debug-apk
           path: pos-android/android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
 
-      - name: Upload full project source
+      - name: Upload exact source used for build
         uses: actions/upload-artifact@v4
         with:
-          name: POS-main-full-project-source
-          path: POS-main-source-with-printer-fix.zip
+          name: POS-latest-full-project-source
+          path: POS-latest-source-built.zip
           if-no-files-found: error
           retention-days: 30
