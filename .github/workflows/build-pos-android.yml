@@ -108,7 +108,7 @@ jobs:
               print("Patched ReceiptOpts with optional pixelWidth.")
           PY
 
-      - name: Use legacy ESC/POS bit-image command for wider printer compatibility
+      - name: Fix legacy ESC/POS bit-image byte layout
         working-directory: pos-android
         run: |
           python3 - <<'PY'
@@ -122,35 +122,25 @@ jobs:
             const width = opts.pixelWidth ?? job.pixelWidth ?? 384
             push(0x1b, 0x40) // ESC @
             push(0x1b, 0x61, 0x00) // left alignment
-
-            // Legacy ESC * 24-dot bit image is supported by older compact printers
-            // that may feed paper but ignore the newer GS v 0 raster command.
             const image = rasterize(job, width)
             const bytesPerRow = image.rowBytes
+
+            // ESC * mode 33: nL/nH are the number of pixel columns (not row bytes).
+            // Each column carries three vertical bytes, MSB first.
             for (let top = 0; top < image.height; top += 24) {
               const rows = Math.min(24, image.height - top)
-              push(0x1b, 0x33, 24) // line spacing = 24 dots
-              push(0x1b, 0x2a, 33, bytesPerRow & 0xff, (bytesPerRow >> 8) & 0xff)
-              for (let x = 0; x < width; x++) {
-                for (let bitRow = 0; bitRow < 24; bitRow++) {
-                  let value = 0
-                  if (bitRow < rows) {
-                    const src = (top + bitRow) * bytesPerRow + (x >> 3)
-                    value = (image.data[src] >> (7 - (x & 7))) & 1
-                  }
-                  // ESC * 24-dot mode expects three vertical bytes per column.
-                  if (bitRow < 8 && value) bytes.push(0) // placeholder; packed below
-                }
-              }
-              // Pack the 24 vertical dots for each column, MSB first.
+              push(0x1b, 0x33, 24)
+              push(0x1b, 0x2a, 33, width & 0xff, (width >> 8) & 0xff)
               for (let x = 0; x < width; x++) {
                 for (let band = 0; band < 3; band++) {
                   let packed = 0
-                  for (let b = 0; b < 8; b++) {
-                    const bitRow = band * 8 + b
-                    if (bitRow < rows) {
-                      const src = (top + bitRow) * bytesPerRow + (x >> 3)
-                      if ((image.data[src] >> (7 - (x & 7))) & 1) packed |= 0x80 >> b
+                  for (let bit = 0; bit < 8; bit++) {
+                    const y = top + band * 8 + bit
+                    if (y < top + rows) {
+                      const src = y * bytesPerRow + (x >> 3)
+                      if ((image.data[src] & (0x80 >> (x & 7))) !== 0) {
+                        packed |= 0x80 >> bit
+                      }
                     }
                   }
                   bytes.push(packed)
@@ -158,16 +148,19 @@ jobs:
               }
               push(0x0a)
             }
-            push(0x1b, 0x32) // restore default line spacing
-            const feed = opts.feed ?? 3
-            for (let i = 0; i < feed; i++) push(0x0a)
+            push(0x1b, 0x32)
+            for (let i = 0; i < (opts.feed ?? 3); i++) push(0x0a)
             if (opts.cut ?? false) push(0x1d, 0x56, 0x01)
             return Uint8Array.from(bytes)
           }
           '''
           s = s[:start] + replacement
           p.write_text(s)
-          print("Switched receipt output from GS v 0 to legacy ESC * 24-dot bit-image mode.")
+          check = p.read_text()
+          assert "bytesPerRow & 0xff" not in check
+          assert "placeholder" not in check
+          assert "0x2a, 33, width & 0xff" in check
+          print("Corrected ESC *: width in nL/nH; removed stray placeholder bytes.")
           PY
 
       - name: Install dependencies
