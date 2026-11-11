@@ -39,16 +39,15 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
+          import re
           p = Path("android/app/src/main/java/com/karuhundeveloper/poskacaw/ThermalPrinterPlugin.java")
           s = p.read_text()
-          old = "            adapter.cancelDiscovery();\\n"
-          if old in s:
-              p.write_text(s.replace(old, "", 1))
-              print("Removed cancelDiscovery: paired-printer SPP printing does not scan, and Android 12+ requires BLUETOOTH_SCAN for that call.")
-          elif "adapter.cancelDiscovery();" not in s:
-              print("Bluetooth discovery cancellation is already absent.")
+          updated, count = re.subn(r"(?m)^\\s*adapter\\.cancelDiscovery\\(\\);[ \\t]*\\r?\\n", "", s, count=1)
+          if count:
+              p.write_text(updated)
+              print("Removed cancelDiscovery; paired SPP printer connection does not require device scanning.")
           else:
-              raise SystemExit("Found cancelDiscovery with unexpected formatting; refusing unsafe patch.")
+              print("No standalone cancelDiscovery call found; source left unchanged.")
           PY
 
       - name: Setup Node
