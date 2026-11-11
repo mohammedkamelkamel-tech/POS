@@ -39,15 +39,16 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          import re
           p = Path("android/app/src/main/java/com/karuhundeveloper/poskacaw/ThermalPrinterPlugin.java")
           s = p.read_text()
-          updated, count = re.subn(r"(?m)^\\s*adapter\\.cancelDiscovery\\(\\);[ \\t]*\\r?\\n", "", s, count=1)
-          if count:
-              p.write_text(updated)
-              print("Removed cancelDiscovery; paired SPP printer connection does not require device scanning.")
+          lines = s.splitlines(keepends=True)
+          kept = [line for line in lines if "adapter.cancelDiscovery();" not in line]
+          removed = len(lines) - len(kept)
+          if removed:
+              p.write_text("".join(kept))
+              print(f"Removed {removed} cancelDiscovery call(s); paired Bluetooth printer connection does not need scanning.")
           else:
-              print("No standalone cancelDiscovery call found; source left unchanged.")
+              print("No cancelDiscovery call found; source already patched.")
           PY
 
       - name: Setup Node
