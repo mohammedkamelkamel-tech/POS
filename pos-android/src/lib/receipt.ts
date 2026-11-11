@@ -92,5 +92,5 @@ export function buildReceipt(
   lines.push({ text: div })
   lines.push({ text: 'Terima kasih 🙏', align: 'center' })
 
-  return { title: `Struk ${sale.number}`, lines }
+  return { title: `Struk ${sale.number}`, lines, pixelWidth: w >= 48 ? 576 : 384 }
 }
