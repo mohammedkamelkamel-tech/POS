@@ -72,7 +72,7 @@ jobs:
               raise SystemExit("Cannot locate ReceiptOpts in extracted project; inspect source archive layout.")
           updated = False
           for p,t in files:
-              m = re.search(r"(?:export\\s+)?interface\\s+ReceiptOpts\\s*\\{", t)
+              m = re.search(r"(?:export\s+)?interface\s+ReceiptOpts\s*\{", t)
               if not m: continue
               depth, i = 1, m.end()
               while i < len(t) and depth:
@@ -82,7 +82,7 @@ jobs:
               if depth: raise SystemExit(f"Malformed ReceiptOpts interface: {p}")
               body = t[m.end():i-1]
               if "pixelWidth" not in body:
-                  t = t[:i-1] + "  pixelWidth?: 384 | 576;\\n" + t[i-1:]
+                  t = t[:i-1] + "  pixelWidth?: 384 | 576;\n" + t[i-1:]
                   p.write_text(t)
                   updated = True
           if not updated:
