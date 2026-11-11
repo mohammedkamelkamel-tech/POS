@@ -34,6 +34,23 @@ jobs:
           echo "Source root:"
           ls -la pos-android
 
+      - name: Fix Bluetooth printer permission on Android 12+
+        working-directory: pos-android
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("android/app/src/main/java/com/karuhundeveloper/poskacaw/ThermalPrinterPlugin.java")
+          s = p.read_text()
+          old = "            adapter.cancelDiscovery();\\n"
+          if old in s:
+              p.write_text(s.replace(old, "", 1))
+              print("Removed cancelDiscovery: paired-printer SPP printing does not scan, and Android 12+ requires BLUETOOTH_SCAN for that call.")
+          elif "adapter.cancelDiscovery();" not in s:
+              print("Bluetooth discovery cancellation is already absent.")
+          else:
+              raise SystemExit("Found cancelDiscovery with unexpected formatting; refusing unsafe patch.")
+          PY
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
