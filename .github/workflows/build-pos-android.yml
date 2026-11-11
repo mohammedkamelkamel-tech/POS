@@ -54,6 +54,53 @@ jobs:
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0"
 
+      - name: Align receipt options type with thermal printer width
+        working-directory: pos-android
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          roots = [Path("src"), Path(""), Path("android")]
+          matches = []
+          for root in roots:
+              if not root.exists():
+                  continue
+              for file in root.rglob("*"):
+                  if not file.is_file() or file.suffix not in {".ts", ".tsx", ".vue"}:
+                      continue
+                  if any(part in {"node_modules", "dist", "build", ".git"} for part in file.parts):
+                      continue
+                  try:
+                      data = file.read_text()
+                  except Exception:
+                      continue
+                  if re.search(r"\\b(?:interface|type)\\s+ReceiptOpts\\b", data):
+                      matches.append((file, data))
+          if not matches:
+              raise SystemExit("ReceiptOpts declaration not found in the uploaded source archive")
+          changed = False
+          for file, data in matches:
+              m = re.search(r"(?:export\\s+)?interface\\s+ReceiptOpts\\s*\\{", data)
+              if m:
+                  depth = 1
+                  i = m.end()
+                  while i < len(data) and depth:
+                      if data[i] == "{": depth += 1
+                      elif data[i] == "}": depth -= 1
+                      i += 1
+                  if depth:
+                      raise SystemExit(f"Unclosed ReceiptOpts interface in {file}")
+                  body_end = i - 1
+                  if "pixelWidth" not in data[m.end():body_end]:
+                      data = data[:body_end] + "  pixelWidth?: 384 | 576;\\n" + data[body_end:]
+                      file.write_text(data)
+                      changed = True
+          if not changed:
+              print("ReceiptOpts already declares pixelWidth or uses a non-interface type; no edit applied.")
+          else:
+              print("Added pixelWidth to ReceiptOpts declaration.")
+          PY
+
       - name: Install dependencies
         working-directory: pos-android
         run: npm ci
