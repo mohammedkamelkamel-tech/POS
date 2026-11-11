@@ -282,13 +282,17 @@ async function printReceipt() {
   if (!lastResult.value) return
   const printer = capabilities.get<PrinterCapability>('printer')
   if (!printer) return
-  await printer.print(
-    buildReceipt(lastResult.value.sale, lastResult.value.items, {
-      storeName: settings.storeName,
-      storeOwner: settings.storeOwner,
-      width: usePrinterStore().paperWidth,
-    }),
-  )
+  try {
+    await printer.print(
+      buildReceipt(lastResult.value.sale, lastResult.value.items, {
+        storeName: settings.storeName,
+        storeOwner: settings.storeOwner,
+        width: usePrinterStore().paperWidth,
+      }),
+    )
+  } catch (error) {
+    operationError.value = error instanceof Error ? error.message : 'تعذرت طباعة الفاتورة.'
+  }
 }
 
 function newTransaction() {
