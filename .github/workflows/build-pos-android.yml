@@ -108,6 +108,68 @@ jobs:
               print("Patched ReceiptOpts with optional pixelWidth.")
           PY
 
+      - name: Use legacy ESC/POS bit-image command for wider printer compatibility
+        working-directory: pos-android
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("src/lib/escpos.ts")
+          s = p.read_text()
+          start = s.index("export function encodeReceipt(")
+          replacement = '''export function encodeReceipt(job: ReceiptJob, opts: EscposOpts = {}): Uint8Array {
+            const bytes: number[] = []
+            const push = (...values: number[]) => bytes.push(...values)
+            const width = opts.pixelWidth ?? job.pixelWidth ?? 384
+            push(0x1b, 0x40) // ESC @
+            push(0x1b, 0x61, 0x00) // left alignment
+
+            // Legacy ESC * 24-dot bit image is supported by older compact printers
+            // that may feed paper but ignore the newer GS v 0 raster command.
+            const image = rasterize(job, width)
+            const bytesPerRow = image.rowBytes
+            for (let top = 0; top < image.height; top += 24) {
+              const rows = Math.min(24, image.height - top)
+              push(0x1b, 0x33, 24) // line spacing = 24 dots
+              push(0x1b, 0x2a, 33, bytesPerRow & 0xff, (bytesPerRow >> 8) & 0xff)
+              for (let x = 0; x < width; x++) {
+                for (let bitRow = 0; bitRow < 24; bitRow++) {
+                  let value = 0
+                  if (bitRow < rows) {
+                    const src = (top + bitRow) * bytesPerRow + (x >> 3)
+                    value = (image.data[src] >> (7 - (x & 7))) & 1
+                  }
+                  // ESC * 24-dot mode expects three vertical bytes per column.
+                  if (bitRow < 8 && value) bytes.push(0) // placeholder; packed below
+                }
+              }
+              // Pack the 24 vertical dots for each column, MSB first.
+              for (let x = 0; x < width; x++) {
+                for (let band = 0; band < 3; band++) {
+                  let packed = 0
+                  for (let b = 0; b < 8; b++) {
+                    const bitRow = band * 8 + b
+                    if (bitRow < rows) {
+                      const src = (top + bitRow) * bytesPerRow + (x >> 3)
+                      if ((image.data[src] >> (7 - (x & 7))) & 1) packed |= 0x80 >> b
+                    }
+                  }
+                  bytes.push(packed)
+                }
+              }
+              push(0x0a)
+            }
+            push(0x1b, 0x32) // restore default line spacing
+            const feed = opts.feed ?? 3
+            for (let i = 0; i < feed; i++) push(0x0a)
+            if (opts.cut ?? false) push(0x1d, 0x56, 0x01)
+            return Uint8Array.from(bytes)
+          }
+          '''
+          s = s[:start] + replacement
+          p.write_text(s)
+          print("Switched receipt output from GS v 0 to legacy ESC * 24-dot bit-image mode.")
+          PY
+
       - name: Install dependencies
         working-directory: pos-android
         run: npm ci
