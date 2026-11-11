@@ -16,6 +16,8 @@ export interface ReceiptJob {
   lines: ReceiptLine[]
   /** HTML lengkap struk buat preview/print web. */
   html?: string
+  /** Raster dots for thermal printers: 384 (58mm) or 576 (80mm). */
+  pixelWidth?: 384 | 576
 }
 
 export interface PrinterDevice {
