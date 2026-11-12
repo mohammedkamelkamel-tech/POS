@@ -113,47 +113,32 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          def replace(path, old, new):
-              p=Path(path); s=p.read_text()
-              if old not in s: raise SystemExit(f"Missing expected text in {path}: {old[:70]!r}")
-              p.write_text(s.replace(old,new,1))
-          replace("src/services/capabilities/registry.ts",
-            "pixelWidth?: 384 | 576", "pixelWidth?: 120 | 384 | 576")
-          p=Path("src/lib/receipt.ts"); s=p.read_text()
           import re
+          def sub(path, pattern, repl, label):
+              p=Path(path); s=p.read_text()
+              ns,n=re.subn(pattern,repl,s,count=1)
+              if not n: raise SystemExit(f"Could not patch {label} in {path}")
+              p.write_text(ns)
+          sub("src/services/capabilities/registry.ts",
+              r"pixelWidth\?:\s*384\s*\|\s*576",
+              "pixelWidth?: 120 | 384 | 576", "ReceiptJob pixelWidth")
+          p=Path("src/lib/receipt.ts"); s=p.read_text()
           if "pixelWidth:" not in s:
-              pattern=r"return\s*\{\s*title:\s*([^,]+),\s*lines\s*\}"
-              m=re.search(pattern,s)
-              if not m:
-                  raise SystemExit("Could not locate buildReceipt return object to add pixelWidth.")
-              title_expr=m.group(1)
-              s=s[:m.start()]+f"return {{ title: {title_expr}, lines, pixelWidth: w >= 48 ? 576 : w === 16 ? 120 : 384 }}"+s[m.end():]
+              m=re.search(r"return\s*\{\s*title:\s*([^,]+),\s*lines\s*\}",s)
+              if not m: raise SystemExit("Cannot locate buildReceipt return object")
+              s=s[:m.start()]+f"return {{ title: {m.group(1)}, lines, pixelWidth: w >= 48 ? 576 : w === 16 ? 120 : 384 }}"+s[m.end():]
               p.write_text(s)
           else:
-              s=re.sub(r"pixelWidth:\\s*w\\s*>=\\s*48\\s*\\?\\s*576\\s*:\\s*384",
-                       "pixelWidth: w >= 48 ? 576 : w === 16 ? 120 : 384", s, count=1)
-              p.write_text(s)
-          replace("src/lib/escpos.ts",
-            "pixelWidth?: 384 | 576", "pixelWidth?: 120 | 384 | 576")
-          replace("src/lib/escpos.ts",
-            "const pad = width === 384 ? 16 : 22",
-            "const pad = width === 120 ? 4 : width === 384 ? 16 : 22")
-          replace("src/lib/escpos.ts",
-            "const normalSize = width === 384 ? 22 : 26",
-            "const normalSize = width === 120 ? 8 : width === 384 ? 22 : 26")
-          replace("src/lib/escpos.ts",
-            "const largeSize = width === 384 ? 30 : 36",
-            "const largeSize = width === 120 ? 10 : width === 384 ? 30 : 36")
-          replace("src/lib/escpos.ts",
-            "const lineGap = width === 384 ? 10 : 12",
-            "const lineGap = width === 120 ? 2 : width === 384 ? 10 : 12")
-          replace("src/stores/printer.ts",
-            "export type PaperWidth = 32 | 48", "export type PaperWidth = 16 | 32 | 48")
-          replace("src/stores/printer.ts",
-            "const paperWidth = ref<PaperWidth>(32)", "const paperWidth = ref<PaperWidth>(16)")
-          replace("src/stores/printer.ts",
-            "paperWidth.value = all[KEYS.width] === '48' ? 48 : 32",
-            "paperWidth.value = all[KEYS.width] === '48' ? 48 : all[KEYS.width] === '32' ? 32 : 16")
+              sub("src/lib/receipt.ts",r"pixelWidth:\s*w\s*>=\s*48\s*\?\s*576\s*:\s*384",
+                  "pixelWidth: w >= 48 ? 576 : w === 16 ? 120 : 384","receipt width mapping")
+          sub("src/lib/escpos.ts",r"pixelWidth\?:\s*384\s*\|\s*576","pixelWidth?: 120 | 384 | 576","ESC/POS width type")
+          sub("src/lib/escpos.ts",r"const pad\s*=\s*[^;\n]+","const pad = width === 120 ? 4 : width === 384 ? 16 : 22","raster padding")
+          sub("src/lib/escpos.ts",r"const normalSize\s*=\s*[^;\n]+","const normalSize = width === 120 ? 8 : width === 384 ? 22 : 26","normal font size")
+          sub("src/lib/escpos.ts",r"const largeSize\s*=\s*[^;\n]+","const largeSize = width === 120 ? 10 : width === 384 ? 30 : 36","large font size")
+          sub("src/lib/escpos.ts",r"const lineGap\s*=\s*[^;\n]+","const lineGap = width === 120 ? 2 : width === 384 ? 10 : 12","line spacing")
+          sub("src/stores/printer.ts",r"export type PaperWidth\s*=\s*32\s*\|\s*48","export type PaperWidth = 16 | 32 | 48","paper width type")
+          sub("src/stores/printer.ts",r"const paperWidth = ref<PaperWidth>\(32\)","const paperWidth = ref<PaperWidth>(16)","default paper width")
+          sub("src/stores/printer.ts",r"paperWidth\.value = all\[KEYS\.width\] === '48' \? 48 : 32","paperWidth.value = all[KEYS.width] === '48' ? 48 : all[KEYS.width] === '32' ? 32 : 16","saved paper width")
           p=Path("src/pages/printer/PrinterPage.vue"); s=p.read_text()
           old='''            <div class="ml-auto flex gap-1.5">
               <Button
@@ -172,14 +157,14 @@ jobs:
                 size="sm"
                 @click="printer.setWidth(32)"
               >58mm</Button>'''
-          if old not in s: raise SystemExit("Could not locate printer paper-width buttons")
+          if old not in s: raise SystemExit("Could not locate printer width buttons")
           p.write_text(s.replace(old,new,1))
           p=Path("src/pages/printer/PrinterPage.vue"); s=p.read_text()
-          old="title: 'Test Print',\n      lines: ["
-          new="title: 'Test Print',\n      pixelWidth: w === 16 ? 120 : w === 48 ? 576 : 384,\n      lines: ["
+          old="title: 'Test Print',\\n      lines: ["
+          new="title: 'Test Print',\\n      pixelWidth: w === 16 ? 120 : w === 48 ? 576 : 384,\\n      lines: ["
           if old not in s: raise SystemExit("Could not locate test print job")
           p.write_text(s.replace(old,new,1))
-          print("15mm option added; raster width 120 dots; narrow font configured.")
+          print("15mm narrow receipt mode patched.")
           PY
 
       - name: Install dependencies
