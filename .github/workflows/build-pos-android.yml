@@ -114,47 +114,64 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import re
-          def sub(path, pattern, repl, label):
-              p=Path(path); s=p.read_text()
-              ns,n=re.subn(pattern,repl,s,count=1)
-              if not n:
-                  lines=s.splitlines(keepends=True)
-                  for i,line in enumerate(lines):
-                      if line.lstrip().startswith(pattern):
-                          lines[i]=repl+"\\n"
-                          n=1
-                          break
-                  if not n: raise SystemExit(f"Could not patch {label} in {path}")
-                  ns="".join(lines)
-              p.write_text(ns)
-          sub("src/services/capabilities/registry.ts",
-              r"pixelWidth\?:\s*384\s*\|\s*576",
-              "pixelWidth?: 120 | 384 | 576", "ReceiptJob pixelWidth")
-          p=Path("src/lib/receipt.ts"); s=p.read_text()
-          if "pixelWidth:" not in s:
-              m=re.search(r"return\s*\{\s*title:\s*([^,]+),\s*lines\s*\}",s)
-              if not m: raise SystemExit("Cannot locate buildReceipt return object")
-              s=s[:m.start()]+f"return {{ title: {m.group(1)}, lines, pixelWidth: w >= 48 ? 576 : w === 16 ? 120 : 384 }}"+s[m.end():]
-              p.write_text(s)
-          else:
-              sub("src/lib/receipt.ts",r"pixelWidth:\s*w\s*>=\s*48\s*\?\s*576\s*:\s*384",
-                  "pixelWidth: w >= 48 ? 576 : w === 16 ? 120 : 384","receipt width mapping")
-          sub("src/lib/escpos.ts",r"pixelWidth\?:\s*384\s*\|\s*576","pixelWidth?: 120 | 384 | 576","ESC/POS width type")
-          sub("src/lib/escpos.ts",r"const pad\s*=\s*[^;\n]+","const pad = width === 120 ? 4 : width === 384 ? 16 : 22","raster padding")
-          sub("src/lib/escpos.ts",r"const normalSize\s*=\s*[^;\n]+","const normalSize = width === 120 ? 8 : width === 384 ? 22 : 26","normal font size")
-          sub("src/lib/escpos.ts",r"const largeSize\s*=\s*[^;\n]+","const largeSize = width === 120 ? 10 : width === 384 ? 30 : 36","large font size")
-          sub("src/lib/escpos.ts",r"const lineGap\s*=\s*[^;\n]+","const lineGap = width === 120 ? 2 : width === 384 ? 10 : 12","line spacing")
-          sub("src/stores/printer.ts",r"export type PaperWidth\s*=\s*32\s*\|\s*48","export type PaperWidth = 16 | 32 | 48","paper width type")
-          sub("src/stores/printer.ts",r"const paperWidth = ref<PaperWidth>\(32\)","const paperWidth = ref<PaperWidth>(16)","default paper width")
-          sub("src/stores/printer.ts",r"paperWidth\.value = all\[KEYS\.width\] === '48' \? 48 : 32","paperWidth.value = all[KEYS.width] === '48' ? 48 : all[KEYS.width] === '32' ? 32 : 16","saved paper width")
-          p=Path("src/pages/printer/PrinterPage.vue"); s=p.read_text()
-          old='''            <div class="ml-auto flex gap-1.5">
+
+          def patch(path, pattern, replacement, label):
+              p = Path(path)
+              source = p.read_text()
+              updated, count = re.subn(pattern, replacement, source, count=1, flags=re.MULTILINE)
+              if count != 1:
+                  raise SystemExit(f"15mm patch failed at {label}: expected one match, got {count}")
+              p.write_text(updated)
+
+          # Receipt jobs and ESC/POS encoder must accept the 120-dot narrow raster.
+          patch("src/services/capabilities/registry.ts",
+                r"pixelWidth\?:\s*384\s*\|\s*576",
+                "pixelWidth?: 120 | 384 | 576", "ReceiptJob width type")
+          patch("src/lib/receipt.ts",
+                r"pixelWidth\?:\s*384\s*\|\s*576",
+                "pixelWidth?: 120 | 384 | 576", "ReceiptOpts width type")
+          patch("src/lib/escpos.ts",
+                r"pixelWidth\?:\s*384\s*\|\s*576",
+                "pixelWidth?: 120 | 384 | 576", "ESC/POS width type")
+
+          # Real rasterize() declarations in the uploaded source use padding,
+          # fontSize and lineHeight (not pad/normalSize/lineGap).
+          patch("src/lib/escpos.ts",
+                r"const padding = 10",
+                "const padding = width === 120 ? 2 : width === 384 ? 10 : 14",
+                "raster padding")
+          patch("src/lib/escpos.ts",
+                r"const fontSize = line\.size === 'large' \? 30 : 23",
+                "const fontSize = width === 120 ? (line.size === 'large' ? 10 : 8) : line.size === 'large' ? 30 : 23",
+                "raster font size")
+          patch("src/lib/escpos.ts",
+                r"const lineHeight = line\.size === 'large' \? 42 : 32",
+                "const lineHeight = width === 120 ? (line.size === 'large' ? 13 : 11) : line.size === 'large' ? 42 : 32",
+                "raster line height")
+
+          # Store width is in receipt characters: 16 chars represents the
+          # requested finger-width layout; 32/48 remain 58/80mm.
+          patch("src/stores/printer.ts",
+                r"export type PaperWidth = 32 \| 48",
+                "export type PaperWidth = 16 | 32 | 48", "paper width type")
+          patch("src/stores/printer.ts",
+                r"const paperWidth = ref<PaperWidth>\(32\)",
+                "const paperWidth = ref<PaperWidth>(16)", "default width")
+          patch("src/stores/printer.ts",
+                r"paperWidth\.value = all\[KEYS\.width\] === '48' \? 48 : 32",
+                "paperWidth.value = all[KEYS.width] === '48' ? 48 : all[KEYS.width] === '32' ? 32 : 16",
+                "saved width hydration")
+
+          # Insert 15mm beside the existing 58/80mm selectors.
+          p = Path("src/pages/printer/PrinterPage.vue")
+          source = p.read_text()
+          anchor = '''            <div class="ml-auto flex gap-1.5">
               <Button
                 :variant="paperWidth === 32 ? 'default' : 'outline'"
                 size="sm"
                 @click="printer.setWidth(32)"
               >58mm</Button>'''
-          new='''            <div class="ml-auto flex gap-1.5">
+          addition = '''            <div class="ml-auto flex gap-1.5">
               <Button
                 :variant="paperWidth === 16 ? 'default' : 'outline'"
                 size="sm"
@@ -165,14 +182,38 @@ jobs:
                 size="sm"
                 @click="printer.setWidth(32)"
               >58mm</Button>'''
-          if old not in s: raise SystemExit("Could not locate printer width buttons")
-          p.write_text(s.replace(old,new,1))
-          p=Path("src/pages/printer/PrinterPage.vue"); s=p.read_text()
-          old="title: 'Test Print',\\n      lines: ["
-          new="title: 'Test Print',\\n      pixelWidth: w === 16 ? 120 : w === 48 ? 576 : 384,\\n      lines: ["
-          if old not in s: raise SystemExit("Could not locate test print job")
-          p.write_text(s.replace(old,new,1))
-          print("15mm narrow receipt mode patched.")
+          if anchor not in source:
+              raise SystemExit("15mm patch failed at paper-width selector")
+          source = source.replace(anchor, addition, 1)
+
+          # Existing test job is Arabic and maps its selected width to raster dots.
+          source, count = re.subn(
+              r"pixelWidth: w === 48 \? 576 : 384",
+              "pixelWidth: w === 16 ? 120 : w === 48 ? 576 : 384",
+              source, count=1)
+          if count != 1:
+              raise SystemExit("15mm patch failed at test-print pixel width")
+          p.write_text(source)
+
+          # The real sale receipt must carry the same width mapping.
+          p = Path("src/lib/receipt.ts")
+          source = p.read_text()
+          if "pixelWidth: w >=" not in source:
+              source, count = re.subn(
+                  r"return \{ title: (`[^\n]*?`), lines \}",
+                  r"return { title: \1, lines, pixelWidth: w >= 48 ? 576 : w === 16 ? 120 : 384 }",
+                  source, count=1)
+              if count != 1:
+                  raise SystemExit("15mm patch failed at buildReceipt return object")
+          else:
+              source, count = re.subn(
+                  r"pixelWidth: w >= 48 \? 576 : 384",
+                  "pixelWidth: w >= 48 ? 576 : w === 16 ? 120 : 384",
+                  source, count=1)
+              if count != 1:
+                  raise SystemExit("15mm patch failed at existing receipt width mapping")
+          p.write_text(source)
+          print("15mm receipt mode configured using actual source declarations.")
           PY
 
       - name: Install dependencies
