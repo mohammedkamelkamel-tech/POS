@@ -117,7 +117,15 @@ jobs:
           def sub(path, pattern, repl, label):
               p=Path(path); s=p.read_text()
               ns,n=re.subn(pattern,repl,s,count=1)
-              if not n: raise SystemExit(f"Could not patch {label} in {path}")
+              if not n:
+                  lines=s.splitlines(keepends=True)
+                  for i,line in enumerate(lines):
+                      if line.lstrip().startswith(pattern):
+                          lines[i]=repl+"\\n"
+                          n=1
+                          break
+                  if not n: raise SystemExit(f"Could not patch {label} in {path}")
+                  ns="".join(lines)
               p.write_text(ns)
           sub("src/services/capabilities/registry.ts",
               r"pixelWidth\?:\s*384\s*\|\s*576",
