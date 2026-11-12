@@ -121,12 +121,18 @@ jobs:
             "pixelWidth?: 384 | 576", "pixelWidth?: 120 | 384 | 576")
           p=Path("src/lib/receipt.ts"); s=p.read_text()
           import re
-          m=re.search(r"pixelWidth:\\s*([A-Za-z_$][\\w$]*(?:\\.[A-Za-z_$][\\w$]*)*)\\s*>=\\s*48\\s*\\?\\s*576\\s*:\\s*384",s)
-          if not m:
-              raise SystemExit("Could not identify existing receipt pixelWidth mapping: " + " | ".join(x.strip() for x in s.splitlines() if "pixelWidth" in x))
-          width_expr=m.group(1)
-          s=s[:m.start()]+f"pixelWidth: {width_expr} >= 48 ? 576 : {width_expr} === 16 ? 120 : 384"+s[m.end():]
-          p.write_text(s)
+          if "pixelWidth:" not in s:
+              pattern=r"return\\s*\\{\\s*title:\\s*([^,]+),\\s*lines\\s*\\}"
+              m=re.search(pattern,s)
+              if not m:
+                  raise SystemExit("Could not locate buildReceipt return object to add pixelWidth.")
+              title_expr=m.group(1)
+              s=s[:m.start()]+f"return {{ title: {title_expr}, lines, pixelWidth: w >= 48 ? 576 : w === 16 ? 120 : 384 }}"+s[m.end():]
+              p.write_text(s)
+          else:
+              s=re.sub(r"pixelWidth:\\s*w\\s*>=\\s*48\\s*\\?\\s*576\\s*:\\s*384",
+                       "pixelWidth: w >= 48 ? 576 : w === 16 ? 120 : 384", s, count=1)
+              p.write_text(s)
           replace("src/lib/escpos.ts",
             "pixelWidth?: 384 | 576", "pixelWidth?: 120 | 384 | 576")
           replace("src/lib/escpos.ts",
