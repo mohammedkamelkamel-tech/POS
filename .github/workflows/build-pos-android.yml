@@ -346,106 +346,77 @@ jobs:
           print("Android 57mm receipt print dialog integrated.")
           PY
 
-      - name: Generate true-size thermal receipt PDF
+      - name: Fix blank thermal receipt PDF rendering
         working-directory: pos-android
         run: |
           python3 - <<'PY'
           from pathlib import Path
           p = Path("android/app/src/main/java/com/karuhundeveloper/poskacaw/PdfExportPlugin.java")
           s = p.read_text()
-          required = [
-              "import android.content.Intent;",
-              "import android.graphics.pdf.PdfDocument;",
-              "import android.net.Uri;",
-              "import android.view.View;",
-              "import androidx.core.content.FileProvider;",
-              "import java.io.File;",
-              "import java.io.FileOutputStream;"
-          ]
-          for item in required:
-              if item not in s:
-                  s = s.replace("import android.content.Context;", "import android.content.Context;\n" + item, 1)
-          start = s.find("    @PluginMethod\n    public void printReceipt(PluginCall call) {")
+          start = s.find("    @PluginMethod\\n    public void printReceipt(PluginCall call) {")
           if start < 0:
               raise SystemExit("Cannot find printReceipt plugin method")
-          end = s.rfind("\n}")
+          end = s.rfind("\\n}")
           if end < start:
               raise SystemExit("Cannot find PdfExportPlugin class closing brace")
           method = r'''    @PluginMethod
               public void printReceipt(PluginCall call) {
                   final String html = call.getString("html");
                   final String filename = call.getString("filename", "إيصال الكاشير");
-                  final int widthMm = call.getInt("paperWidthMm", 57);
+                  final int widthMm = Math.max(32, Math.min(80, call.getInt("paperWidthMm", 57)));
                   if (html == null || html.trim().isEmpty()) {
                       call.reject("لا توجد بيانات لإنشاء إيصال PDF.");
                       return;
                   }
                   getActivity().runOnUiThread(() -> {
-                      final WebView webView = new WebView(getContext());
-                      webView.getSettings().setJavaScriptEnabled(false);
-                      webView.getSettings().setUseWideViewPort(false);
-                      webView.setInitialScale(100);
-                      webView.setBackgroundColor(android.graphics.Color.WHITE);
-                      webView.setWebViewClient(new WebViewClient() {
-                          @Override
-                          public void onPageFinished(WebView view, String url) {
-                              try {
-                                  int widthPx = Math.round(widthMm * 96f / 25.4f);
-                                  int widthSpec = View.MeasureSpec.makeMeasureSpec(widthPx, View.MeasureSpec.EXACTLY);
-                                  int heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-                                  view.measure(widthSpec, heightSpec);
-                                  int contentHeightPx = Math.max(view.getMeasuredHeight(), view.getContentHeight());
-                                  contentHeightPx = Math.max(contentHeightPx, 120);
-                                  view.layout(0, 0, widthPx, contentHeightPx);
-
-                                  // Android PdfDocument uses 72-point-per-inch page units.
-                                  // 57mm = 161.57pt. This creates a real narrow PDF page,
-                                  // independent of the selected A4/Letter paper in PrintManager.
-                                  int pageWidthPt = Math.round(widthMm * 72f / 25.4f);
-                                  int pageHeightPt = Math.max(120, Math.round(contentHeightPx * 72f / 96f) + 12);
-                                  PdfDocument document = new PdfDocument();
-                                  PdfDocument.PageInfo info = new PdfDocument.PageInfo.Builder(
-                                      pageWidthPt, pageHeightPt, 1).create();
-                                  PdfDocument.Page page = document.startPage(info);
-                                  page.getCanvas().scale(72f / 96f, 72f / 96f);
-                                  view.draw(page.getCanvas());
-                                  document.finishPage(page);
-
-                                  File dir = new File(getContext().getCacheDir(), "thermal-receipts");
-                                  if (!dir.exists() && !dir.mkdirs()) {
-                                      document.close();
-                                      call.reject("تعذر إنشاء مجلد إيصال PDF.");
-                                      return;
-                                  }
-                                  String safeName = "receipt-" + System.currentTimeMillis();
-                                  File pdf = new File(dir, safeName + "-" + System.currentTimeMillis() + ".pdf");
-                                  try (FileOutputStream output = new FileOutputStream(pdf)) {
-                                      document.writeTo(output);
-                                  }
-                                  document.close();
-
-                                  Uri uri = FileProvider.getUriForFile(
-                                      getContext(), getContext().getPackageName() + ".fileprovider", pdf);
-                                  Intent open = new Intent(Intent.ACTION_VIEW);
-                                  open.setDataAndType(uri, "application/pdf");
-                                  open.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                  open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                  getContext().startActivity(Intent.createChooser(open, "فتح إيصال الكاشير"));
-                                  call.resolve();
-                              } catch (Exception error) {
-                                  call.reject("تعذر إنشاء إيصال PDF بمقاس حراري: " + error.getMessage());
-                              } finally {
-                                  view.destroy();
+                      try {
+                          final WebView webView = new WebView(getContext());
+                          webView.getSettings().setJavaScriptEnabled(false);
+                          webView.getSettings().setUseWideViewPort(false);
+                          webView.setInitialScale(100);
+                          webView.setBackgroundColor(android.graphics.Color.WHITE);
+                          webView.setWebViewClient(new WebViewClient() {
+                              private boolean submitted = false;
+                              @Override
+                              public void onPageFinished(WebView view, String url) {
+                                  if (submitted) return;
+                                  submitted = true;
+                                  view.postVisualStateCallback(1L, requestId -> {
+                                      try {
+                                          String jobName = filename.replaceAll("[\\\\/:*?\\"<>|]", "_");
+                                          int widthMils = Math.round(widthMm * 1000f / 25.4f);
+                                          int heightMils = Math.round(300f * 1000f / 25.4f);
+                                          PrintAttributes attributes = new PrintAttributes.Builder()
+                                              .setMediaSize(new PrintAttributes.MediaSize(
+                                                  "POS_" + widthMm + "MM", widthMm + "mm", widthMils, heightMils))
+                                              .setResolution(new PrintAttributes.Resolution("pos_thermal", "Thermal", 203, 203))
+                                              .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
+                                              .build();
+                                          PrintManager manager = (PrintManager) getContext().getSystemService(Context.PRINT_SERVICE);
+                                          if (manager == null) {
+                                              call.reject("خدمة الطباعة غير متاحة على هذا الجهاز.");
+                                              view.destroy();
+                                              return;
+                                          }
+                                          manager.print(jobName, view.createPrintDocumentAdapter(jobName), attributes);
+                                          call.resolve();
+                                      } catch (Exception error) {
+                                          call.reject("تعذر تجهيز معاينة الفاتورة: " + error.getMessage());
+                                          view.destroy();
+                                      }
+                                  });
                               }
-                          }
-                      });
-                      webView.loadDataWithBaseURL("https://localhost/", html, "text/html", "UTF-8", null);
+                          });
+                          webView.loadDataWithBaseURL("https://localhost/", html, "text/html", "UTF-8", null);
+                      } catch (Exception error) {
+                          call.reject("تعذر إنشاء معاينة الفاتورة: " + error.getMessage());
+                      }
                   });
               }
           '''
           s = s[:start] + method + s[end:]
           p.write_text(s)
-          print("Receipt printing now exports a real 57mm-wide PDF and opens it in a PDF viewer; report PDF remains A4.")
+          print("Thermal receipt now uses Android WebView PrintDocumentAdapter; removed manual blank-page PdfDocument drawing.")
           PY
 
       - name: Install dependencies
