@@ -342,20 +342,14 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
+          import re
           p = Path("android/app/src/main/java/com/karuhundeveloper/poskacaw/PdfExportPlugin.java")
           s = p.read_text()
-          old = """                            PrintAttributes.MediaSize media = new PrintAttributes.MediaSize(
-                                "THERMAL_57MM", "57mm", widthMils, 12000);"""
-          new = """                            // Use a true narrow thermal page and size its length to the
-                            // rendered receipt instead of forcing a 304mm/A4-like blank page.
-                            int contentHeightPx = Math.max(1, view.getContentHeight());
-                            int contentHeightMils = Math.round(contentHeightPx * 1000f / 96f) + 900;
-                            int heightMils = Math.max(2200, Math.min(16000, contentHeightMils));
-                            PrintAttributes.MediaSize media = new PrintAttributes.MediaSize(
-                                "THERMAL_57MM", "57mm roll", widthMils, heightMils);"""
-          if old not in s:
-              raise SystemExit("Cannot find fixed 57mm media height in PdfExportPlugin.java")
-          s = s.replace(old, new, 1)
+          # Update the MediaSize height argument wherever the 57mm media is declared.
+          pattern = r'(new PrintAttributes\\.MediaSize\\(\\s*"THERMAL_57MM",\\s*"[^"]+",\\s*widthMils,\\s*)12000(\\s*\\))'
+          s, n = re.subn(pattern, r'\\g<1>Math.max(2200, Math.min(16000, Math.round(Math.max(1, view.getContentHeight()) * 1000f / 96f) + 900))\\g<2>', s, count=1)
+          if n == 0:
+              raise SystemExit("Cannot locate THERMAL_57MM MediaSize declaration to adjust page height")
           s = s.replace('new PrintAttributes.Resolution("thermal", "Thermal", 203, 203)',
                         'new PrintAttributes.Resolution("thermal203", "203 dpi", 203, 203)', 1)
           p.write_text(s)
@@ -364,12 +358,11 @@ jobs:
           s = p.read_text()
           s = s.replace("@page { size: 57mm 200mm; margin: 2mm; }",
                         "@page { size: 57mm auto; margin: 2mm; }")
-          s = s.replace("font-size:${size}", "font-size:${size}")
           s = s.replace("line.size === 'large' ? '20px' : '13px'",
                         "line.size === 'large' ? '22px' : '15px'")
           s = s.replace("line-height:1.55", "line-height:1.45")
           p.write_text(s)
-          print("Receipt PDF now uses a content-fitted 57mm thermal page.")
+          print("57mm receipt page height now follows rendered content.")
           PY
 
       - name: Install dependencies
