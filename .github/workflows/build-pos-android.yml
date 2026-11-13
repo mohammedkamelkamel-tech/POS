@@ -181,8 +181,6 @@ jobs:
           source = p.read_text()
           start = source.find("async function printReceipt() {")
           end = source.find("function newTransaction()", start)
-          if end >= 0:
-              end = source.rfind("\\n", start, end) if source.rfind("\\n", start, end) >= 0 else end
           if start < 0 or end < 0:
               raise SystemExit("Cannot locate printReceipt/newTransaction function boundaries")
           new_function = """async function printReceipt() {
@@ -225,7 +223,7 @@ jobs:
               printing.value = false
             }
           }"""
-          p.write_text(source[:start] + new_function + source[end:])
+          p.write_text(source[:start] + new_function + "\\n" + source[end:])
 
           # Use the same raster width for actual sale receipts, not just test prints.
           replace_once("src/pages/pos/PosPage.vue",
