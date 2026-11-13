@@ -194,6 +194,12 @@ jobs:
         working-directory: pos-android
         run: npm ci
 
+      - name: Inspect patched printer page before build
+        working-directory: pos-android
+        run: |
+          echo "PrinterPage.vue around compiler error:"
+          nl -ba src/pages/printer/PrinterPage.vue | sed -n "180,205p"
+
       - name: Build web app
         working-directory: pos-android
         run: npm run build
