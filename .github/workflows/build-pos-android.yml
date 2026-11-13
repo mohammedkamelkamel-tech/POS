@@ -9,6 +9,7 @@ on:
       - "butcher-pos-full-project-source-fixed.zip"
       - ".github/workflows/build-pos-android.yml"
       - ".github/scripts/patch-printer-settings.py"
+      - ".github/scripts/patch-native-printer-route.py"
 
 permissions:
   contents: read
@@ -436,6 +437,10 @@ jobs:
       - name: Enable manual printer settings and editable receipt preview
         working-directory: pos-android
         run: python3 ../.github/scripts/patch-printer-settings.py
+
+      - name: Route checkout and reprints through native thermal printer
+        working-directory: pos-android
+        run: python3 ../.github/scripts/patch-native-printer-route.py
 
       - name: Install dependencies
         working-directory: pos-android
