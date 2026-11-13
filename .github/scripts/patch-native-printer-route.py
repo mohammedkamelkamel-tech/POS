@@ -18,18 +18,28 @@ p = Path("src/pages/transactions/TransactionDetailPage.vue")
 s = p.read_text()
 s = s.replace("import { printReceiptViaAndroid } from '@/lib/receiptPrint'\\n", "")
 start = s.find("async function printReceipt() {")
-end = s.find("\\n}", start)
-if start < 0 or end < 0:
+if start < 0:
     raise SystemExit("Transaction print function not found.")
-fn = s[start:end+2]
+brace = s.find("{", start)
+depth = 0
+end = -1
+for i in range(brace, len(s)):
+    if s[i] == "{": depth += 1
+    elif s[i] == "}":
+        depth -= 1
+        if depth == 0:
+            end = i + 1
+            break
+if end < 0:
+    raise SystemExit("Transaction print function is malformed.")
+fn = s[start:end]
 if "printReceiptViaAndroid(" in fn:
     fn = fn.replace("await printReceiptViaAndroid(", "await printer.print(")
-    # Remove the obsolete second layout argument after buildReceipt.
     fn = fn.replace("""    }),
     { paperMm: usePrinterStore().paperMm, contentMm: usePrinterStore().contentMm, marginMm: usePrinterStore().marginMm, fontPx: usePrinterStore().fontPx },
   )""", """    }),
   )""")
-    s = s[:start] + fn + s[end+2:]
+    s = s[:start] + fn + s[end:]
 elif "await printer.print(" not in fn:
     raise SystemExit("Transaction print call not found.")
 p.write_text(s)
