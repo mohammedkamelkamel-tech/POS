@@ -163,11 +163,11 @@ jobs:
           i = matches[0]
           indent = lines[i][:len(lines[i]) - len(lines[i].lstrip())]
           block = [
-              f'{indent}<Button\\n',
-              f'{indent}  :variant="paperWidth === 16 ? \'default\' : \'outline\'"\\n',
-              f'{indent}  size="sm"\\n',
-              f'{indent}  @click="printer.setWidth(16)"\\n',
-              f'{indent}>15mm</Button>\\n',
+              f'{indent}<Button\n',
+              f'{indent}  :variant="paperWidth === 16 ? \'default\' : \'outline\'"\n',
+              f'{indent}  size="sm"\n',
+              f'{indent}  @click="printer.setWidth(16)"\n',
+              f'{indent}>15mm</Button>\n',
           ]
           lines[i:i] = block
           source = "".join(lines)
