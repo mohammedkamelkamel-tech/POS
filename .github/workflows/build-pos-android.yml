@@ -8,6 +8,7 @@ on:
     paths:
       - "butcher-pos-full-project-source-fixed.zip"
       - ".github/workflows/build-pos-android.yml"
+      - ".github/scripts/patch-printer-settings.py"
 
 permissions:
   contents: read
