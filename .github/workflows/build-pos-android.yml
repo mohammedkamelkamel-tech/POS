@@ -395,7 +395,9 @@ jobs:
                           public void onPageFinished(WebView view, String url) {
                               if (submitted) return;
                               submitted = true;
-                              view.postVisualStateCallback(1L, requestId -> {
+                              view.postVisualStateCallback(1L, new WebView.VisualStateCallback() {
+                                  @Override
+                                  public void onComplete(long requestId) {
                                   try {
                                       String jobName = "إيصال الكاشير";
                                       int widthMils = Math.round(widthMm * 1000f / 25.4f);
