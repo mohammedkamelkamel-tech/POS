@@ -210,7 +210,7 @@ jobs:
           s = p.read_text()
           m = re.search(r"^([ \t]*pixelWidth\s*\??:\s*)[^;\n]+", s, re.M)
           if m:
-              s = s[:m.start()] + m.group(1) + "120 | 384 | 576" + s[m.end():]
+              s = s[:m.start()] + m.group(1) + "384 | 576" + s[m.end():]
           else:
               m = re.search(r"(interface\s+ReceiptOpts\s*\{)", s)
               if not m:
