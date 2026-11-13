@@ -343,13 +343,15 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import re
+
           p = Path("android/app/src/main/java/com/karuhundeveloper/poskacaw/PdfExportPlugin.java")
           s = p.read_text()
-          # Update the MediaSize height argument wherever the 57mm media is declared.
-          pattern = r'(new PrintAttributes\\.MediaSize\\(\\s*"THERMAL_57MM",\\s*"[^"]+",\\s*widthMils,\\s*)12000(\\s*\\))'
-          s, n = re.subn(pattern, r'\\g<1>Math.max(2200, Math.min(16000, Math.round(Math.max(1, view.getContentHeight()) * 1000f / 96f) + 900))\\g<2>', s, count=1)
-          if n == 0:
-              raise SystemExit("Cannot locate THERMAL_57MM MediaSize declaration to adjust page height")
+          pattern = r'("THERMAL_57MM",\s*"57mm",\s*widthMils,\s*)12000'
+          s, n = re.subn(pattern,
+              r'\g<1>Math.max(2200, Math.min(16000, Math.round(Math.max(1, view.getContentHeight()) * 1000f / 96f) + 900))',
+              s, count=1)
+          if n != 1:
+              raise SystemExit("Could not update the actual THERMAL_57MM page height declaration")
           s = s.replace('new PrintAttributes.Resolution("thermal", "Thermal", 203, 203)',
                         'new PrintAttributes.Resolution("thermal203", "203 dpi", 203, 203)', 1)
           p.write_text(s)
