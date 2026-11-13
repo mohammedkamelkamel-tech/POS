@@ -454,8 +454,14 @@ jobs:
           p = Path("src/lib/receipt.ts")
           s = p.read_text()
           if "html: buildReceiptHtml" not in s:
-              s = s.replace("return { title: `Struk ${sale.number}`, lines, pixelWidth: w >= 48 ? 576 : 384 }",
-                            "return { title: `Struk ${sale.number}`, lines, pixelWidth: 384, html: buildReceiptHtml(sale, items, opts) }")
+              lines = s.splitlines()
+              for index, line in enumerate(lines):
+                  if "return { title:" in line and "sale.number" in line:
+                      lines[index] = "  return { title: `Struk ${sale.number}`, lines, pixelWidth: 384, html: buildReceiptHtml(sale, items, opts) }"
+                      break
+              else:
+                  raise SystemExit("Cannot locate receipt return object to attach HTML")
+              s = "\n".join(lines) + "\n"
           if "function buildReceiptHtml(" not in s:
               s += r'''
           function receiptEscape(value: unknown): string {
