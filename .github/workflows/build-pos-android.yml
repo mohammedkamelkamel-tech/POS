@@ -167,6 +167,28 @@ jobs:
               "pixelWidth: w === 48 ? 576 : 384", 1)
           p.write_text(source)
 
+          # The 15mm selector remains a label only; use the full 58mm-class
+          # printable raster and matching 32-character receipt layout.
+          replace_once("src/pages/pos/PosPage.vue",
+                       "width: usePrinterStore().paperWidth,",
+                       "width: usePrinterStore().paperWidth === 16 ? 32 : usePrinterStore().paperWidth,",
+                       "15mm receipt text columns")
+
+          # Resolve the JS print promise only after the Bluetooth socket is closed.
+          # This prevents a fast second tap from racing the previous connection teardown.
+          replace_once("android/app/src/main/java/com/karuhundeveloper/poskacaw/ThermalPrinterPlugin.java",
+                       "        Exception lastError = null;\n        try {",
+                       "        Exception lastError = null;\n        boolean printed = false;\n        try {",
+                       "Bluetooth completion flag")
+          replace_once("android/app/src/main/java/com/karuhundeveloper/poskacaw/ThermalPrinterPlugin.java",
+                       "            call.resolve();\n        } catch (Exception e) {",
+                       "            printed = true;\n        } catch (Exception e) {",
+                       "defer Bluetooth print resolution")
+          replace_once("android/app/src/main/java/com/karuhundeveloper/poskacaw/ThermalPrinterPlugin.java",
+                       "                try { socket.close(); } catch (Exception ignored) {}\n            }\n        }",
+                       "                try { socket.close(); } catch (Exception ignored) {}\n            }\n            if (printed) call.resolve();\n        }",
+                       "resolve after Bluetooth socket close")
+
           # Use the same raster width for actual sale receipts, not just test prints.
           replace_once("src/pages/pos/PosPage.vue",
                        "pixelWidth: usePrinterStore().paperWidth === 48 ? 576 : 384",
