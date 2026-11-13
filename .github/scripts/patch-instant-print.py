@@ -13,7 +13,6 @@ import { useSalesStore } from '@/stores/sales'
 import { useSettingsStore } from '@/stores/settings'
 import { buildReceipt } from '@/lib/receipt'
 import { formatRupiah } from '@/lib/money'
-import { formatDateTime } from '@/lib/datetime'
 import type { Sale } from '@/db/types'"""
 )
 s = s.replace(
