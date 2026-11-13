@@ -52,6 +52,10 @@ jobs:
               print("No cancelDiscovery call found; source already patched.")
           PY
 
+      - name: Prevent Bluetooth thermal print data truncation
+        working-directory: pos-android
+        run: python3 ../.github/scripts/patch-printer-send.py
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
