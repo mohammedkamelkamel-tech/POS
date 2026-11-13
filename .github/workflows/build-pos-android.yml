@@ -226,10 +226,7 @@ jobs:
           p.write_text(source[:start] + new_function + "\\n" + source[end:])
 
           # Use the same raster width for actual sale receipts, not just test prints.
-          replace_once("src/pages/pos/PosPage.vue",
-                       "pixelWidth: usePrinterStore().paperWidth === 48 ? 576 : 384",
-                       "pixelWidth: usePrinterStore().paperWidth === 48 ? 576 : 384",
-                       "sale receipt raster width")
+          # Sale print width is already set by the guarded printReceipt implementation above.
           replace_once("src/lib/receipt.ts",
                        "return { title: `إيصال ${sale.number}`, lines }",
                        "return { title: `إيصال ${sale.number}`, lines, pixelWidth: opts.pixelWidth ?? (w >= 48 ? 576 : 384) }",
