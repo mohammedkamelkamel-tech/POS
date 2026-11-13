@@ -123,25 +123,14 @@ jobs:
                   raise SystemExit(f"{label}: expected exactly one source match, found {count}")
               p.write_text(source.replace(old, new, 1))
 
-          # The real source uses a 120-dot raster for the requested 15mm width.
+          # Keep the 15mm label as requested, but render it at the normal 58mm
+          # printer raster width (384 dots, approx. 48mm printable width at 203 DPI).
           replace_once("src/services/capabilities/registry.ts",
                        "pixelWidth?: 384 | 576",
-                       "pixelWidth?: 120 | 384 | 576", "ReceiptJob type")
+                       "pixelWidth?: 384 | 576", "ReceiptJob type")
           replace_once("src/lib/escpos.ts",
                        "pixelWidth?: 384 | 576",
-                       "pixelWidth?: 120 | 384 | 576", "ESC/POS options type")
-
-          # Match the actual rasterize() implementation in the uploaded archive.
-          replace_once("src/lib/escpos.ts", "const padding = 10",
-                       "const padding = width === 120 ? 2 : 10", "raster padding")
-          replace_once("src/lib/escpos.ts",
-                       "const fontSize = line.size === 'large' ? 30 : 23",
-                       "const fontSize = width === 120 ? (line.size === 'large' ? 10 : 8) : line.size === 'large' ? 30 : 23",
-                       "raster font size")
-          replace_once("src/lib/escpos.ts",
-                       "const lineHeight = line.size === 'large' ? 42 : 32",
-                       "const lineHeight = width === 120 ? (line.size === 'large' ? 13 : 11) : line.size === 'large' ? 42 : 32",
-                       "raster line height")
+                       "pixelWidth?: 384 | 576", "ESC/POS options type")
 
           # Store selection: 16 chars for narrow layout, 32/48 remain unchanged.
           replace_once("src/stores/printer.ts", "export type PaperWidth = 32 | 48",
@@ -175,17 +164,17 @@ jobs:
           if source.count(replace_test) != 1:
               raise SystemExit("Test-print raster width expression did not match exactly once")
           source = source.replace(replace_test,
-              "pixelWidth: w === 16 ? 120 : w === 48 ? 576 : 384", 1)
+              "pixelWidth: w === 48 ? 576 : 384", 1)
           p.write_text(source)
 
           # Use the same raster width for actual sale receipts, not just test prints.
           replace_once("src/pages/pos/PosPage.vue",
                        "pixelWidth: usePrinterStore().paperWidth === 48 ? 576 : 384",
-                       "pixelWidth: usePrinterStore().paperWidth === 16 ? 120 : usePrinterStore().paperWidth === 48 ? 576 : 384",
+                       "pixelWidth: usePrinterStore().paperWidth === 48 ? 576 : 384",
                        "sale receipt raster width")
           replace_once("src/lib/receipt.ts",
                        "return { title: `إيصال ${sale.number}`, lines }",
-                       "return { title: `إيصال ${sale.number}`, lines, pixelWidth: opts.pixelWidth ?? (w === 16 ? 120 : w >= 48 ? 576 : 384) }",
+                       "return { title: `إيصال ${sale.number}`, lines, pixelWidth: opts.pixelWidth ?? (w >= 48 ? 576 : 384) }",
                        "receipt job raster width")
           print("15mm mode configured for test and sale receipts; 58mm and 80mm retained.")
           PY
