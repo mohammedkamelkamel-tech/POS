@@ -262,12 +262,11 @@ jobs:
               return `<div class="line" style="text-align:${align};font-size:${size};font-weight:${line.bold ? 700 : 400}">${escapeHtml(line.text)}</div>`
             }).join('')
             const html = `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>
-              @page { margin: 2mm; }
+              @page { size: 58mm auto; margin: 0; }
               * { box-sizing: border-box; }
-              html,body { width:100%; margin:0; padding:0; direction:rtl; unicode-bidi:plaintext; }
-              body { font-family: "Noto Naskh Arabic","Noto Sans Arabic",Tahoma,Arial,sans-serif; color:#000; background:#fff; }
+              html,body { width:58mm; margin:0; padding:0; direction:rtl; unicode-bidi:plaintext; }
+              body { font-family: "Noto Naskh Arabic","Noto Sans Arabic",Tahoma,Arial,sans-serif; color:#000; background:#fff; width:54mm; margin:1mm auto; }
               .line { width:100%; white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.55; padding:1px 0; }
-              @media screen { body { width:56mm; margin:0 auto; } }
             </style></head><body>${rows}</body></html>`
             await NativeReceiptPrint.printReceipt({ html, filename: job.title || 'إيصال الكاشير', paperWidthMm: 58 })
           }
@@ -428,108 +427,6 @@ jobs:
           s = s[:line_start] + method + s[end:]
           p.write_text(s)
           print("Receipt method replaced by Android WebView print adapter after visual-state callback.")
-          PY
-
-      - name: Apply Yemen rial currency and 58mm Arabic receipt template
-        working-directory: pos-android
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          import re
-
-          # All screens and calculations that use the shared money formatter now show YER.
-          p = Path("src/lib/money.ts")
-          s = p.read_text()
-          s = re.sub(r"const idr = new Intl\.NumberFormat\([\s\S]*?\n\)\n", """const idr = new Intl.NumberFormat('en-US', {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-          })
-          """, s, count=1)
-          s = s.replace("return idr.format(Math.round(amount || 0))",
-                        "return idr.format(Math.round(amount || 0)) + ' YER'")
-          s = s.replace("Rp 26.000", "8,000 YER").replace("Rp 26.000", "8,000 YER")
-          p.write_text(s)
-
-          # Generate the receipt HTML from the actual sale data using the supplied 58mm layout.
-          p = Path("src/lib/receipt.ts")
-          s = p.read_text()
-          if "html: buildReceiptHtml" not in s:
-              lines = s.splitlines()
-              for index, line in enumerate(lines):
-                  if "return { title:" in line and "sale.number" in line:
-                      lines[index] = "  return { title: `Struk ${sale.number}`, lines, pixelWidth: 384, html: buildReceiptHtml(sale, items, opts) }"
-                      break
-              else:
-                  raise SystemExit("Cannot locate receipt return object to attach HTML")
-              s = "\n".join(lines) + "\n"
-          if "function buildReceiptHtml(" not in s:
-              s += r'''
-          function receiptEscape(value: unknown): string {
-            return String(value ?? '').replace(/[&<>"']/g, (c) => ({
-              '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
-            }[c]!))
-          }
-
-          function buildReceiptHtml(sale: Sale, items: SaleItem[], opts: ReceiptOpts): string {
-            const money = (value: number) => formatRupiah(value)
-            const date = formatDateTime(completedSaleTime(sale))
-            const rows = items.map((item) => `<tr>
-              <td>${receiptEscape(item.name_snapshot)}</td>
-              <td class="qty">${receiptEscape(item.qty)}</td>
-              <td class="price">${money(item.line_total)}</td>
-            </tr>`).join('')
-            const payLabel = PAY_LABEL[sale.payment_method] ?? 'نقداً'
-            return `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width,initial-scale=1">
-            <title>فاتورة الكاشير</title><style>
-            @page { size: 58mm auto; margin: 0; }
-            * { box-sizing: border-box; }
-            html, body { margin: 0; padding: 0; width: 58mm; background: #fff; color: #000; }
-            body { font-family: Tahoma, Arial, sans-serif; width: 54mm; margin: 1mm auto;
-              font-size: 11px; line-height: 1.2; direction: rtl; }
-            .header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 4px; margin-bottom: 4px; }
-            .store-name { font-size: 13px; font-weight: bold; margin-bottom: 2px; }
-            .info { font-size: 9px; margin-bottom: 3px; }
-            .info div { display: flex; justify-content: space-between; gap: 3px; }
-            table { width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 4px; }
-            th, td { padding: 2px 0; text-align: right; overflow-wrap: anywhere; }
-            th { border-bottom: 1px solid #000; font-size: 9px; }
-            .qty { text-align: center; white-space: nowrap; }
-            .price { text-align: left; white-space: nowrap; }
-            .totals { font-size: 10px; margin-top: 3px; border-top: 1px dashed #000; padding-top: 3px; }
-            .totals-row { display: flex; justify-content: space-between; gap: 4px; margin-bottom: 1px; }
-            .footer { text-align: center; font-size: 9px; margin-top: 5px;
-              border-top: 1px dashed #000; padding-top: 4px; }
-            </style></head><body>
-            <div class="header"><div class="store-name">${receiptEscape(opts.storeName || 'الكامل - كاشير')}</div>
-            <div class="info"><div><span>رقم الفاتورة:</span><span>${receiptEscape(sale.number)}</span></div>
-            <div><span>التاريخ:</span><span>${receiptEscape(date)}</span></div></div></div>
-            <table><thead><tr><th>الصنف</th><th style="text-align:center">الكمية</th>
-            <th style="text-align:left">السعر</th></tr></thead><tbody>${rows}</tbody></table>
-            <div class="totals">
-            <div class="totals-row"><span>المجموع الفرعي:</span><span>${money(sale.subtotal)}</span></div>
-            ${sale.discount > 0 ? `<div class="totals-row"><span>الخصم:</span><span>${money(sale.discount)}</span></div>` : ''}
-            <div class="totals-row" style="font-weight:bold"><span>الإجمالي:</span><span>${money(sale.total)}</span></div>
-            <div class="totals-row"><span>${receiptEscape(payLabel)}:</span><span>${money(sale.paid)}</span></div>
-            ${sale.change_due > 0 ? `<div class="totals-row"><span>الباقي:</span><span>${money(sale.change_due)}</span></div>` : ''}
-            </div><div class="footer"><div>شكراً لتعاملكم معنا 🙏</div>
-            <div style="margin-top:2px;font-weight:bold">${receiptEscape(opts.storeName || 'الكامل - كاشير')}</div></div>
-            </body></html>`
-          }
-          '''
-          p.write_text(s)
-
-          # Native print uses the exact HTML receipt, rather than converting text lines again.
-          p = Path("src/lib/receiptPrint.ts")
-          s = p.read_text()
-          s = s.replace("const rows = job.lines.map((line) => {",
-                        "const rows = job.lines.map((line) => {")
-          s = s.replace("const html = `<!doctype html>",
-                        "const fallbackHtml = `<!doctype html>")
-          s = s.replace("await NativeReceiptPrint.printReceipt({ html, filename:",
-                        "await NativeReceiptPrint.printReceipt({ html: job.html || fallbackHtml, filename:")
-          p.write_text(s)
-          print("YER currency and 58mm variable-content receipt template applied.")
           PY
 
       - name: Install dependencies
