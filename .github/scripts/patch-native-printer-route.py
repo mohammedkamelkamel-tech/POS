@@ -1,22 +1,20 @@
 from pathlib import Path
 
-# Checkout and invoice reprints must use the native ESC/POS Bluetooth transport.
-# The Android PrintManager dialog is only a preview/export path and does not
-# guarantee routing to the already-paired YHK-0E4B printer.
+def remove_old_import(text):
+    return "\n".join(line for line in text.splitlines()
+                     if "import { printReceiptViaAndroid }" not in line) + "\n"
 
 p = Path("src/pages/pos/PosPage.vue")
-s = p.read_text()
-s = s.replace("import { printReceiptViaAndroid } from '@/lib/receiptPrint'\\n", "")
-old = """    await printReceiptViaAndroid(job, { paperMm: usePrinterStore().paperMm, contentMm: usePrinterStore().contentMm, marginMm: usePrinterStore().marginMm, fontPx: usePrinterStore().fontPx })"""
+s = remove_old_import(p.read_text())
+old = "    await printReceiptViaAndroid(job, { paperMm: usePrinterStore().paperMm, contentMm: usePrinterStore().contentMm, marginMm: usePrinterStore().marginMm, fontPx: usePrinterStore().fontPx })"
 if old in s:
     s = s.replace(old, "    await printer.print(job)", 1)
 elif "await printer.print(job)" not in s:
-    raise SystemExit("Checkout print call not found; refusing to patch PosPage.")
+    raise SystemExit("Checkout print call not found.")
 p.write_text(s)
 
 p = Path("src/pages/transactions/TransactionDetailPage.vue")
-s = p.read_text()
-s = s.replace("import { printReceiptViaAndroid } from '@/lib/receiptPrint'\\n", "")
+s = remove_old_import(p.read_text())
 start = s.find("async function printReceipt() {")
 if start < 0:
     raise SystemExit("Transaction print function not found.")
@@ -45,9 +43,8 @@ elif "await printer.print(" not in fn:
 p.write_text(s)
 
 p = Path("src/pages/printer/PrinterPage.vue")
-s = p.read_text()
-s = s.replace("import { printReceiptViaAndroid } from '@/lib/receiptPrint'\\n", "")
-old = """  await printReceiptViaAndroid(job, { paperMm: paperMm.value, contentMm: contentMm.value, marginMm: marginMm.value, fontPx: fontPx.value })"""
+s = remove_old_import(p.read_text())
+old = "  await printReceiptViaAndroid(job, { paperMm: paperMm.value, contentMm: contentMm.value, marginMm: marginMm.value, fontPx: fontPx.value })"
 if old in s:
     s = s.replace(old, """  if (!cap.value || !(await cap.value.isAvailable())) throw new Error('اختر الطابعة المقترنة من إعدادات البلوتوث أولاً.')
   await cap.value.print(job)""", 1)
@@ -55,4 +52,4 @@ elif "await cap.value.print(job)" not in s:
     raise SystemExit("Preview print call not found.")
 p.write_text(s)
 
-print("Checkout, preview printing, and transaction reprints now use the selected native ESC/POS printer (Bluetooth/USB), not Android PrintManager.")
+print("All actual receipt print actions now use the selected native ESC/POS printer.")
