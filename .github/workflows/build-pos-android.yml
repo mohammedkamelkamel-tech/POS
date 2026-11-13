@@ -156,24 +156,22 @@ jobs:
           # Add the selector to the exact existing 58mm/80mm controls.
           p = Path("src/pages/printer/PrinterPage.vue")
           source = p.read_text()
-          old = '''              <Button
-                :variant="paperWidth === 32 ? 'default' : 'outline'"
-                size="sm"
-                @click="printer.setWidth(32)"
-              >58mm</Button>'''
-          new = '''              <Button
-                :variant="paperWidth === 16 ? 'default' : 'outline'"
-                size="sm"
-                @click="printer.setWidth(16)"
-              >15mm</Button>
-              <Button
-                :variant="paperWidth === 32 ? 'default' : 'outline'"
-                size="sm"
-                @click="printer.setWidth(32)"
-              >58mm</Button>'''
-          if source.count(old) != 1:
-              raise SystemExit("Printer width selector source block did not match exactly once")
-          source = source.replace(old, new, 1)
+          pattern = re.compile(r'(?m)^(\s*)<Button\s*\n\s*:variant="paperWidth === 32 \? \'default\' : \'outline\'"\s*\n\s*size="sm"\s*\n\s*@click="printer\.setWidth\(32\)"\s*\n\s*>58mm</Button>')
+          match = pattern.search(source)
+          if not match:
+              raise SystemExit("Could not locate the 58mm selector in PrinterPage.vue")
+          indent = match.group(1)
+          new = f'''{indent}<Button
+{indent}  :variant="paperWidth === 16 ? 'default' : 'outline'"
+{indent}  size="sm"
+{indent}  @click="printer.setWidth(16)"
+{indent}>15mm</Button>
+{indent}<Button
+{indent}  :variant="paperWidth === 32 ? 'default' : 'outline'"
+{indent}  size="sm"
+{indent}  @click="printer.setWidth(32)"
+{indent}>58mm</Button>'''
+          source = source[:match.start()] + new + source[match.end():]
           replace_test = "pixelWidth: w === 48 ? 576 : 384"
           if source.count(replace_test) != 1:
               raise SystemExit("Test-print raster width expression did not match exactly once")
