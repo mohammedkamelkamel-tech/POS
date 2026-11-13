@@ -157,9 +157,9 @@ jobs:
           p = Path("src/pages/printer/PrinterPage.vue")
           source = p.read_text()
           lines = source.splitlines(keepends=True)
-          matches = [i for i, line in enumerate(lines) if ">58mm</Button>" in line]
+          matches = [i for i, line in enumerate(lines) if ':variant="paperWidth === 32 ? \'default\' : \'outline\'"' in line]
           if len(matches) != 1:
-              raise SystemExit(f"Expected one 58mm selector closing line, found {len(matches)}")
+              raise SystemExit(f"Expected one 58mm selector variant line, found {len(matches)}")
           i = matches[0]
           indent = lines[i][:len(lines[i]) - len(lines[i].lstrip())]
           block = [
@@ -169,7 +169,7 @@ jobs:
               f'{indent}  @click="printer.setWidth(16)"\n',
               f'{indent}>15mm</Button>\n',
           ]
-          lines[i:i] = block
+          lines[i-1:i-1] = block
           source = "".join(lines)
           replace_test = "pixelWidth: w === 48 ? 576 : 384"
           if source.count(replace_test) != 1:
