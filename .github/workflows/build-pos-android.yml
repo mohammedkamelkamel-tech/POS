@@ -360,10 +360,22 @@ jobs:
           start = s.rfind("@PluginMethod", 0, pos)
           if start < 0:
               raise SystemExit("Cannot find printReceipt annotation")
+          brace = s.find("{", pos)
+          if brace < 0:
+              raise SystemExit("Cannot find printReceipt method body")
+          depth = 0
+          end = -1
+          for i in range(brace, len(s)):
+              if s[i] == "{":
+                  depth += 1
+              elif s[i] == "}":
+                  depth -= 1
+                  if depth == 0:
+                      end = i + 1
+                      break
+          if end < 0:
+              raise SystemExit("Cannot find end of printReceipt method")
           line_start = s.rfind("\\n", 0, start) + 1
-          end = s.rfind("\\n}")
-          if end < pos:
-              raise SystemExit("Cannot find PdfExportPlugin class closing brace")
           method = r'''    @PluginMethod
               public void printReceipt(PluginCall call) {
                   final String html = call.getString("html");
@@ -411,11 +423,10 @@ jobs:
                       });
                       webView.loadDataWithBaseURL("https://localhost/", html, "text/html", "UTF-8", null);
                   });
-              }
-          '''
+              }'''
           s = s[:line_start] + method + s[end:]
           p.write_text(s)
-          print("Thermal receipt uses WebView PrintDocumentAdapter after visual-state completion.")
+          print("Receipt method replaced by Android WebView print adapter after visual-state callback.")
           PY
 
       - name: Install dependencies
