@@ -174,20 +174,79 @@ jobs:
                        "width: usePrinterStore().paperWidth === 16 ? 32 : usePrinterStore().paperWidth,",
                        "15mm receipt text columns")
 
-          # Resolve the JS print promise only after the Bluetooth socket is closed.
-          # This prevents a fast second tap from racing the previous connection teardown.
-          replace_once("android/app/src/main/java/com/karuhundeveloper/poskacaw/ThermalPrinterPlugin.java",
-                       "        Exception lastError = null;\n        try {",
-                       "        Exception lastError = null;\n        boolean printed = false;\n        try {",
-                       "Bluetooth completion flag")
-          replace_once("android/app/src/main/java/com/karuhundeveloper/poskacaw/ThermalPrinterPlugin.java",
-                       "            call.resolve();\n        } catch (Exception e) {",
-                       "            printed = true;\n        } catch (Exception e) {",
-                       "defer Bluetooth print resolution")
-          replace_once("android/app/src/main/java/com/karuhundeveloper/poskacaw/ThermalPrinterPlugin.java",
-                       "                try { socket.close(); } catch (Exception ignored) {}\n            }\n        }",
-                       "                try { socket.close(); } catch (Exception ignored) {}\n            }\n            if (printed) call.resolve();\n        }",
-                       "resolve after Bluetooth socket close")
+          # Never issue a blank print: reload the persisted sale and item snapshots
+          # when the in-memory checkout result is absent or incomplete.
+          p = Path("src/pages/pos/PosPage.vue")
+          source = p.read_text()
+          old = """async function printReceipt() {
+            if (!lastResult.value || printing.value) return
+            const printer = capabilities.get<PrinterCapability>('printer')
+            if (!printer) {
+              operationError.value = 'Printer غير متصلة أو غير مهيأة. افتح إعدادات Printer ثم أعد المحاولة.'
+              return
+            }
+            printing.value = true
+            operationError.value = null
+            try {
+              await printer.print(
+                buildReceipt(lastResult.value.sale, lastResult.value.items, {
+                  storeName: settings.storeName,
+                  storeOwner: settings.storeOwner,
+                  width: usePrinterStore().paperWidth,
+                  pixelWidth: usePrinterStore().paperWidth === 48 ? 576 : 384,
+                }),
+              )
+            } catch (error) {
+              operationError.value = error instanceof Error ? `تعذرت طباعة الإيصال: ${error.message}` : 'تعذرت طباعة الإيصال. تحقق من اتصال Printer.'
+            } finally {
+              printing.value = false
+            }
+          }"""
+          new = """async function printReceipt() {
+            if (printing.value) return
+            const printer = capabilities.get<PrinterCapability>('printer')
+            if (!printer) {
+              operationError.value = 'الطابعة غير متصلة أو غير مهيأة. افتح إعدادات الطابعة ثم أعد المحاولة.'
+              return
+            }
+            printing.value = true
+            operationError.value = null
+            try {
+              let result = lastResult.value
+              if (!result?.sale?.id || !Array.isArray(result.items) || result.items.length === 0) {
+                const saleId = result?.sale?.id
+                if (!saleId) {
+                  throw new Error('بيانات الفاتورة غير متوفرة. افتح الفاتورة من سجل المبيعات وأعد الطباعة.')
+                }
+                const persisted = await sales.getWithItems(saleId)
+                if (!persisted.sale || persisted.items.length === 0) {
+                  throw new Error('لم يتم العثور على أصناف محفوظة لهذه الفاتورة؛ أُلغيت الطباعة حتى لا تخرج ورقة فارغة.')
+                }
+                result = { sale: persisted.sale, items: persisted.items }
+                lastResult.value = result
+              }
+              if (result.sale.status !== 'completed' || result.items.length === 0) {
+                throw new Error('الفاتورة غير مكتملة أو لا تحتوي على أصناف قابلة للطباعة.')
+              }
+              const job = buildReceipt(result.sale, result.items, {
+                storeName: settings.storeName,
+                storeOwner: settings.storeOwner,
+                width: usePrinterStore().paperWidth === 16 ? 32 : usePrinterStore().paperWidth,
+                pixelWidth: usePrinterStore().paperWidth === 48 ? 576 : 384,
+              })
+              if (!job.lines.some(line => line.text.trim().length > 0)) {
+                throw new Error('محتوى الفاتورة فارغ؛ لم يتم إرسال أمر للطابعة.')
+              }
+              await printer.print(job)
+            } catch (error) {
+              operationError.value = error instanceof Error ? `تعذرت طباعة الإيصال: ${error.message}` : 'تعذرت طباعة الإيصال. تحقق من اتصال الطابعة.'
+            } finally {
+              printing.value = false
+            }
+          }"""
+          if source.count(old) != 1:
+              raise SystemExit(f"Expected one printReceipt function, found {source.count(old)}")
+          p.write_text(source.replace(old, new, 1))
 
           # Use the same raster width for actual sale receipts, not just test prints.
           replace_once("src/pages/pos/PosPage.vue",
