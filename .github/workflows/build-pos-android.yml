@@ -1,4 +1,5 @@
 name: Build POS Android from latest uploaded source ZIP
+# Rebuild after correcting the instant-print tab import patch.
 
 on:
   workflow_dispatch:
