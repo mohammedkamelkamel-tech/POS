@@ -226,6 +226,117 @@ jobs:
           print("15mm selector and repeat-print guard configured.")
           PY
 
+      - name: Add Android 57mm receipt print dialog
+        working-directory: pos-android
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          # Dedicated Android PrintManager path: same system print preview
+          # used by the working companion app, with a 57mm custom paper size.
+          helper = """import { registerPlugin } from '@capacitor/core'
+          import type { ReceiptJob } from '@/services/capabilities/registry'
+
+          interface ReceiptPrintPlugin {
+            printReceipt(options: { html: string; filename: string; paperWidthMm: number }): Promise<void>
+          }
+          const NativeReceiptPrint = registerPlugin<ReceiptPrintPlugin>('PdfExport')
+
+          function escapeHtml(value: string): string {
+            return value.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!)
+          }
+
+          export async function printReceiptViaAndroid(job: ReceiptJob): Promise<void> {
+            const rows = job.lines.map((line) => {
+              const align = line.align === 'center' ? 'center' : line.align === 'left' ? 'left' : 'right'
+              const size = line.size === 'large' ? '20px' : '13px'
+              return `<div class="line" style="text-align:${align};font-size:${size};font-weight:${line.bold ? 700 : 400}">${escapeHtml(line.text)}</div>`
+            }).join('')
+            const html = `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>
+              @page { size: 57mm 200mm; margin: 2mm; }
+              * { box-sizing: border-box; }
+              html,body { width:100%; margin:0; padding:0; direction:rtl; unicode-bidi:plaintext; }
+              body { font-family: "Noto Naskh Arabic","Noto Sans Arabic",Tahoma,Arial,sans-serif; color:#000; background:#fff; }
+              .line { width:100%; white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.55; padding:1px 0; }
+              @media screen { body { width:53mm; margin:0 auto; } }
+            </style></head><body>${rows}</body></html>`
+            await NativeReceiptPrint.printReceipt({ html, filename: job.title || 'إيصال الكاشير', paperWidthMm: 57 })
+          }
+          """
+          Path("src/lib/receiptPrint.ts").write_text(helper)
+
+          p = Path("android/app/src/main/java/com/karuhundeveloper/poskacaw/PdfExportPlugin.java")
+          s = p.read_text()
+          if "public void printReceipt(PluginCall call)" not in s:
+              method = '''
+              @PluginMethod
+              public void printReceipt(PluginCall call) {
+                  String html = call.getString("html");
+                  String filename = call.getString("filename", "إيصال الكاشير");
+                  int widthMm = call.getInt("paperWidthMm", 57);
+                  if (html == null || html.trim().isEmpty()) {
+                      call.reject("لا توجد بيانات لطباعة الإيصال.");
+                      return;
+                  }
+                  getActivity().runOnUiThread(() -> {
+                      try {
+                          WebView webView = new WebView(getContext());
+                          webView.getSettings().setJavaScriptEnabled(false);
+                          webView.setWebViewClient(new WebViewClient() {
+                              @Override
+                              public void onPageFinished(WebView view, String url) {
+                                  try {
+                                      PrintManager printManager = (PrintManager) getContext().getSystemService(Context.PRINT_SERVICE);
+                                      String jobName = filename.replaceAll("[\\\\\\\\/:*?\\"<>|]", "_");
+                                      int widthMils = Math.round(widthMm * 1000f / 25.4f);
+                                      PrintAttributes.MediaSize media = new PrintAttributes.MediaSize(
+                                          "THERMAL_57MM", "57mm", widthMils, 12000);
+                                      PrintAttributes attributes = new PrintAttributes.Builder()
+                                          .setMediaSize(media)
+                                          .setResolution(new PrintAttributes.Resolution("thermal", "Thermal", 203, 203))
+                                          .setMinMargins(new PrintAttributes.Margins(40, 40, 40, 40))
+                                          .build();
+                                      printManager.print(jobName, view.createPrintDocumentAdapter(jobName), attributes);
+                                      call.resolve();
+                                  } catch (Exception e) {
+                                      call.reject("تعذر فتح معاينة طباعة الإيصال: " + e.getMessage());
+                                  }
+                              }
+                          });
+                          webView.loadDataWithBaseURL("https://localhost/", html, "text/html", "UTF-8", null);
+                      } catch (Exception error) {
+                          call.reject("تعذر تجهيز الإيصال للطباعة: " + error.getMessage());
+                      }
+                  });
+              }
+          '''
+              pos = s.rfind("\n}")
+              if pos < 0: raise SystemExit("Cannot find PdfExportPlugin class end")
+              s = s[:pos] + "\n" + method + s[pos:]
+              p.write_text(s)
+
+          # Route checkout receipt printing through Android's native print UI.
+          p = Path("src/pages/pos/PosPage.vue")
+          s = p.read_text()
+          if "printReceiptViaAndroid" not in s:
+              s = s.replace("import { buildReceipt } from '@/lib/receipt'",
+                            "import { buildReceipt } from '@/lib/receipt'\nimport { printReceiptViaAndroid } from '@/lib/receiptPrint'")
+          s = s.replace("await printer.print(job)", "await printReceiptViaAndroid(job)")
+          # Do not require selecting the legacy direct-Bluetooth printer for Android print framework.
+          s = s.replace("    const printer = capabilities.get<PrinterCapability>('printer')\n    if (!printer) {\n      operationError.value = 'الطابعة غير متصلة أو غير مهيأة. افتح إعدادات الطابعة ثم أعد المحاولة.'\n      return\n    }\n", "")
+          p.write_text(s)
+
+          # Route reprints from transaction history through the same print preview.
+          p = Path("src/pages/transactions/TransactionDetailPage.vue")
+          s = p.read_text()
+          if "printReceiptViaAndroid" not in s:
+              s = s.replace("import { buildReceipt } from '@/lib/receipt'",
+                            "import { buildReceipt } from '@/lib/receipt'\nimport { printReceiptViaAndroid } from '@/lib/receiptPrint'")
+          s = s.replace("await printer.print(", "await printReceiptViaAndroid(")
+          p.write_text(s)
+          print("Android 57mm receipt print dialog integrated.")
+          PY
+
       - name: Install dependencies
         working-directory: pos-android
         run: npm ci
