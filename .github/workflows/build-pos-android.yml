@@ -337,6 +337,41 @@ jobs:
           print("Android 57mm receipt print dialog integrated.")
           PY
 
+      - name: Fit receipt PDF to thermal roll content
+        working-directory: pos-android
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("android/app/src/main/java/com/karuhundeveloper/poskacaw/PdfExportPlugin.java")
+          s = p.read_text()
+          old = """                            PrintAttributes.MediaSize media = new PrintAttributes.MediaSize(
+                                "THERMAL_57MM", "57mm", widthMils, 12000);"""
+          new = """                            // Use a true narrow thermal page and size its length to the
+                            // rendered receipt instead of forcing a 304mm/A4-like blank page.
+                            int contentHeightPx = Math.max(1, view.getContentHeight());
+                            int contentHeightMils = Math.round(contentHeightPx * 1000f / 96f) + 900;
+                            int heightMils = Math.max(2200, Math.min(16000, contentHeightMils));
+                            PrintAttributes.MediaSize media = new PrintAttributes.MediaSize(
+                                "THERMAL_57MM", "57mm roll", widthMils, heightMils);"""
+          if old not in s:
+              raise SystemExit("Cannot find fixed 57mm media height in PdfExportPlugin.java")
+          s = s.replace(old, new, 1)
+          s = s.replace('new PrintAttributes.Resolution("thermal", "Thermal", 203, 203)',
+                        'new PrintAttributes.Resolution("thermal203", "203 dpi", 203, 203)', 1)
+          p.write_text(s)
+
+          p = Path("src/lib/receiptPrint.ts")
+          s = p.read_text()
+          s = s.replace("@page { size: 57mm 200mm; margin: 2mm; }",
+                        "@page { size: 57mm auto; margin: 2mm; }")
+          s = s.replace("font-size:${size}", "font-size:${size}")
+          s = s.replace("line.size === 'large' ? '20px' : '13px'",
+                        "line.size === 'large' ? '22px' : '15px'")
+          s = s.replace("line-height:1.55", "line-height:1.45")
+          p.write_text(s)
+          print("Receipt PDF now uses a content-fitted 57mm thermal page.")
+          PY
+
       - name: Install dependencies
         working-directory: pos-android
         run: npm ci
