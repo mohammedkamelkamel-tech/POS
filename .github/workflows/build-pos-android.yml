@@ -420,6 +420,7 @@ jobs:
                                       call.reject("تعذر تجهيز معاينة الفاتورة: " + error.getMessage());
                                       view.destroy();
                                   }
+                                  }
                               });
                           }
                       });
