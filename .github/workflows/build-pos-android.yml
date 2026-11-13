@@ -180,7 +180,9 @@ jobs:
           p = Path("src/pages/pos/PosPage.vue")
           source = p.read_text()
           start = source.find("async function printReceipt() {")
-          end = source.find("\\nfunction newTransaction()", start)
+          end = source.find("function newTransaction()", start)
+          if end >= 0:
+              end = source.rfind("\\n", start, end) if source.rfind("\\n", start, end) >= 0 else end
           if start < 0 or end < 0:
               raise SystemExit("Cannot locate printReceipt/newTransaction function boundaries")
           new_function = """async function printReceipt() {
