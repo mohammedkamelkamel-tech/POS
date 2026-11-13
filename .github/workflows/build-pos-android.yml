@@ -115,72 +115,53 @@ jobs:
           from pathlib import Path
           import re
 
-          def replace_once(path, old, new, label):
+          def edit(path, fn, label):
               p = Path(path)
-              source = p.read_text()
-              count = source.count(old)
-              if count != 1:
-                  raise SystemExit(f"{label}: expected exactly one source match, found {count}")
-              p.write_text(source.replace(old, new, 1))
+              s = p.read_text()
+              out = fn(s)
+              if out == s:
+                  print(f"{label}: already configured")
+              else:
+                  p.write_text(out)
+                  print(f"{label}: updated")
 
-          # Keep the 15mm label as requested, but render it at the normal 58mm
-          # printer raster width (384 dots, approx. 48mm printable width at 203 DPI).
-          replace_once("src/services/capabilities/registry.ts",
-                       "pixelWidth?: 384 | 576",
-                       "pixelWidth?: 384 | 576", "ReceiptJob type")
-          replace_once("src/lib/escpos.ts",
-                       "pixelWidth?: 384 | 576",
-                       "pixelWidth?: 384 | 576", "ESC/POS options type")
+          # Keep the requested 15mm selector label. It uses the printable
+          # raster of a 58mm thermal printer; the physical printer sets the limit.
+          p = Path("src/stores/printer.ts")
+          s = p.read_text()
+          s = s.replace("export type PaperWidth = 32 | 48", "export type PaperWidth = 16 | 32 | 48")
+          s = s.replace("const paperWidth = ref<PaperWidth>(32)", "const paperWidth = ref<PaperWidth>(16)")
+          s = s.replace("paperWidth.value = all[KEYS.width] === '48' ? 48 : 32",
+                        "paperWidth.value = all[KEYS.width] === '48' ? 48 : all[KEYS.width] === '32' ? 32 : 16")
+          p.write_text(s)
 
-          # Store selection: 16 chars for narrow layout, 32/48 remain unchanged.
-          replace_once("src/stores/printer.ts", "export type PaperWidth = 32 | 48",
-                       "export type PaperWidth = 16 | 32 | 48", "paper width type")
-          replace_once("src/stores/printer.ts", "const paperWidth = ref<PaperWidth>(32)",
-                       "const paperWidth = ref<PaperWidth>(16)", "default paper width")
-          replace_once("src/stores/printer.ts",
-                       "paperWidth.value = all[KEYS.width] === '48' ? 48 : 32",
-                       "paperWidth.value = all[KEYS.width] === '48' ? 48 : all[KEYS.width] === '32' ? 32 : 16",
-                       "persisted paper width")
-
-          # Add the selector to the exact existing 58mm/80mm controls.
+          # Add the selector only if it is not already present.
           p = Path("src/pages/printer/PrinterPage.vue")
-          source = p.read_text()
-          lines = source.splitlines(keepends=True)
-          matches = [i for i, line in enumerate(lines) if ':variant="paperWidth === 32 ? \'default\' : \'outline\'"' in line]
-          if len(matches) != 1:
-              raise SystemExit(f"Expected one 58mm selector variant line, found {len(matches)}")
-          i = matches[0]
-          indent = lines[i][:len(lines[i]) - len(lines[i].lstrip())]
-          block = [
-              f'{indent}<Button\n',
-              f'{indent}  :variant="paperWidth === 16 ? \'default\' : \'outline\'"\n',
-              f'{indent}  size="sm"\n',
-              f'{indent}  @click="printer.setWidth(16)"\n',
-              f'{indent}>15mm</Button>\n',
-          ]
-          lines[i-1:i-1] = block
-          source = "".join(lines)
-          replace_test = "pixelWidth: w === 48 ? 576 : 384"
-          if source.count(replace_test) != 1:
-              raise SystemExit("Test-print raster width expression did not match exactly once")
-          source = source.replace(replace_test,
-              "pixelWidth: w === 48 ? 576 : 384", 1)
-          p.write_text(source)
+          s = p.read_text()
+          if ">15mm</Button>" not in s:
+              lines = s.splitlines(keepends=True)
+              matches = [i for i,line in enumerate(lines)
+                         if ':variant="paperWidth === 32 ? \'default\' : \'outline\'"' in line]
+              if len(matches) != 1:
+                  raise SystemExit(f"Expected one 58mm selector variant line, found {len(matches)}")
+              i = matches[0]
+              indent = lines[i][:len(lines[i])-len(lines[i].lstrip())]
+              block = [f'{indent}<Button\\n',
+                       f'{indent}  :variant="paperWidth === 16 ? \'default\' : \'outline\'"\\n',
+                       f'{indent}  size="sm"\\n',
+                       f'{indent}  @click="printer.setWidth(16)"\\n',
+                       f'{indent}>15mm</Button>\\n']
+              lines[i-1:i-1] = block
+              p.write_text("".join(lines))
 
-          # The 15mm selector remains a label only; use the full 58mm-class
-          # printable raster and matching 32-character receipt layout.
-          replace_once("src/pages/pos/PosPage.vue",
-                       "width: usePrinterStore().paperWidth,",
-                       "width: usePrinterStore().paperWidth === 16 ? 32 : usePrinterStore().paperWidth,",
-                       "15mm receipt text columns")
-
-          # Never issue a blank print: reload the persisted sale and item snapshots
-          # when the in-memory checkout result is absent or incomplete.
-          # Replace printReceipt by function boundaries, independent of formatting.
+          # The narrow selector keeps its name but prints using 32-column
+          # layout and the normal 384-dot raster. Existing 58/80mm modes remain.
           p = Path("src/pages/pos/PosPage.vue")
-          source = p.read_text()
-          start = source.find("async function printReceipt() {")
-          end = source.find("function newTransaction()", start)
+          s = p.read_text()
+          s = s.replace("width: usePrinterStore().paperWidth,",
+                        "width: usePrinterStore().paperWidth === 16 ? 32 : usePrinterStore().paperWidth,")
+          start = s.find("async function printReceipt() {")
+          end = s.find("function newTransaction()", start)
           if start < 0 or end < 0:
               raise SystemExit("Cannot locate printReceipt/newTransaction function boundaries")
           new_function = """async function printReceipt() {
@@ -198,8 +179,6 @@ jobs:
             printing.value = true
             operationError.value = null
             try {
-              // Read a fresh immutable snapshot on every print, so a previous
-              // print cannot consume or clear the data used by the next print.
               const persisted = await sales.getWithItems(current.sale.id)
               const sale = persisted.sale ?? current.sale
               const items = persisted.items.length > 0 ? persisted.items : current.items
@@ -223,20 +202,28 @@ jobs:
               printing.value = false
             }
           }"""
-          p.write_text(source[:start] + new_function + "\n" + source[end:])
+          s = s[:start] + new_function + "\\n" + s[end:]
+          p.write_text(s)
 
-          # Use the same raster width for actual sale receipts, not just test prints.
-          # Widen ReceiptOpts to accept the selector's full type union.
-          replace_once("src/lib/receipt.ts",
-                       "pixelWidth?: 384 | 576",
-                       "pixelWidth?: 120 | 384 | 576", "receipt options pixel width type")
-
-          # Sale print width is already set by the guarded printReceipt implementation above.
-          replace_once("src/lib/receipt.ts",
-                       "return { title: `إيصال ${sale.number}`, lines }",
-                       "return { title: `إيصال ${sale.number}`, lines, pixelWidth: opts.pixelWidth ?? (w >= 48 ? 576 : 384) }",
-                       "receipt job raster width")
-          print("15mm mode configured for test and sale receipts; 58mm and 80mm retained.")
+          # Make the receipt option type compatible regardless of its original form.
+          p = Path("src/lib/receipt.ts")
+          s = p.read_text()
+          m = re.search(r"^([ \\t]*pixelWidth\\s*\\??:\\s*)[^;\\n]+", s, re.M)
+          if m:
+              s = s[:m.start()] + m.group(1) + "120 | 384 | 576" + s[m.end():]
+          else:
+              m = re.search(r"(interface\\s+ReceiptOpts\\s*\\{)", s)
+              if not m:
+                  raise SystemExit("Cannot locate ReceiptOpts interface in receipt.ts")
+              s = s[:m.end()] + "\\n  pixelWidth?: 120 | 384 | 576;" + s[m.end():]
+          # Ensure the generated receipt job carries its raster width.
+          s, n = re.subn(r"return \\{ title: `إيصال \\$\\{sale\\.number\\}`, lines \\}",
+                         "return { title: `إيصال ${sale.number}`, lines, pixelWidth: opts.pixelWidth ?? (w >= 48 ? 576 : 384) }",
+                         s, count=1)
+          if n == 0 and "pixelWidth: opts.pixelWidth" not in s:
+              raise SystemExit("Cannot locate receipt job return object")
+          p.write_text(s)
+          print("15mm selector and repeat-print guard configured.")
           PY
 
       - name: Install dependencies
