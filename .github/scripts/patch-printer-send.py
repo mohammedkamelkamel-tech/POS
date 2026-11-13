@@ -1,17 +1,28 @@
 from pathlib import Path
+
 p = Path("android/app/src/main/java/com/karuhundeveloper/poskacaw/ThermalPrinterPlugin.java")
 s = p.read_text()
-old = """            out.write(bytes);
-            out.flush();
-            // beri jeda supaya buffer benar-benar terkirim sebelum socket ditutup
-            try { Thread.sleep(250); } catch (InterruptedException ignored) {}"""
-new = """            // Kirim bertahap agar buffer kecil pada printer thermal Bluetooth
-            // tidak penuh lalu memutus/mengehentikan cetakan di tengah struk.
-            final int chunkSize = 512;
-            for (int offset = 0; offset < bytes.length; offset += chunkSize) {
-                int length = Math.min(chunkSize, bytes.length - offset);
-                out.write(bytes, offset, length);
+
+# The source archive already sends 1024-byte chunks, but without pacing.
+old_chunked = """            // إرسال دفعات صغيرة يقلل انقطاع بعض طابعات SPP مع الصور الطويلة.
+            int offset = 0;
+            while (offset < bytes.length) {
+                int count = Math.min(1024, bytes.length - offset);
+                out.write(bytes, offset, count);
                 out.flush();
+                offset += count;
+            }
+            // اترك وقتاً للطابعة لتفريغ الذاكرة المؤقتة قبل إغلاق الاتصال.
+            try { Thread.sleep(Math.min(1500, Math.max(400, bytes.length / 300))); }
+            catch (InterruptedException ignored) { Thread.currentThread().interrupt(); }"""
+
+new_chunked = """            // إرسال أبطأ بدفعات صغيرة حتى لا تتوقف الطابعة أثناء الفواتير الطويلة.
+            int offset = 0;
+            while (offset < bytes.length) {
+                int count = Math.min(512, bytes.length - offset);
+                out.write(bytes, offset, count);
+                out.flush();
+                offset += count;
                 try {
                     Thread.sleep(12);
                 } catch (InterruptedException interrupted) {
@@ -19,11 +30,16 @@ new = """            // Kirim bertahap agar buffer kecil pada printer thermal Bl
                     throw new java.io.IOException("تم إيقاف إرسال بيانات الطباعة.", interrupted);
                 }
             }
-            // انتظر تصريف آخر جزء من بيانات الطباعة قبل إغلاق اتصال البلوتوث.
-            try { Thread.sleep(700); } catch (InterruptedException ignored) {
-                Thread.currentThread().interrupt();
-            }"""
-if old not in s:
-    raise SystemExit("Could not locate Bluetooth bulk-write block; no source changed.")
-p.write_text(s.replace(old, new, 1))
-print("Bluetooth receipt transfer now sends 512-byte chunks with pacing and a longer final drain.")
+            // انتظر انتهاء الطابعة من استقبال آخر دفعة قبل إغلاق الاتصال.
+            try { Thread.sleep(Math.min(2500, Math.max(900, bytes.length / 180))); }
+            catch (InterruptedException ignored) { Thread.currentThread().interrupt(); }"""
+
+if old_chunked in s:
+    s = s.replace(old_chunked, new_chunked, 1)
+elif "Thread.sleep(12);" in s and "Math.min(512," in s:
+    print("Bluetooth pacing patch already present; no change needed.")
+else:
+    raise SystemExit("Could not locate supported Bluetooth send loop; no source changed.")
+
+p.write_text(s)
+print("Bluetooth transfer patched: 512-byte chunks, 12ms pacing, and longer drain before socket close.")
