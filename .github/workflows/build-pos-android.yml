@@ -235,14 +235,14 @@ jobs:
         working-directory: pos-android
         run: python3 ../.github/scripts/patch-instant-print.py
 
-      - name: Add Android 57mm receipt print dialog
+      - name: Add Android 60mm receipt print dialog
         working-directory: pos-android
         run: |
           python3 - <<'PY'
           from pathlib import Path
 
           # Dedicated Android PrintManager path: same system print preview
-          # used by the working companion app, with a 57mm custom paper size.
+          # used by the working companion app, with a 60mm custom paper size.
           helper = """import { registerPlugin } from '@capacitor/core'
           import type { ReceiptJob } from '@/services/capabilities/registry'
 
@@ -262,14 +262,14 @@ jobs:
               return `<div class="line" style="text-align:${align};font-size:${size};font-weight:${line.bold ? 700 : 400}">${escapeHtml(line.text)}</div>`
             }).join('')
             const html = `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>
-              @page { size: 57mm 200mm; margin: 2mm; }
+              @page { size: 60mm 200mm; margin: 2mm; }
               * { box-sizing: border-box; }
               html,body { width:100%; margin:0; padding:0; direction:rtl; unicode-bidi:plaintext; }
               body { font-family: "Noto Naskh Arabic","Noto Sans Arabic",Tahoma,Arial,sans-serif; color:#000; background:#fff; }
               .line { width:100%; white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.55; padding:1px 0; }
               @media screen { body { width:53mm; margin:0 auto; } }
             </style></head><body>${rows}</body></html>`
-            await NativeReceiptPrint.printReceipt({ html, filename: job.title || 'إيصال الكاشير', paperWidthMm: 57 })
+            await NativeReceiptPrint.printReceipt({ html, filename: job.title || 'إيصال الكاشير', paperWidthMm: 60 })
           }
           """
           Path("src/lib/receiptPrint.ts").write_text(helper)
@@ -282,7 +282,7 @@ jobs:
               public void printReceipt(PluginCall call) {
                   String html = call.getString("html");
                   String filename = call.getString("filename", "إيصال الكاشير");
-                  int widthMm = call.getInt("paperWidthMm", 57);
+                  int widthMm = call.getInt("paperWidthMm", 60);
                   if (html == null || html.trim().isEmpty()) {
                       call.reject("لا توجد بيانات لطباعة الإيصال.");
                       return;
@@ -299,7 +299,7 @@ jobs:
                                       String jobName = filename.replaceAll("[\\\\\\\\/:*?\\"<>|]", "_");
                                       int widthMils = Math.round(widthMm * 1000f / 25.4f);
                                       PrintAttributes.MediaSize media = new PrintAttributes.MediaSize(
-                                          "THERMAL_57MM", "57mm", widthMils, 12000);
+                                          "THERMAL_60MM", "60mm", widthMils, 12000);
                                       PrintAttributes attributes = new PrintAttributes.Builder()
                                           .setMediaSize(media)
                                           .setResolution(new PrintAttributes.Resolution("thermal", "Thermal", 203, 203))
@@ -343,7 +343,7 @@ jobs:
                             "import { buildReceipt } from '@/lib/receipt'\nimport { printReceiptViaAndroid } from '@/lib/receiptPrint'")
           s = s.replace("await printer.print(", "await printReceiptViaAndroid(")
           p.write_text(s)
-          print("Android 57mm receipt print dialog integrated.")
+          print("Android 60mm receipt print dialog integrated.")
           PY
 
       - name: Fix blank thermal receipt PDF rendering
@@ -380,7 +380,7 @@ jobs:
               public void printReceipt(PluginCall call) {
                   final String html = call.getString("html");
                   final String filename = call.getString("filename", "إيصال الكاشير");
-                  final int widthMm = Math.max(32, Math.min(80, call.getInt("paperWidthMm", 57)));
+                  final int widthMm = Math.max(32, Math.min(80, call.getInt("paperWidthMm", 60)));
                   if (html == null || html.trim().isEmpty()) {
                       call.reject("لا توجد بيانات لإنشاء إيصال PDF.");
                       return;
