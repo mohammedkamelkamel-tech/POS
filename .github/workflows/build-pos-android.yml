@@ -408,7 +408,7 @@ jobs:
                                       call.reject("تعذر إنشاء مجلد إيصال PDF.");
                                       return;
                                   }
-                                  String safeName = filename.replaceAll("[\\\\/:*?\\"<>|]", "_");
+                                  String safeName = "receipt-" + System.currentTimeMillis();
                                   File pdf = new File(dir, safeName + "-" + System.currentTimeMillis() + ".pdf");
                                   try (FileOutputStream output = new FileOutputStream(pdf)) {
                                       document.writeTo(output);
