@@ -156,22 +156,21 @@ jobs:
           # Add the selector to the exact existing 58mm/80mm controls.
           p = Path("src/pages/printer/PrinterPage.vue")
           source = p.read_text()
-          pattern = re.compile(r'(?m)^(\s*)<Button\s*\n\s*:variant="paperWidth === 32 \? \'default\' : \'outline\'"\s*\n\s*size="sm"\s*\n\s*@click="printer\.setWidth\(32\)"\s*\n\s*>58mm</Button>')
-          match = pattern.search(source)
-          if not match:
-              raise SystemExit("Could not locate the 58mm selector in PrinterPage.vue")
-          indent = match.group(1)
-          new = f'''{indent}<Button
-{indent}  :variant="paperWidth === 16 ? 'default' : 'outline'"
-{indent}  size="sm"
-{indent}  @click="printer.setWidth(16)"
-{indent}>15mm</Button>
-{indent}<Button
-{indent}  :variant="paperWidth === 32 ? 'default' : 'outline'"
-{indent}  size="sm"
-{indent}  @click="printer.setWidth(32)"
-{indent}>58mm</Button>'''
-          source = source[:match.start()] + new + source[match.end():]
+          lines = source.splitlines(keepends=True)
+          matches = [i for i, line in enumerate(lines) if ">58mm</Button>" in line]
+          if len(matches) != 1:
+              raise SystemExit(f"Expected one 58mm selector closing line, found {len(matches)}")
+          i = matches[0]
+          indent = lines[i][:len(lines[i]) - len(lines[i].lstrip())]
+          block = [
+              f'{indent}<Button\\n',
+              f'{indent}  :variant="paperWidth === 16 ? \'default\' : \'outline\'"\\n',
+              f'{indent}  size="sm"\\n',
+              f'{indent}  @click="printer.setWidth(16)"\\n',
+              f'{indent}>15mm</Button>\\n',
+          ]
+          lines[i:i] = block
+          source = "".join(lines)
           replace_test = "pixelWidth: w === 48 ? 576 : 384"
           if source.count(replace_test) != 1:
               raise SystemExit("Test-print raster width expression did not match exactly once")
