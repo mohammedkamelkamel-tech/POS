@@ -223,7 +223,7 @@ jobs:
               printing.value = false
             }
           }"""
-          p.write_text(source[:start] + new_function + "\\n" + source[end:])
+          p.write_text(source[:start] + new_function + "\n" + source[end:])
 
           # Use the same raster width for actual sale receipts, not just test prints.
           # Sale print width is already set by the guarded printReceipt implementation above.
