@@ -398,7 +398,7 @@ jobs:
                               submitted = true;
                               view.postVisualStateCallback(1L, requestId -> {
                                   try {
-                                      String jobName = filename.replaceAll("[\\\\/:*?\\"<>|]", "_");
+                                      String jobName = "إيصال الكاشير";
                                       int widthMils = Math.round(widthMm * 1000f / 25.4f);
                                       PrintAttributes attributes = new PrintAttributes.Builder()
                                           .setMediaSize(new PrintAttributes.MediaSize(
