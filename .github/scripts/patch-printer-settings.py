@@ -90,7 +90,8 @@ async function printPreview() {
 if needle not in s: raise SystemExit("PrinterPage logic insertion point missing")
 s=s.replace(needle,insert+needle)
 s=s.replace('<div class="grid grid-cols-2 gap-2 border-b border-border bg-card p-3">', '<div class="grid grid-cols-3 gap-2 border-b border-border bg-card p-3">')
-s=s.replace('      <Button :variant="activeTab === \\'instant\\' ? \\'default\\' : \\'outline\\'" @click="activeTab = \\'instant\\'; sales.load()">الطباعة الفورية</Button>', '      <Button :variant="activeTab === \\'preview\\' ? \\'default\\' : \\'outline\\'" @click="activeTab = \\'preview\\'">المعاينة والتعديل</Button>\n      <Button :variant="activeTab === \\'instant\\' ? \\'default\\' : \\'outline\\'" @click="activeTab = \\'instant\\'; sales.load()">الطباعة الفورية</Button>')
+s=s.replace("""      <Button :variant="activeTab === 'instant' ? 'default' : 'outline'" @click="activeTab = 'instant'; sales.load()">الطباعة الفورية</Button>""", """      <Button :variant="activeTab === 'preview' ? 'default' : 'outline'" @click="activeTab = 'preview'">المعاينة والتعديل</Button>
+      <Button :variant="activeTab === 'instant' ? 'default' : 'outline'" @click="activeTab = 'instant'; sales.load()">الطباعة الفورية</Button>""")
 manual="""      <Card>
         <CardContent class="space-y-3 p-4">
           <p class="text-sm font-semibold">ضبط مقاس الورق والطباعة يدوياً</p>
