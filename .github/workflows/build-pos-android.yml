@@ -398,7 +398,7 @@ jobs:
                                   PdfDocument.PageInfo info = new PdfDocument.PageInfo.Builder(
                                       pageWidthPt, pageHeightPt, 1).create();
                                   PdfDocument.Page page = document.startPage(info);
-                                  page.getCanvas().scale(72f / 96f);
+                                  page.getCanvas().scale(72f / 96f, 72f / 96f);
                                   view.draw(page.getCanvas());
                                   document.finishPage(page);
 
