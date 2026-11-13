@@ -353,11 +353,16 @@ jobs:
           from pathlib import Path
           p = Path("android/app/src/main/java/com/karuhundeveloper/poskacaw/PdfExportPlugin.java")
           s = p.read_text()
-          start = s.find("    @PluginMethod\\n    public void printReceipt(PluginCall call) {")
+          marker = "public void printReceipt(PluginCall call)"
+          pos = s.find(marker)
+          if pos < 0:
+              raise SystemExit("Cannot find printReceipt method signature")
+          start = s.rfind("@PluginMethod", 0, pos)
           if start < 0:
-              raise SystemExit("Cannot find printReceipt plugin method")
+              raise SystemExit("Cannot find printReceipt annotation")
+          line_start = s.rfind("\\n", 0, start) + 1
           end = s.rfind("\\n}")
-          if end < start:
+          if end < pos:
               raise SystemExit("Cannot find PdfExportPlugin class closing brace")
           method = r'''    @PluginMethod
               public void printReceipt(PluginCall call) {
@@ -369,54 +374,48 @@ jobs:
                       return;
                   }
                   getActivity().runOnUiThread(() -> {
-                      try {
-                          final WebView webView = new WebView(getContext());
-                          webView.getSettings().setJavaScriptEnabled(false);
-                          webView.getSettings().setUseWideViewPort(false);
-                          webView.setInitialScale(100);
-                          webView.setBackgroundColor(android.graphics.Color.WHITE);
-                          webView.setWebViewClient(new WebViewClient() {
-                              private boolean submitted = false;
-                              @Override
-                              public void onPageFinished(WebView view, String url) {
-                                  if (submitted) return;
-                                  submitted = true;
-                                  view.postVisualStateCallback(1L, requestId -> {
-                                      try {
-                                          String jobName = filename.replaceAll("[\\\\/:*?\\"<>|]", "_");
-                                          int widthMils = Math.round(widthMm * 1000f / 25.4f);
-                                          int heightMils = Math.round(300f * 1000f / 25.4f);
-                                          PrintAttributes attributes = new PrintAttributes.Builder()
-                                              .setMediaSize(new PrintAttributes.MediaSize(
-                                                  "POS_" + widthMm + "MM", widthMm + "mm", widthMils, heightMils))
-                                              .setResolution(new PrintAttributes.Resolution("pos_thermal", "Thermal", 203, 203))
-                                              .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
-                                              .build();
-                                          PrintManager manager = (PrintManager) getContext().getSystemService(Context.PRINT_SERVICE);
-                                          if (manager == null) {
-                                              call.reject("خدمة الطباعة غير متاحة على هذا الجهاز.");
-                                              view.destroy();
-                                              return;
-                                          }
-                                          manager.print(jobName, view.createPrintDocumentAdapter(jobName), attributes);
-                                          call.resolve();
-                                      } catch (Exception error) {
-                                          call.reject("تعذر تجهيز معاينة الفاتورة: " + error.getMessage());
+                      final WebView webView = new WebView(getContext());
+                      webView.getSettings().setJavaScriptEnabled(false);
+                      webView.getSettings().setUseWideViewPort(false);
+                      webView.setBackgroundColor(android.graphics.Color.WHITE);
+                      webView.setWebViewClient(new WebViewClient() {
+                          private boolean submitted = false;
+                          @Override
+                          public void onPageFinished(WebView view, String url) {
+                              if (submitted) return;
+                              submitted = true;
+                              view.postVisualStateCallback(1L, requestId -> {
+                                  try {
+                                      String jobName = filename.replaceAll("[\\\\/:*?\\"<>|]", "_");
+                                      int widthMils = Math.round(widthMm * 1000f / 25.4f);
+                                      PrintAttributes attributes = new PrintAttributes.Builder()
+                                          .setMediaSize(new PrintAttributes.MediaSize(
+                                              "POS_" + widthMm + "MM", widthMm + "mm", widthMils, 30000))
+                                          .setResolution(new PrintAttributes.Resolution("pos_thermal", "Thermal", 203, 203))
+                                          .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
+                                          .build();
+                                      PrintManager manager = (PrintManager) getContext().getSystemService(Context.PRINT_SERVICE);
+                                      if (manager == null) {
+                                          call.reject("خدمة الطباعة غير متاحة على هذا الجهاز.");
                                           view.destroy();
+                                          return;
                                       }
-                                  });
-                              }
-                          });
-                          webView.loadDataWithBaseURL("https://localhost/", html, "text/html", "UTF-8", null);
-                      } catch (Exception error) {
-                          call.reject("تعذر إنشاء معاينة الفاتورة: " + error.getMessage());
-                      }
+                                      manager.print(jobName, view.createPrintDocumentAdapter(jobName), attributes);
+                                      call.resolve();
+                                  } catch (Exception error) {
+                                      call.reject("تعذر تجهيز معاينة الفاتورة: " + error.getMessage());
+                                      view.destroy();
+                                  }
+                              });
+                          }
+                      });
+                      webView.loadDataWithBaseURL("https://localhost/", html, "text/html", "UTF-8", null);
                   });
               }
           '''
-          s = s[:start] + method + s[end:]
+          s = s[:line_start] + method + s[end:]
           p.write_text(s)
-          print("Thermal receipt now uses Android WebView PrintDocumentAdapter; removed manual blank-page PdfDocument drawing.")
+          print("Thermal receipt uses WebView PrintDocumentAdapter after visual-state completion.")
           PY
 
       - name: Install dependencies
