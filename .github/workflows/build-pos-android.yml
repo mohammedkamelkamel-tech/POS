@@ -440,7 +440,7 @@ jobs:
           # All screens and calculations that use the shared money formatter now show YER.
           p = Path("src/lib/money.ts")
           s = p.read_text()
-          s = re.sub(r"const idr = new Intl\\.NumberFormat\\([\\s\\S]*?\\n\\)\\n", """const idr = new Intl.NumberFormat('en-US', {
+          s = re.sub(r"const idr = new Intl\.NumberFormat\([\s\S]*?\n\)\n", """const idr = new Intl.NumberFormat('en-US', {
             minimumFractionDigits: 0,
             maximumFractionDigits: 0,
           })
