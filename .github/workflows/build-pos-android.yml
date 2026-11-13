@@ -226,6 +226,11 @@ jobs:
           p.write_text(source[:start] + new_function + "\n" + source[end:])
 
           # Use the same raster width for actual sale receipts, not just test prints.
+          # Widen ReceiptOpts to accept the selector's full type union.
+          replace_once("src/lib/receipt.ts",
+                       "pixelWidth?: 384 | 576",
+                       "pixelWidth?: 120 | 384 | 576", "receipt options pixel width type")
+
           # Sale print width is already set by the guarded printReceipt implementation above.
           replace_once("src/lib/receipt.ts",
                        "return { title: `إيصال ${sale.number}`, lines }",
