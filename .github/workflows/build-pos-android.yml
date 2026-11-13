@@ -432,6 +432,10 @@ jobs:
           print("Receipt method replaced by Android WebView print adapter after visual-state callback.")
           PY
 
+      - name: Enable manual printer settings and editable receipt preview
+        working-directory: pos-android
+        run: python3 ../.github/scripts/patch-printer-settings.py
+
       - name: Install dependencies
         working-directory: pos-android
         run: npm ci
